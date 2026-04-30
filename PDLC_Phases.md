@@ -6,6 +6,35 @@ A seven-phase framework for taking a product from problem identification through
 Discover  →  Define  →  Design  →  Build  →  Validate  →  Deploy  →  Learn  ↺
 ```
 
+## At a glance
+
+```mermaid
+flowchart LR
+    P1["1 · Discover<br/><i>Is the problem worth solving?</i>"]
+    P2["2 · Define<br/><i>What to build & how to know it worked.</i>"]
+    P3["3 · Design<br/><i>How it looks, flows, is built.</i>"]
+    P4["4 · Build<br/><i>Produce a working release candidate.</i>"]
+    P5["5 · Validate<br/><i>Confirm it's safe, correct, useful.</i>"]
+    P6["6 · Deploy<br/><i>Get to prod, get to users.</i>"]
+    P7["7 · Learn<br/><i>Did it work? What next?</i>"]
+    P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
+    P7 -. iterate .-> P1
+    classDef phase fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
+    class P1,P2,P3,P4,P5,P6,P7 phase;
+```
+
+| # | Phase | Goal | Library coverage |
+|---|---|---|---|
+| 1 | Discover | Decide if a problem is worth solving | *(human-led — no skills today)* |
+| 2 | Define | Decide what to build and how you'll know it worked | `/prd` · `/plan` · `/glossary` · `/grill-me` · `/refactor` |
+| 3 | Design | Decide how it looks, flows, and is built | `/prototype` |
+| 4 | Build | Produce a working release candidate | `/setup-project` · `/code-map` · `/setup-database` · `/add-auth` · `/add-payment` · `/add-files` · `/add-monitoring` · `/build-feature` · `/migrate-from-vibe` |
+| 5 | Validate | Confirm the RC is safe, correct, and useful | `/triage` · `/check-production` |
+| 6 | Deploy | Get code to prod and the feature to users | `/deploy` |
+| 7 | Learn | Find out if it worked and decide what's next | *(human-led — no skills today)* |
+
+For a one-page big-picture map of how skills, agents, and workflows fit each phase, see [MAP.md](MAP.md).
+
 ---
 
 ## 1. Discover

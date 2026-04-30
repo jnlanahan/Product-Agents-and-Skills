@@ -1,206 +1,205 @@
-# The Big Picture — Workflows × Skills × Agents
+# The Big Picture — Everything, Through the PDLC
 
-One page. Three layers (workflows → skills → agents). Visual maps and cross-reference tables for every connection in this library.
+Every artifact in this library — agent, skill, workflow — earns its place by serving a phase of the **Product Development Lifecycle**.
 
-If you only read one file in this repo, this is the one. Everything else is a deeper view of a slice shown here.
+```text
+1 Discover  →  2 Define  →  3 Design  →  4 Build  →  5 Validate  →  6 Deploy  →  7 Learn  ↺
+```
 
-- **Layer 1 — Workflows** (8) — named end-to-end paths through the PDLC. *What you're trying to do.*
-- **Layer 2 — Skills** (19) — slash-command workflows the user invokes. *What gets run.*
-- **Layer 3 — Agents** (6) — read-only diagnostic helpers skills delegate to. *How context is gathered.*
+If you only read one file, this is it. The pieces are:
 
-Source-of-truth indexes: [AGENTS.md](AGENTS.md) · [WORKFLOWS.md](WORKFLOWS.md) · [GAPS.md](GAPS.md) · [PDLC_Phases.md](PDLC_Phases.md)
+- **PDLC** (7 phases) — the spine. Everything else is positioned against it.
+- **Skills** (19) — slash-commands the user runs *inside* a phase.
+- **Agents** (6) — read-only diagnostics that skills delegate to *during* their phase.
+- **Workflows** (8) — opinionated paths *through* the phases at different rigor levels.
+
+Source-of-truth docs: [PDLC_Phases.md](PDLC_Phases.md) · [AGENTS.md](AGENTS.md) · [WORKFLOWS.md](WORKFLOWS.md) · [GAPS.md](GAPS.md)
 
 ---
 
 ## Table of contents
 
-- [The three-layer map](#the-three-layer-map)
-- [PDLC × Skills × Agents](#pdlc--skills--agents)
-- [Skill → Agent cross-reference](#skill--agent-cross-reference)
+- [The PDLC at a glance](#the-pdlc-at-a-glance)
+- [Phase by phase — what runs, what comes out](#phase-by-phase--what-runs-what-comes-out)
+- [Workflows are PDLC traversals](#workflows-are-pdlc-traversals)
 - [Workflow → Skill heatmap](#workflow--skill-heatmap)
-- [Workflow → Agent heatmap](#workflow--agent-heatmap)
-- [Skills, sorted by what they produce](#skills-sorted-by-what-they-produce)
-- [Agents, sorted by structured output](#agents-sorted-by-structured-output)
-- [Reading guide — pick your starting point](#reading-guide--pick-your-starting-point)
+- [Skill → Agent matrix](#skill--agent-matrix)
+- [Reading guide](#reading-guide)
 
 ---
 
-## The three-layer map
+## The PDLC at a glance
 
-How a user request flows from a workflow choice → the skills it triggers → the agents those skills delegate to.
+The 7 phases, one-line goal per phase, and which skills + agents live there. Every workflow walks this same path; they differ only in rigor and emphasis.
 
 ```mermaid
-flowchart TB
-    subgraph L1["Layer 1 · Workflows (intent)"]
-        direction LR
-        W1["W1 · Prototype"]
-        W2["W2 · Production SaaS"]
-        W3["W3 · Add Feature"]
-        W4["W4 · Migrate to Prod"]
-        W5["W5 · Refactor"]
-        W6["W6 · Bug Hotfix"]
-        W7["W7 · Audit & Harden"]
-        W8["W8 · Personal Tool"]
-    end
+flowchart LR
+    P1["1 · Discover<br/><i>Is the problem worth solving?</i><br/><br/>skills: —<br/>agents: —"]
+    P2["2 · Define<br/><i>What to build, how to know it worked.</i><br/><br/>skills: /prd /plan /glossary<br/>/grill-me /refactor<br/>agents: —"]
+    P3["3 · Design<br/><i>How it looks, flows, is built.</i><br/><br/>skills: /prototype<br/>agents: —"]
+    P4["4 · Build<br/><i>Produce a working release candidate.</i><br/><br/>skills: /setup-project /code-map<br/>/setup-database /add-auth<br/>/add-payment /add-files<br/>/add-monitoring /build-feature<br/>/migrate-from-vibe<br/>agents: stack-detector<br/>pattern-finder<br/>codebase-classifier"]
+    P5["5 · Validate<br/><i>Confirm it's safe, correct, useful.</i><br/><br/>skills: /triage<br/>/check-production<br/>agents: secret-scanner<br/>dependency-currency-checker<br/>prod-readiness-auditor"]
+    P6["6 · Deploy<br/><i>Get to prod, get to users.</i><br/><br/>skills: /deploy<br/>agents: secret-scanner<br/>prod-readiness-auditor"]
+    P7["7 · Learn<br/><i>Did it work? What next?</i><br/><br/>skills: —<br/>agents: —"]
 
-    subgraph L2["Layer 2 · Skills (slash-commands)"]
-        direction TB
-        subgraph S0["Stage 0 — Setup"]
-            NS["/next-steps"]
-            SP["/setup-project"]
-        end
-        subgraph S2["Stage 2 — Define"]
-            PRD["/prd"]
-            PLN["/plan"]
-            RFC["/refactor"]
-            GLS["/glossary"]
-            GRL["/grill-me"]
-        end
-        subgraph S3["Stage 3 — Design"]
-            PRT["/prototype"]
-        end
-        subgraph S4["Stage 4 — Build"]
-            CM["/code-map"]
-            DB["/setup-database"]
-            AUTH["/add-auth"]
-            PAY["/add-payment"]
-            FS["/add-files"]
-            MON["/add-monitoring"]
-            BF["/build-feature"]
-            MFV["/migrate-from-vibe"]
-        end
-        subgraph S5["Stage 5 — Validate"]
-            TRG["/triage"]
-            CHK["/check-production"]
-        end
-        subgraph S6["Stage 6 — Deploy"]
-            DEP["/deploy"]
-        end
-    end
+    P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
+    P7 -. iterate .-> P1
 
-    subgraph L3["Layer 3 · Agents (read-only diagnostics)"]
-        direction LR
-        SD["stack-detector"]
-        CC["codebase-classifier"]
-        PF["pattern-finder"]
-        SS["secret-scanner"]
-        DCC["dependency-currency-checker"]
-        PRA["prod-readiness-auditor"]
-    end
+    NS(["/next-steps<br/><i>cross-phase compass</i>"]):::cross
+    NS -.-> P2 & P4 & P5
 
-    W1 --> PRT
-    W2 --> SP & PRD & PLN & GLS & GRL & PRT & DB & AUTH & PAY & FS & MON & BF & CHK & DEP
-    W3 --> NS & PRD & PLN & CM & BF & TRG & CHK & DEP
-    W4 --> NS & PLN & CM & MFV & DB & MON & TRG & CHK & DEP
-    W5 --> NS & PLN & RFC & GRL & CM & BF & TRG & CHK & DEP
-    W6 --> TRG & BF & CHK & DEP
-    W7 --> NS & MON & BF & TRG & CHK & DEP
-    W8 --> SP & BF & DEP
-
-    NS --> SD & CC & DCC
-    SP --> SD
-    DB --> SD & PF
-    AUTH --> SD & PF
-    PAY --> SD & PF
-    FS --> SD & PF
-    BF --> SD & PF
-    MFV --> SD & CC & PF
-    CHK --> SD & CC & SS & DCC & PRA
-    DEP --> SS & PRA
-
-    classDef workflow fill:#fff4e6,stroke:#d97706,color:#7c2d12;
-    classDef skill fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
-    classDef agent fill:#ecfdf5,stroke:#059669,color:#064e3b;
-    class W1,W2,W3,W4,W5,W6,W7,W8 workflow;
-    class NS,SP,PRD,PLN,RFC,GLS,GRL,PRT,CM,DB,AUTH,PAY,FS,MON,BF,MFV,TRG,CHK,DEP skill;
-    class SD,CC,PF,SS,DCC,PRA agent;
+    classDef phase fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
+    classDef cross fill:#fff4e6,stroke:#d97706,color:#7c2d12,stroke-dasharray: 3 3;
+    class P1,P2,P3,P4,P5,P6,P7 phase;
 ```
 
-> Mermaid renders inline on GitHub. To experiment locally, paste into [mermaid.live](https://mermaid.live).
+Phases 1 (Discover) and 7 (Learn) intentionally have no skills today — they're human-led. See [GAPS.md](GAPS.md). `/next-steps` is the always-on compass that orients you wherever you are in the lifecycle.
 
 ---
 
-## PDLC × Skills × Agents
+## Phase by phase — what runs, what comes out
 
-Each skill's lifecycle stage and the agents it delegates to. Stages map to [PDLC_Phases.md](PDLC_Phases.md).
+A two-line description per phase, the skills available, the agents they pull in, and the artifact you should leave with.
 
-| Stage | Skill | Slash-command | Agents called |
-|---|---|---|---|
-| 0 — Setup | `0-Always-Next-Steps` | `/next-steps` | `stack-detector` · `codebase-classifier` · `dependency-currency-checker` |
-| 0 — Setup | `0-Setup-Project` | `/setup-project` | `stack-detector` |
-| 2 — Define | `2-Define-PRD` | `/prd` | — |
-| 2 — Define | `2-Define-Plan` | `/plan` | — |
-| 2 — Define | `2-Define-Refactor` | `/refactor` | — |
-| 2 — Define | `2-Define-Glossary` | `/glossary` | — |
-| 2 — Define | `2-Define-Grill-Me` | `/grill-me` | — |
-| 3 — Design | `3-Design-Prototype` | `/prototype` | — |
-| 4 — Build | `4-Build-Code-Map` | `/code-map` | — |
-| 4 — Build | `4-Build-Database` | `/setup-database` | `stack-detector` · `pattern-finder` |
-| 4 — Build | `4-Build-Auth` | `/add-auth` | `stack-detector` · `pattern-finder` |
-| 4 — Build | `4-Build-Payments` | `/add-payment` | `stack-detector` · `pattern-finder` |
-| 4 — Build | `4-Build-File-Storage` | `/add-files` | `stack-detector` · `pattern-finder` |
-| 4 — Build | `4-Build-Monitoring` | `/add-monitoring` | — |
-| 4 — Build | `4-Build-Feature` | `/build-feature` | `stack-detector` · `pattern-finder` |
-| 4 — Build | `4-Build-Migrate-From-Vibe` | `/migrate-from-vibe` | `stack-detector` · `codebase-classifier` · `pattern-finder` |
-| 5 — Validate | `5-Validate-Triage` | `/triage` | `stack-detector` (ad-hoc) · `pattern-finder` (ad-hoc) |
-| 5 — Validate | `5-Validate-Production-Readiness` | `/check-production` | **all six** — `stack-detector` · `codebase-classifier` · `secret-scanner` · `dependency-currency-checker` · `prod-readiness-auditor` |
-| 6 — Deploy | `6-Deploy` | `/deploy` | `secret-scanner` (gate) · `prod-readiness-auditor` (if not already run) |
+### 1 · Discover — *is this worth solving?*
 
-Note: PDLC Stage 1 (Discover) and Stage 7 (Learn) currently have **no skills** — see [GAPS.md](GAPS.md).
+Decide whether a real problem exists, who hurts, how big, and whether you have or can get the data to validate it. Outside the code; outside the library today.
+
+| Item | Detail |
+|---|---|
+| Skills | *(none — human-led)* |
+| Agents | *(none)* |
+| Output | Opportunity brief, validated problem statement, rough sizing, data-availability note |
+| Gap | A `/discover` skill could synthesize interview notes — see [GAPS.md](GAPS.md#discover-phase) |
+
+### 2 · Define — *what to build & how to know it worked*
+
+Synthesize the problem into a writeable scope: PRD, success metrics, plan, vocabulary. Pressure-test the plan before you spend a sprint on it.
+
+| Item | Detail |
+|---|---|
+| Skills | `/prd` · `/plan` · `/glossary` · `/grill-me` · `/refactor` (when refactoring is the work) |
+| Agents | *(none — these skills work in conversation + the codebase)* |
+| Output | `.claude/prd.md` · `.claude/plan.md` · `.claude/glossary.md` · `.claude/refactor-plan.md` |
+
+### 3 · Design — *how it looks and flows*
+
+Make the design decisions explicit. For UI work, the prototype is the design.
+
+| Item | Detail |
+|---|---|
+| Skills | `/prototype` (three clickable HTML variants — pick one) |
+| Agents | *(none)* |
+| Output | `prototypes/variant-A.html` · `variant-B.html` · `variant-C.html` |
+
+### 4 · Build — *produce a release candidate*
+
+Where most of the library lives. Scaffold, wire third-party services, ship features in TDD layers. Every implementer skill calls `stack-detector` and `pattern-finder` so new code matches local style.
+
+| Item | Detail |
+|---|---|
+| Skills | `/setup-project` · `/code-map` · `/setup-database` · `/add-auth` · `/add-payment` · `/add-files` · `/add-monitoring` · `/build-feature` · `/migrate-from-vibe` |
+| Agents | `stack-detector` · `pattern-finder` · `codebase-classifier` (for `/migrate-from-vibe`) |
+| Output | Working code in coherent waves, one commit per layer, tests at each layer |
+
+### 5 · Validate — *safe, correct, useful*
+
+Catch what shouldn't ship. `/check-production` orchestrates all five validating agents in parallel; `/triage` turns findings (or user reports) into structured bug reports.
+
+| Item | Detail |
+|---|---|
+| Skills | `/triage` · `/check-production` |
+| Agents | `secret-scanner` · `dependency-currency-checker` · `prod-readiness-auditor` (+ `stack-detector` and `codebase-classifier` for context) |
+| Output | Severity-graded readiness report (Critical/High/Medium/Low) · `.claude/bugs/<name>.md` |
+
+### 6 · Deploy — *get to prod, get to users*
+
+Two distinct steps: code in production, feature available to users. Plus the operational scaffolding (env, domain, SSL, runbook).
+
+| Item | Detail |
+|---|---|
+| Skills | `/deploy` |
+| Agents | `secret-scanner` (pre-flight gate) · `prod-readiness-auditor` (if not already run) |
+| Output | Deployed app, env vars, custom domain + SSL, post-deploy smoke tests, runbook |
+
+### 7 · Learn — *did it work?*
+
+Compare against Define's success metrics. Decide: double down, iterate, sunset. Feed insights back into Discover.
+
+| Item | Detail |
+|---|---|
+| Skills | *(none — human-led)* |
+| Agents | *(none)* |
+| Output | Launch review, decision, backlog updates |
+| Gap | A `/post-launch-review` skill is on the wishlist — see [GAPS.md](GAPS.md#learn-phase) |
 
 ---
 
-## Skill → Agent cross-reference
+## Workflows are PDLC traversals
 
-Inverse view: which skills each agent serves. **●** = primary caller. **○** = ad-hoc / conditional.
+The eight workflows are not eight different lifecycles. **They all walk the same seven phases.** They differ in *which phases they spend time in* and *how heavyweight* the work is at each step.
 
-| Skill ↓ \ Agent → | `stack-detector` | `codebase-classifier` | `pattern-finder` | `secret-scanner` | `dependency-currency-checker` | `prod-readiness-auditor` |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|
-| `/next-steps` | ● | ● | | | ● | |
-| `/setup-project` | ● | | | | | |
-| `/prd` | | | | | | |
-| `/plan` | | | | | | |
-| `/refactor` | | | | | | |
-| `/glossary` | | | | | | |
-| `/grill-me` | | | | | | |
-| `/prototype` | | | | | | |
-| `/code-map` | | | | | | |
-| `/setup-database` | ● | | ● | | | |
-| `/add-auth` | ● | | ● | | | |
-| `/add-payment` | ● | | ● | | | |
-| `/add-files` | ● | | ● | | | |
-| `/add-monitoring` | | | | | | |
-| `/build-feature` | ● | | ● | | | |
-| `/migrate-from-vibe` | ● | ● | ● | | | |
-| `/triage` | ○ | | ○ | ○ | | |
-| `/check-production` | ● | ● | | ● | ● | ● |
-| `/deploy` | | | | ● | | ● |
+```mermaid
+flowchart LR
+    subgraph PDLC["The PDLC — every workflow walks this"]
+        direction LR
+        D1["1 Discover"] --> D2["2 Define"] --> D3["3 Design"] --> D4["4 Build"] --> D5["5 Validate"] --> D6["6 Deploy"] --> D7["7 Learn"]
+    end
 
-**Hot agents** — invoked across the most skills:
-- `stack-detector` — 9 skills (entry-point read for almost everything)
-- `pattern-finder` — 7 skills (every `/add-*` and `/build-feature`)
-- `prod-readiness-auditor` — 2 skills (`/check-production`, `/deploy`) but heavyweight
+    W1["W1 · Prototype<br/><i>fast pass — same phases, lighter rigor</i>"]
+    W2["W2 · Production SaaS<br/><i>full rigor end-to-end</i>"]
+    W3["W3 · Add Feature<br/><i>Design optional, everything else full</i>"]
+    W4["W4 · Migrate to Prod<br/><i>retrofits Define onto a vibe-coded MVP</i>"]
+    W5["W5 · Refactor<br/><i>Define + Build + Validate, no behavior change</i>"]
+    W6["W6 · Bug Hotfix<br/><i>Build + Validate + Deploy, narrow blast radius</i>"]
+    W7["W7 · Audit & Harden<br/><i>Validate-led, drives back into Build</i>"]
+    W8["W8 · Personal Tool<br/><i>slim version of every phase</i>"]
 
-**Cold agents** — focused, deliberate:
-- `codebase-classifier` — only when behavior branches on greenfield/wired/vibe-coded
-- `secret-scanner` — pre-deploy gate + production readiness only
-- `dependency-currency-checker` — the only network-touching agent; reserved for `/next-steps` and `/check-production`
+    W1 --> PDLC
+    W2 --> PDLC
+    W3 --> PDLC
+    W4 --> PDLC
+    W5 --> PDLC
+    W6 --> PDLC
+    W7 --> PDLC
+    W8 --> PDLC
+
+    classDef workflow fill:#fff4e6,stroke:#d97706,color:#7c2d12;
+    classDef phase fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
+    class W1,W2,W3,W4,W5,W6,W7,W8 workflow;
+    class D1,D2,D3,D4,D5,D6,D7 phase;
+```
+
+**Workflow × phase emphasis** — **●** = real work happens here. **○** = light pass. Blank = skipped.
+
+| Workflow | 1 Discover | 2 Define | 3 Design | 4 Build | 5 Validate | 6 Deploy | 7 Learn |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| W1 · Prototype | ○ | ● | ● | | ○ | ○ | ○ |
+| W2 · Production SaaS | ○ | ● | ● | ● | ● | ● | ○ |
+| W3 · Add Feature | | ● | ○ | ● | ● | ● | ○ |
+| W4 · Migrate to Prod | | ● | | ● | ● | ● | ○ |
+| W5 · Refactor | | ● | | ● | ● | ○ | |
+| W6 · Bug Hotfix | | | | ● | ● | ● | |
+| W7 · Audit & Harden | | | | ● | ● | ● | ○ |
+| W8 · Personal Tool | ○ | ○ | ○ | ● | ○ | ● | |
+
+> Discover and Learn are mostly outside the library today. The dots are about *whether you should think about the phase*, not whether a skill runs.
 
 ---
 
 ## Workflow → Skill heatmap
 
-Mirror of [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), kept here so this page is self-contained. **●** = always used. **○** = conditional.
+Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), kept here so this page is self-contained. **●** = always used. **○** = conditional.
 
 | Skill | W1 Prototype | W2 SaaS | W3 Feature | W4 Migrate | W5 Refactor | W6 Hotfix | W7 Audit | W8 Personal |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | `/next-steps` | | ● | ● | ● | ● | ○ | ● | ○ |
 | `/setup-project` | | ● | | | | | | ● |
-| `/prd` | | ● | ● | ○ | | | | ○ |
-| `/plan` | | ● | ● | ● | ● | | | ○ |
+| `/prd` | ○ | ● | ● | ○ | | | | ○ |
+| `/plan` | ○ | ● | ● | ● | ● | | | ○ |
 | `/refactor` | | | ○ | | ● | ○ | ○ | |
-| `/glossary` | | ● | ○ | | | | | |
-| `/grill-me` | | ● | ○ | | ● | | | |
+| `/glossary` | ○ | ● | ○ | | | | | |
+| `/grill-me` | ○ | ● | ○ | | ● | | | |
 | `/prototype` | ● | ● | ○ | | | | | ○ |
 | `/code-map` | | | ● | ● | ● | ○ | | |
 | `/setup-database` | | ● | ○ | ● | | | ○ | ● |
@@ -216,78 +215,40 @@ Mirror of [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), kept
 
 ---
 
-## Workflow → Agent heatmap
+## Skill → Agent matrix
 
-Same idea, projected to the agent layer (synthesized from each workflow's *Agents called* section). **●** = always fires. **○** = conditional. Blank = not used.
+Which agents each skill delegates to. **●** = primary caller. **○** = ad-hoc / conditional.
 
-| Agent | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| `stack-detector` | | ● | ● | ● | ● | ○ | ● | ● |
-| `codebase-classifier` | | ● | ○ | ● | ● | | ● | |
-| `pattern-finder` | | ● | ● | ● | ● | ○ | ● | ● |
-| `secret-scanner` | | ● | ● | ● | ○ | ○ | ● | ○ |
-| `dependency-currency-checker` | | ● | ● | ● | ○ | | ● | |
-| `prod-readiness-auditor` | | ● | ● | ● | ● | ● | ● | |
+| Skill ↓ \ Agent → | `stack-detector` | `codebase-classifier` | `pattern-finder` | `secret-scanner` | `dependency-currency-checker` | `prod-readiness-auditor` |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|
+| `/next-steps` | ● | ● | | | ● | |
+| `/setup-project` | ● | | | | | |
+| `/setup-database` | ● | | ● | | | |
+| `/add-auth` | ● | | ● | | | |
+| `/add-payment` | ● | | ● | | | |
+| `/add-files` | ● | | ● | | | |
+| `/build-feature` | ● | | ● | | | |
+| `/migrate-from-vibe` | ● | ● | ● | | | |
+| `/triage` | ○ | | ○ | ○ | | |
+| `/check-production` | ● | ● | | ● | ● | ● |
+| `/deploy` | | | | ● | | ● |
 
-**W7 — Audit & Harden** is the agent-heaviest workflow (all six fire deliberately). **W1 — Prototype** is the lightest (zero — `/prototype` is self-contained).
+Skills not listed (`/prd`, `/plan`, `/refactor`, `/glossary`, `/grill-me`, `/prototype`, `/code-map`, `/add-monitoring`) call no agents — they work in conversation.
 
 ---
 
-## Skills, sorted by what they produce
+## Reading guide
 
-When you know the artifact you want, find the skill that emits it.
-
-| Skill | Output artifact |
+| You want to… | Open |
 |---|---|
-| `/next-steps` | `.claude/next-steps.md` — living journey-to-production checklist |
-| `/setup-project` | Scaffolded greenfield repo, `CLAUDE.md`, third-party accounts, git/GitHub conventions |
-| `/prd` | `.claude/prd.md` — problem, personas, stories, requirements, metrics, risks |
-| `/plan` | `.claude/plan.md` — vertical slices, TDD strategy, commit sequencing |
-| `/refactor` | `.claude/refactor-plan.md` — tiny commits + Claude Code refactoring best practices |
-| `/glossary` | `.claude/glossary.md` — domain term tables and relationships |
-| `/grill-me` | Surfaced unknowns, decided trade-offs, sharper plan (in-conversation) |
-| `/prototype` | `prototypes/variant-A.html`, `variant-B.html`, `variant-C.html` (Tailwind via CDN) |
-| `/code-map` | Module map, public interfaces, data-flow narrative |
-| `/setup-database` | Migrations applied + verified (Drizzle / Prisma / Kysely / raw SQL) |
-| `/add-auth` | Wired auth (Firebase preferred; adapts to Clerk / NextAuth / Supabase / custom JWT) |
-| `/add-payment` | Wired Stripe with webhook signature verification, idempotency, Customer Portal |
-| `/add-files` | Wired Firebase Storage (or extends S3 / R2 / UploadThing), magic-byte MIME checks |
-| `/add-monitoring` | Sentry + PostHog wired, env vars, verified with real test events |
-| `/build-feature` | Feature in TDD layers — schema → storage → routes → hooks → components |
-| `/migrate-from-vibe` | Working app extracted off Replit / V0 / Lovable / Bolt onto a real local stack |
-| `/triage` | `.claude/bugs/<short-name>.md` — root-cause hypothesis, 2+ fixes, evidence |
-| `/check-production` | Severity-graded readiness report (Critical/High/Medium/Low) with `file:line` |
-| `/deploy` | Deployed app, env vars, custom domain + SSL, runbook, post-deploy smoke tests |
-
----
-
-## Agents, sorted by structured output
-
-Every agent returns a labeled block (best practice #7) so callers parse cleanly.
-
-| Agent | Output block | Network access? |
-|---|---|:-:|
-| `stack-detector` | `STACK PROFILE` — framework, DB/ORM, auth, payments, AI, monitoring, deploy target | — |
-| `codebase-classifier` | One-word verdict (`greenfield` / `wired` / `vibe-coded`) + confidence + adaptation hint | — |
-| `pattern-finder` | `PATTERN` — location, naming, imports, validation, error handling, response shape, auth wiring | — |
-| `secret-scanner` | `SECRET SCAN REPORT` — truncated evidence + rotation actions (working tree **and** git history) | — |
-| `dependency-currency-checker` | `CURRENCY REPORT` — risk and effort estimates per stack-relevant dependency | ✅ `WebFetch` to npm |
-| `prod-readiness-auditor` | Severity-graded findings (Critical/High/Medium/Low) with `file:line`, impact, fix | — |
-
----
-
-## Reading guide — pick your starting point
-
-| You want to… | Start here |
-|---|---|
-| Pick a workflow for what you're doing | [WORKFLOWS.md § choose a workflow](WORKFLOWS.md#how-to-choose-a-workflow) |
+| Understand the lifecycle deeply | [PDLC_Phases.md](PDLC_Phases.md) |
+| Pick a workflow for what you're doing | [WORKFLOWS.md](WORKFLOWS.md) |
 | Look up one specific skill or agent | [AGENTS.md](AGENTS.md) |
 | See what's missing from the library | [GAPS.md](GAPS.md) |
-| Understand the lifecycle | [PDLC_Phases.md](PDLC_Phases.md) |
-| Read the user's locked greenfield stack | [skills/_stack-preferences.md](skills/_stack-preferences.md) |
+| Read the locked greenfield stack | [skills/_stack-preferences.md](skills/_stack-preferences.md) |
 | See the rules for adapting to existing codebases | [skills/_adaptation-playbook.md](skills/_adaptation-playbook.md) |
-| Walk through a worked example | any [workflows/Wn-*.md](workflows/) page — every one has an *example walkthrough* section |
+| Walk through a worked example | any [workflows/Wn-*.md](workflows/) page |
 
 ---
 
-*This page is hand-curated against [AGENTS.md](AGENTS.md) and the per-workflow files in [workflows/](workflows/). When you add or change a skill, agent, or workflow, update those source-of-truth files and re-check the heatmaps here.*
+*This page is hand-curated against [PDLC_Phases.md](PDLC_Phases.md), [AGENTS.md](AGENTS.md), and the per-workflow files. When the lifecycle understanding shifts, this page changes first.*
