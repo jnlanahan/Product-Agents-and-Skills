@@ -34,7 +34,7 @@ The 7 phases, one-line goal per phase, and which skills + agents live there. Eve
 
 ```mermaid
 flowchart LR
-    P1["1 · Discover<br/><i>Is the problem worth solving?</i><br/><br/>skills: —<br/>agents: —"]
+    P1["1 · Discover<br/><i>Is the problem worth solving?</i><br/><br/>skills: /discover<br/>agents: pain-point-miner<br/>competitive-scanner"]
     P2["2 · Define<br/><i>What to build, how to know it worked.</i><br/><br/>skills: /prd /plan /glossary<br/>/grill-me /refactor<br/>agents: —"]
     P3["3 · Design<br/><i>How it looks, flows, is built.</i><br/><br/>skills: /prototype<br/>agents: —"]
     P4["4 · Build<br/><i>Produce a working release candidate.</i><br/><br/>skills: /setup-project /code-map<br/>/setup-database /add-auth<br/>/add-payment /add-files<br/>/add-monitoring /build-feature<br/>/migrate-from-vibe<br/>agents: stack-detector<br/>pattern-finder<br/>codebase-classifier"]
@@ -53,7 +53,7 @@ flowchart LR
     class P1,P2,P3,P4,P5,P6,P7 phase;
 ```
 
-Phases 1 (Discover) and 7 (Learn) intentionally have no skills today — they're human-led. See [GAPS.md](GAPS.md). `/next-steps` is the always-on compass that orients you wherever you are in the lifecycle.
+Phase 7 (Learn) intentionally has no skills today — it's human-led. See [GAPS.md](GAPS.md). `/next-steps` is the always-on compass that orients you wherever you are in the lifecycle.
 
 ---
 
@@ -63,14 +63,14 @@ A two-line description per phase, the skills available, the agents they pull in,
 
 ### 1 · Discover — *is this worth solving?*
 
-Decide whether a real problem exists, who hurts, how big, and whether you have or can get the data to validate it. Outside the code; outside the library today.
+Decide whether a real problem exists, who hurts, how big, and what already exists in the space. `/discover` orchestrates open-source research (Reddit, HN, Stack Overflow, Indie Hackers, competitor sites) and synthesizes a decision-shaped writeup.
 
 | Item | Detail |
 |---|---|
-| Skills | *(none — human-led)* |
-| Agents | *(none)* |
-| Output | Opportunity brief, validated problem statement, rough sizing, data-availability note |
-| Gap | A `/discover` skill could synthesize interview notes — see [GAPS.md](GAPS.md#discover-phase) |
+| Skills | `/discover` |
+| Agents | `pain-point-miner` · `competitive-scanner` |
+| Output | `.claude/discover.md` — problem statement, evidence-backed pains, competitive landscape, gap analysis, recommendation (proceed / sharpen / kill) |
+| Gap | TAM/sizing math — deliberately not automated; honest numbers can't be web-scraped, see [GAPS.md](GAPS.md#discover-phase) |
 
 ### 2 · Define — *what to build & how to know it worked*
 
@@ -145,10 +145,10 @@ The eight workflows are not eight different lifecycles. **They all walk the same
 
 | Workflow | 1 Discover | 2 Define | 3 Design | 4 Build | 5 Validate | 6 Deploy | 7 Learn |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| **W1** Prototype          | 🟨 | 🟧 | 🟥 | ⬜ | 🟨 | 🟨 | 🟨 |
-| **W2** Production SaaS    | 🟨 | 🟥 | 🟧 | 🟥 | 🟥 | 🟧 | 🟨 |
+| **W1** Prototype          | 🟧 | 🟧 | 🟥 | ⬜ | 🟨 | 🟨 | 🟨 |
+| **W2** Production SaaS    | 🟧 | 🟥 | 🟧 | 🟥 | 🟥 | 🟧 | 🟨 |
 | **W3** Add Feature        | ⬜ | 🟧 | 🟨 | 🟥 | 🟧 | 🟧 | 🟨 |
-| **W4** Migrate to Prod    | ⬜ | 🟧 | ⬜ | 🟥 | 🟥 | 🟧 | 🟨 |
+| **W4** Migrate to Prod    | 🟨 | 🟧 | ⬜ | 🟥 | 🟥 | 🟧 | 🟨 |
 | **W5** Refactor           | ⬜ | 🟧 | ⬜ | 🟥 | 🟧 | 🟨 | ⬜ |
 | **W6** Bug Hotfix         | ⬜ | ⬜ | ⬜ | 🟧 | 🟥 | 🟧 | ⬜ |
 | **W7** Audit & Harden     | ⬜ | ⬜ | ⬜ | 🟧 | 🟥 | 🟧 | 🟨 |
@@ -166,6 +166,7 @@ Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), k
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | `/next-steps` | | ● | ● | ● | ● | ○ | ● | ○ |
 | `/setup-project` | | ● | | | | | | ● |
+| `/discover` | ○ | ● | | ○ | | | | |
 | `/prd` | ○ | ● | ● | ○ | | | | ○ |
 | `/plan` | ○ | ● | ● | ● | ● | | | ○ |
 | `/refactor` | | | ○ | | ● | ○ | ○ | |
@@ -190,19 +191,20 @@ Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), k
 
 Which agents each skill delegates to. **●** = primary caller. **○** = ad-hoc / conditional.
 
-| Skill ↓ \ Agent → | `stack-detector` | `codebase-classifier` | `pattern-finder` | `secret-scanner` | `dependency-currency-checker` | `prod-readiness-auditor` |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|
-| `/next-steps` | ● | ● | | | ● | |
-| `/setup-project` | ● | | | | | |
-| `/setup-database` | ● | | ● | | | |
-| `/add-auth` | ● | | ● | | | |
-| `/add-payment` | ● | | ● | | | |
-| `/add-files` | ● | | ● | | | |
-| `/build-feature` | ● | | ● | | | |
-| `/migrate-from-vibe` | ● | ● | ● | | | |
-| `/triage` | ○ | | ○ | ○ | | |
-| `/check-production` | ● | ● | | ● | ● | ● |
-| `/deploy` | | | | ● | | ● |
+| Skill ↓ \ Agent → | `stack-detector` | `codebase-classifier` | `pattern-finder` | `secret-scanner` | `dependency-currency-checker` | `prod-readiness-auditor` | `pain-point-miner` | `competitive-scanner` |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| `/next-steps` | ● | ● | | | ● | | | |
+| `/setup-project` | ● | | | | | | | |
+| `/discover` | | | | | | | ● | ● |
+| `/setup-database` | ● | | ● | | | | | |
+| `/add-auth` | ● | | ● | | | | | |
+| `/add-payment` | ● | | ● | | | | | |
+| `/add-files` | ● | | ● | | | | | |
+| `/build-feature` | ● | | ● | | | | | |
+| `/migrate-from-vibe` | ● | ● | ● | | | | | |
+| `/triage` | ○ | | ○ | ○ | | | | |
+| `/check-production` | ● | ● | | ● | ● | ● | | |
+| `/deploy` | | | | ● | | ● | | |
 
 Skills not listed (`/prd`, `/plan`, `/refactor`, `/glossary`, `/grill-me`, `/prototype`, `/code-map`, `/add-monitoring`) call no agents — they work in conversation.
 

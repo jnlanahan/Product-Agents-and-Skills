@@ -95,6 +95,7 @@ Which skills each workflow touches. **●** = always used. **○** = conditional
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | `/next-steps` | | ● | ● | ● | ● | ○ | ● | ○ |
 | `/setup-project` | | ● | | | | | | ● |
+| `/discover` | ○ | ● | | ○ | | | | |
 | `/prd` | ○ | ● | ● | ○ | | | | ○ |
 | `/plan` | ○ | ● | ● | ● | ● | | | ○ |
 | `/refactor` | | | ○ | | ● | ○ | ○ | |

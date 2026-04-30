@@ -3,8 +3,8 @@
 > A curated library of [Claude Code](https://claude.com/claude-code) **agents** and **skills** that drive a full Product Development Lifecycle — from prototyping a new idea to shipping a production-grade SaaS, with eight named workflows that compose them.
 
 [![PDLC](https://img.shields.io/badge/PDLC-7%20phases-1f6feb)](PDLC_Phases.md)
-[![Agents](https://img.shields.io/badge/agents-6-2da44e)](AGENTS.md#agents-read-only-diagnostics)
-[![Skills](https://img.shields.io/badge/skills-19-2da44e)](AGENTS.md#skills-by-pdlc-phase)
+[![Agents](https://img.shields.io/badge/agents-8-2da44e)](AGENTS.md#agents-read-only-diagnostics)
+[![Skills](https://img.shields.io/badge/skills-20-2da44e)](AGENTS.md#skills-by-pdlc-phase)
 [![Workflows](https://img.shields.io/badge/workflows-8-orange)](WORKFLOWS.md)
 [![Map](https://img.shields.io/badge/map-one--page-8957e5)](MAP.md)
 
@@ -43,19 +43,22 @@ It's organized around a **7-phase Product Development Lifecycle** — Discover �
 ├── LICENSE
 ├── settings.snippet.json      ← optional Claude Code hook config
 │
-├── agents/                    ← 6 read-only diagnostic agents
+├── agents/                    ← 8 read-only diagnostic agents
 │   ├── stack-detector.md
 │   ├── codebase-classifier.md
 │   ├── pattern-finder.md
 │   ├── prod-readiness-auditor.md
 │   ├── secret-scanner.md
-│   └── dependency-currency-checker.md
+│   ├── dependency-currency-checker.md
+│   ├── pain-point-miner.md
+│   └── competitive-scanner.md
 │
-├── skills/                    ← 19 conversational skills (slash-commands)
+├── skills/                    ← 20 conversational skills (slash-commands)
 │   ├── _stack-preferences.md  ← locked greenfield stack
 │   ├── _adaptation-playbook.md← rules for adapting to existing codebases
 │   ├── 0-Always-Next-Steps/
 │   ├── 0-Setup-Project/
+│   ├── 1-Discover-Research/
 │   ├── 2-Define-PRD/
 │   ├── 2-Define-Plan/
 │   ├── 2-Define-Refactor/
@@ -134,13 +137,13 @@ Every agent and skill follows the same rubric ([10 best practices](AGENTS.md#des
 1. **Right mechanism** — subagents for delegated diagnostic work, skills for repeating procedural workflows
 2. **Action-oriented descriptions** — every agent's `description` is a delegation trigger, not a summary
 3. **Tools scoped explicitly** — least-privilege; reviewers get `Read, Grep, Glob`; only one agent has network access
-4. **One job per agent** — six small specialists, not one mega-agent
+4. **One job per agent** — eight small specialists, not one mega-agent
 5. **Stateless invocations** — every needed input is passed in the prompt
 6. **Behavior in the body** — concrete constraints live in the system prompt, not the description
 7. **Structured output** — `STACK PROFILE`, `PATTERN`, `SECRET SCAN REPORT` — every agent returns a labeled block
 8. **Skills for procedural knowledge that repeats** — anything you find yourself re-explaining belongs in a skill
 9. **Evaluate before optimizing** — these were built against real project failures, not imagined ones
-10. **Read-only first** — all six agents are read-only by design; write capability lives in skills with the user in the loop
+10. **Read-only first** — all eight agents are read-only by design; write capability lives in skills with the user in the loop
 
 ---
 

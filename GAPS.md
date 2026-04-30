@@ -18,12 +18,12 @@ For the full PDLC stages, see [PDLC_Phases.md](PDLC_Phases.md). For what *is* co
 
 ## Discover phase
 
-The PDLC explicitly flags Discover as **human-led** — this gap is partially intentional. But guided synthesis would still help.
+`/discover` (with `pain-point-miner` + `competitive-scanner`) covers the open-source-research subset. Interviews, sales-call mining, and honest TAM math remain human-led.
 
 | Missing | Why useful | Workflows affected | Priority |
 |---|---|---|---|
-| **`/discover`** — opportunity brief, problem framing, hypothesis formation | Even informal "is this real?" structuring beats no structuring. Particularly for [W1](workflows/W1-prototype-new-idea.md), [W2](workflows/W2-production-saas.md), and especially [W4](workflows/W4-migrate-to-production.md) (where teams often invest in migration without re-validating that the prototype's traction is actually durable) | W1, W2, W4 | Low |
-| **`/market-scan`** — structured competitor analysis | Sometimes upstream of `/prd` | W2 | Low |
+| **`/interview-synthesis`** — turn raw interview transcripts / sales-call notes / support-ticket dumps into structured insights that feed `/discover` and `/prd` | The web-research half is covered; the first-party voice-of-customer half isn't. Interviews are still the gold standard. | W1, W2, W4 | Medium |
+| **TAM / market sizing** | Deliberately not automated — honest sizing numbers can't be web-scraped, and a skill that fabricated them would be worse than none. Stays human-led. | All | *(intentional)* |
 
 ---
 

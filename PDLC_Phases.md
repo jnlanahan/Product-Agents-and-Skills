@@ -25,7 +25,7 @@ flowchart LR
 
 | # | Phase | Goal | Library coverage |
 |---|---|---|---|
-| 1 | Discover | Decide if a problem is worth solving | *(human-led — no skills today)* |
+| 1 | Discover | Decide if a problem is worth solving | `/discover` (uses `pain-point-miner` + `competitive-scanner`) |
 | 2 | Define | Decide what to build and how you'll know it worked | `/prd` · `/plan` · `/glossary` · `/grill-me` · `/refactor` |
 | 3 | Design | Decide how it looks, flows, and is built | `/prototype` |
 | 4 | Build | Produce a working release candidate | `/setup-project` · `/code-map` · `/setup-database` · `/add-auth` · `/add-payment` · `/add-files` · `/add-monitoring` · `/build-feature` · `/migrate-from-vibe` |
@@ -41,7 +41,7 @@ For a one-page big-picture map of how skills, agents, and workflows fit each pha
 
 > **Goal:** Decide whether a problem is worth solving.
 
-> **Skill coverage:** Customer/product discovery is a human-led activity — interviews, market scan, sizing — that happens outside the code. The skill library intentionally has no Discover-phase commands today; this phase is reserved for that work and may grow skills later (e.g., a research-synthesis or interview-coding skill).
+> **Skill coverage:** `/discover` orchestrates the open-source-research subset of this phase — pain-point mining (Reddit, HN, Stack Overflow, Indie Hackers) and competitive scanning — and synthesizes findings into a decision-shaped writeup. Interviews, sales-call review, and TAM math remain human-led; honest sizing numbers can't be web-scraped, so the skill deliberately doesn't try.
 
 ### Activities
 

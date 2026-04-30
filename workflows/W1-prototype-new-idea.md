@@ -12,7 +12,7 @@ This workflow is **not a shortcut around the PDLC** — it walks the same phases
 
 | Phase | Skills | Why |
 |---|---|---|
-| 1 · Discover | *(informal — even a 5-minute "is this a real pain?" check)* | Cheap to skip; expensive when you skip it |
+| 1 · Discover | *(optional)* `/discover` — quick pass through Reddit / HN / competitor sites | 30-minute reality check; surfaces whether the pain is real and what already exists. Skip only if the idea is for an audience you ARE. |
 | 2 · Define | `/grill-me` → `/prd` (lightweight) → `/glossary` *(if domain-heavy)* → `/plan` *(brief)* | Even a one-page PRD forces you to name the user, the job, the success signal |
 | 3 · Design | `/prototype` | Three HTML variants → pick one — this is where the workflow earns its keep |
 | 4 · Build | *(skipped — or hand the HTML to Replit / V0 for a live demo)* | If Build is needed, you've graduated to W2 |
@@ -48,11 +48,12 @@ flowchart LR
 
 ## Agents called
 
-- None directly. The Define-phase skills work in conversation; `/prototype` is self-contained — no codebase to detect.
+- If `/discover` runs: `pain-point-miner` and `competitive-scanner` (both network-touching, parallel).
+- The Define-phase skills work in conversation; `/prototype` is self-contained — no codebase to detect.
 
 ## Gaps surfaced
 
-- **No `/discover` skill** to formalize problem framing before prototyping. Currently human-led. → [GAPS.md](../GAPS.md#discover-phase)
+- **No `/interview-synthesis` skill** to fold first-party interviews / sales calls into the Discover output. Open-source research is covered by `/discover`; voice-of-customer interviews remain human-led. → [GAPS.md](../GAPS.md#discover-phase)
 - **No `/post-launch-review` skill** to capture prototype feedback structurally. → [GAPS.md](../GAPS.md#learn-phase)
 
 ## Example walkthrough

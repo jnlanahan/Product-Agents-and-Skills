@@ -12,7 +12,7 @@ This is harder than [W2](W2-production-saas.md) because you're working around ex
 
 | Phase | Skills | Why |
 |---|---|---|
-| 1 · Discover | *(done — there's already a prototype)* | |
+| 1 · Discover | *(optional)* `/discover` — re-validate before the migration spend | Migrating a vibe-coded MVP to production is real engineering investment. If the prototype's traction was thin, `/discover` surfaces whether the pain still warrants the build-out. Skip if traction is solid. |
 | 2 · Define | `/code-map` → *(optional)* `/prd` retrofit → `/plan` | Understand what's there; document; plan the gap fixes |
 | 3 · Design | *(usually skipped)* | Design exists in the working UI |
 | 4 · Build | `/migrate-from-vibe` → `/setup-database` → `/add-auth` → `/add-payment` (if needed) → `/add-monitoring` | Wave 1: extract. Then fill gaps. |

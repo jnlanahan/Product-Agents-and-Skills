@@ -178,6 +178,9 @@ The agent has access to these skills. It will suggest the right one based on wha
 - /next-steps — production-readiness check + what to do next
 - /setup-project — scaffold a new SaaS from empty
 
+**Discover (validate the idea before building)**
+- /discover — open-source research (pains + competitors) → actionable insights
+
 **Define (turn ideas into specs)**
 - /prd — produce a comprehensive PRD from current context
 - /plan — turn the PRD into vertical slices with TDD strategy

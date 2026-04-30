@@ -12,7 +12,7 @@ If you're a solo developer building for yourself with no plans to charge or scal
 
 | Phase | Skills | Why |
 |---|---|---|
-| 1 · Discover | *(human-led — assumed done before this workflow)* | This workflow assumes a real, validated pain |
+| 1 · Discover | `/discover` *(if not already done; otherwise skip)* | Even if the pain is "validated," 30 minutes of `/discover` often surfaces competitors or pain framings you missed. Skip only if you've already done this rigorously. |
 | 2 · Define | `/prd` → `/glossary` → `/plan` → `/grill-me` | Synthesize PRD; pin down domain language; break into vertical slices; stress-test |
 | 3 · Design | `/prototype` | Three HTML variants → pick one → that's the design reference |
 | 4 · Build | `/setup-project` → `/setup-database` → `/add-auth` → `/add-payment` → `/add-files` → `/add-monitoring` → `/build-feature` (per slice) | Disciplined waves, one commit per layer |

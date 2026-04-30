@@ -12,6 +12,7 @@ For the lifecycle this library is built around, see [PDLC_Phases.md](PDLC_Phases
 - [Agents (read-only diagnostics)](#agents-read-only-diagnostics)
 - [Skills by PDLC phase](#skills-by-pdlc-phase)
   - [Stage 0 — Setup & Navigation](#stage-0--setup--navigation)
+  - [Stage 1 — Discover](#stage-1--discover)
   - [Stage 2 — Define](#stage-2--define)
   - [Stage 3 — Design](#stage-3--design)
   - [Stage 4 — Build](#stage-4--build)
@@ -38,7 +39,7 @@ Source of truth for each entry is the `description` field in the file's YAML fro
 
 ## Agents (read-only diagnostics)
 
-All six agents are **read-only by design** (best practice #10). They detect, classify, and report. They never write. Skills call them to gather context before proposing changes.
+All eight agents are **read-only by design** (best practice #10). They detect, classify, and report. They never write. Skills call them to gather context before proposing changes.
 
 ### `stack-detector`
 
@@ -86,7 +87,23 @@ All six agents are **read-only by design** (best practice #10). They detect, cla
 - **Tools** — `Read, Grep, Glob, Bash, WebFetch`
 - **Output** — `CURRENCY REPORT` with risk and effort estimates per dependency
 - **File** — [agents/dependency-currency-checker.md](agents/dependency-currency-checker.md)
-- **Notes** — only one with network access (WebFetch to the npm registry); narrows scope to production-relevant libraries to avoid noise
+- **Notes** — network-touching (WebFetch to the npm registry); narrows scope to production-relevant libraries to avoid noise
+
+### `pain-point-miner`
+
+- **Use when** — `/discover` calls this to surface real user complaints from public discussion (Reddit, HN, Stack Overflow, Indie Hackers, niche forums) about a problem topic
+- **Tools** — `Read, Grep, Glob, WebSearch, WebFetch`
+- **Output** — `PAIN POINT FINDINGS` with verbatim quotes, source URLs, frequency signal, severity reads, null-result notes, limitations
+- **File** — [agents/pain-point-miner.md](agents/pain-point-miner.md)
+- **Notes** — network-touching; capped at ~25 fetches per run; never fabricates quotes or counts
+
+### `competitive-scanner`
+
+- **Use when** — `/discover` calls this to map direct, indirect, and adjacent competitors for a product idea
+- **Tools** — `Read, Grep, Glob, WebSearch, WebFetch`
+- **Output** — `COMPETITIVE LANDSCAPE` with positioning, pricing, key features, gap candidates, vaporware/waitlist callouts
+- **File** — [agents/competitive-scanner.md](agents/competitive-scanner.md)
+- **Notes** — network-touching; capped at ~30 fetches per run; refuses to recommend a wedge — surfaces gaps only
 
 ---
 
@@ -109,6 +126,17 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **Output** — scaffolded project in disciplined waves (one commit per wave), `CLAUDE.md` with skills index, third-party accounts wired, git/GitHub conventions seeded
 - **Calls agents** — `stack-detector` (sanity check that this is greenfield)
 - **File** — [skills/0-Setup-Project/SKILL.md](skills/0-Setup-Project/SKILL.md)
+
+---
+
+### Stage 1 — Discover
+
+#### `/discover` — `1-Discover-Research`
+
+- **Use when** — the user has an idea but hasn't validated whether the problem is real, who hurts, or what already exists. Run before `/prd` on a new idea, or before `/migrate-from-vibe` when the prototype's traction hasn't been re-validated.
+- **Output** — `.claude/discover.md` with problem statement, target user, hypothesis, evidence-backed pain summary, competitive landscape, gap analysis, and a decision-shaped recommendation (proceed / sharpen / kill). Raw agent output preserved as appendices.
+- **Calls agents** — `pain-point-miner`, `competitive-scanner` (in parallel)
+- **File** — [skills/1-Discover-Research/SKILL.md](skills/1-Discover-Research/SKILL.md)
 
 ---
 
@@ -270,7 +298,7 @@ Every agent and skill in this repo is checked against these ten best practices.
 7. **Demand structured output.** Every agent returns a labeled block (`STACK PROFILE`, `PATTERN`, `SECRET SCAN REPORT`, etc.) so callers parse cleanly.
 8. **Skills for procedural knowledge that repeats.** A SKILL.md plus optional scripts and references — not prompts re-explained each session.
 9. **Evaluate before optimizing.** Run on real tasks, find where it fails, fix what actually breaks.
-10. **Start read-only.** Reviewer / auditor / research agents first. The six agents in this repo are all read-only; write capability lives in skills where the user is in the loop.
+10. **Start read-only.** Reviewer / auditor / research agents first. The eight agents in this repo are all read-only; write capability lives in skills where the user is in the loop.
 
 Plus two repo-level rules:
 
