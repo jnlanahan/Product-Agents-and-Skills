@@ -1,6 +1,8 @@
 # Workflows
 
-Eight named paths through the [PDLC](PDLC_Phases.md), each composed from the [agents and skills](AGENTS.md) in this repo. They differ in **intent**, **rigor**, and **which phases collapse** — not in lifecycle. Every workflow still touches Define → Design → Build → Validate → Deploy in spirit.
+Eight named paths through the [PDLC](PDLC_Phases.md), each composed from the [agents and skills](AGENTS.md) in this repo. They differ in **intent**, **rigor**, and **which phases get the most weight** — not in lifecycle. Every workflow walks the same seven phases (Discover → Define → Design → Build → Validate → Deploy → Learn); the lighter ones spend less time in some and more in others, but they don't *skip* the thinking the lifecycle expects.
+
+For the one-page big-picture view of how phases, skills, and agents connect, see [MAP.md](MAP.md).
 
 ---
 
@@ -39,8 +41,9 @@ flowchart LR
         D1 --> D2 --> D3 --> D4 --> D5 --> D6 --> D7
     end
 
-    W1["W1 · Prototype a New Idea"] -.-> D2
+    W1["W1 · Prototype a New Idea"] --> D2
     W1 --> D3
+    W1 -.-> D5
     W1 -.-> D7
 
     W2["W2 · Production-Grade SaaS"] --> D2
@@ -92,11 +95,11 @@ Which skills each workflow touches. **●** = always used. **○** = conditional
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | `/next-steps` | | ● | ● | ● | ● | ○ | ● | ○ |
 | `/setup-project` | | ● | | | | | | ● |
-| `/prd` | | ● | ● | ○ | | | | ○ |
-| `/plan` | | ● | ● | ● | ● | | | ○ |
+| `/prd` | ○ | ● | ● | ○ | | | | ○ |
+| `/plan` | ○ | ● | ● | ● | ● | | | ○ |
 | `/refactor` | | | ○ | | ● | ○ | ○ | |
-| `/glossary` | | ● | ○ | | | | | |
-| `/grill-me` | | ● | ○ | | ● | | | |
+| `/glossary` | ○ | ● | ○ | | | | | |
+| `/grill-me` | ○ | ● | ○ | | ● | | | |
 | `/prototype` | ● | ● | ○ | | | | | ○ |
 | `/code-map` | | | ● | ● | ● | ○ | | |
 | `/setup-database` | | ● | ○ | ● | | | ○ | ● |
