@@ -139,51 +139,22 @@ Compare against Define's success metrics. Decide: double down, iterate, sunset. 
 
 The eight workflows are not eight different lifecycles. **They all walk the same seven phases.** They differ in *which phases they spend time in* and *how heavyweight* the work is at each step.
 
-```mermaid
-flowchart LR
-    subgraph PDLC["The PDLC — every workflow walks this"]
-        direction LR
-        D1["1 Discover"] --> D2["2 Define"] --> D3["3 Design"] --> D4["4 Build"] --> D5["5 Validate"] --> D6["6 Deploy"] --> D7["7 Learn"]
-    end
+**Heatmap — read each row left-to-right as one workflow's PDLC pass.** Darker = heavier focus.
 
-    W1["W1 · Prototype<br/><i>fast pass — same phases, lighter rigor</i>"]
-    W2["W2 · Production SaaS<br/><i>full rigor end-to-end</i>"]
-    W3["W3 · Add Feature<br/><i>Design optional, everything else full</i>"]
-    W4["W4 · Migrate to Prod<br/><i>retrofits Define onto a vibe-coded MVP</i>"]
-    W5["W5 · Refactor<br/><i>Define + Build + Validate, no behavior change</i>"]
-    W6["W6 · Bug Hotfix<br/><i>Build + Validate + Deploy, narrow blast radius</i>"]
-    W7["W7 · Audit & Harden<br/><i>Validate-led, drives back into Build</i>"]
-    W8["W8 · Personal Tool<br/><i>slim version of every phase</i>"]
-
-    W1 --> PDLC
-    W2 --> PDLC
-    W3 --> PDLC
-    W4 --> PDLC
-    W5 --> PDLC
-    W6 --> PDLC
-    W7 --> PDLC
-    W8 --> PDLC
-
-    classDef workflow fill:#fff4e6,stroke:#d97706,color:#7c2d12;
-    classDef phase fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
-    class W1,W2,W3,W4,W5,W6,W7,W8 workflow;
-    class D1,D2,D3,D4,D5,D6,D7 phase;
-```
-
-**Workflow × phase emphasis** — **●** = real work happens here. **○** = light pass. Blank = skipped.
+🟥 primary focus · 🟧 standard work · 🟨 light pass · ⬜ skipped or external to the library
 
 | Workflow | 1 Discover | 2 Define | 3 Design | 4 Build | 5 Validate | 6 Deploy | 7 Learn |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| W1 · Prototype | ○ | ● | ● | | ○ | ○ | ○ |
-| W2 · Production SaaS | ○ | ● | ● | ● | ● | ● | ○ |
-| W3 · Add Feature | | ● | ○ | ● | ● | ● | ○ |
-| W4 · Migrate to Prod | | ● | | ● | ● | ● | ○ |
-| W5 · Refactor | | ● | | ● | ● | ○ | |
-| W6 · Bug Hotfix | | | | ● | ● | ● | |
-| W7 · Audit & Harden | | | | ● | ● | ● | ○ |
-| W8 · Personal Tool | ○ | ○ | ○ | ● | ○ | ● | |
+| **W1** Prototype          | 🟨 | 🟧 | 🟥 | ⬜ | 🟨 | 🟨 | 🟨 |
+| **W2** Production SaaS    | 🟨 | 🟥 | 🟧 | 🟥 | 🟥 | 🟧 | 🟨 |
+| **W3** Add Feature        | ⬜ | 🟧 | 🟨 | 🟥 | 🟧 | 🟧 | 🟨 |
+| **W4** Migrate to Prod    | ⬜ | 🟧 | ⬜ | 🟥 | 🟥 | 🟧 | 🟨 |
+| **W5** Refactor           | ⬜ | 🟧 | ⬜ | 🟥 | 🟧 | 🟨 | ⬜ |
+| **W6** Bug Hotfix         | ⬜ | ⬜ | ⬜ | 🟧 | 🟥 | 🟧 | ⬜ |
+| **W7** Audit & Harden     | ⬜ | ⬜ | ⬜ | 🟧 | 🟥 | 🟧 | 🟨 |
+| **W8** Personal Tool      | 🟨 | 🟨 | 🟨 | 🟧 | 🟨 | 🟧 | ⬜ |
 
-> Discover and Learn are mostly outside the library today. The dots are about *whether you should think about the phase*, not whether a skill runs.
+> Discover and Learn are mostly outside the library today. The intensities reflect *whether you should think about the phase*, not whether a skill runs.
 
 ---
 
