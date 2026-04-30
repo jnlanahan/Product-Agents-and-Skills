@@ -1,0 +1,30 @@
+{
+  "_comment": "Hooks block to merge into ~/.claude/settings.json. Both hooks are conservative and opt-in. Delete either if it gets annoying. Do not overwrite your existing settings.json — merge the 'hooks' key.",
+
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const fs=require('fs');const path=require('path');const cwd=process.cwd();const pkgPath=path.join(cwd,'package.json');if(!fs.existsSync(pkgPath))process.exit(0);const pkg=JSON.parse(fs.readFileSync(pkgPath,'utf8'));if(!pkg.scripts||!pkg.scripts.check)process.exit(0);const{execSync}=require('child_process');try{execSync('npm run check',{stdio:'pipe',timeout:60000});}catch(e){console.error('Typecheck failed after edit:');console.error(e.stdout?.toString()||e.message);process.exit(2);}\"",
+            "_comment": "Runs `npm run check` after any Edit/Write/MultiEdit IF the project has a 'check' script in package.json. Exits non-zero on type errors so Claude sees the failure. Skip silently if no package.json or no check script."
+          }
+        ]
+      }
+    ],
+
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[stack-detector] On first skill invocation, the stack-detector agent will scan this project. Output cached per session in /tmp/claude-stack-profile.json (or %TEMP% on Windows).'",
+            "_comment": "Just a reminder. The actual stack detection is on-demand via the agent, not on session start (would slow every session start). If you want true on-start detection, replace this command with: claude run-agent stack-detector --output /tmp/claude-stack-profile.json"
+          }
+        ]
+      }
+    ]
+  }
+}
