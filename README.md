@@ -6,6 +6,7 @@
 [![Agents](https://img.shields.io/badge/agents-6-2da44e)](AGENTS.md#agents-read-only-diagnostics)
 [![Skills](https://img.shields.io/badge/skills-19-2da44e)](AGENTS.md#skills-by-pdlc-phase)
 [![Workflows](https://img.shields.io/badge/workflows-8-orange)](WORKFLOWS.md)
+[![Map](https://img.shields.io/badge/map-one--page-8957e5)](MAP.md)
 
 ---
 
@@ -33,6 +34,7 @@ It's organized around a **7-phase Product Development Lifecycle** — Discover �
 ```
 .
 ├── README.md                  ← you are here
+├── MAP.md                     ← one-page map of workflows × skills × agents
 ├── AGENTS.md                  ← index of every agent + skill
 ├── WORKFLOWS.md               ← index of the 8 workflows
 ├── GAPS.md                    ← known coverage gaps + future work
@@ -119,7 +121,7 @@ Then in any project, in Claude Code, the slash-commands are available:
 
 ### Pick a workflow
 
-Start with [WORKFLOWS.md](WORKFLOWS.md) and find the row that matches what you're doing. Each workflow has a diagram, an ordered skill sequence, and an example walkthrough.
+Open [MAP.md](MAP.md) for the one-page view of how workflows, skills, and agents fit together — diagrams plus cross-reference tables. Or jump straight to [WORKFLOWS.md](WORKFLOWS.md) and find the row that matches what you're doing. Each workflow has a diagram, an ordered skill sequence, and an example walkthrough.
 
 If you're not sure, run `/next-steps` in your project — it tells you where you're at and what to run next.
 

@@ -12,7 +12,7 @@ A library you publish for others (and yourself) to install into their global Cla
 - **19 skills** in [skills/](skills/) — conversational slash-command workflows organized by PDLC phase (`0-Setup-*`, `2-Define-*`, `3-Design-*`, `4-Build-*`, `5-Validate-*`, `6-Deploy`).
 - **8 workflows** in [workflows/](workflows/) — named end-to-end paths through the agents and skills for different intents.
 - **Reference docs** — [PDLC_Phases.md](PDLC_Phases.md), [skills/_stack-preferences.md](skills/_stack-preferences.md), [skills/_adaptation-playbook.md](skills/_adaptation-playbook.md).
-- **Indexes** — [AGENTS.md](AGENTS.md) (everything), [WORKFLOWS.md](WORKFLOWS.md) (composed paths), [GAPS.md](GAPS.md) (missing pieces).
+- **Indexes** — [MAP.md](MAP.md) (one-page big-picture map of workflows × skills × agents), [AGENTS.md](AGENTS.md) (everything), [WORKFLOWS.md](WORKFLOWS.md) (composed paths), [GAPS.md](GAPS.md) (missing pieces).
 
 ## Where to start when working in this repo
 
@@ -23,6 +23,7 @@ A library you publish for others (and yourself) to install into their global Cla
 | Adding or editing a workflow | [WORKFLOWS.md](WORKFLOWS.md) → relevant `workflows/Wn-*.md` |
 | Updating the index | [AGENTS.md](AGENTS.md) — keep frontmatter `description` and the index entry in sync |
 | Closing a gap | [GAPS.md](GAPS.md) — when you ship the skill, remove its row |
+| Showing how everything fits together | [MAP.md](MAP.md) — diagrams + cross-reference tables |
 
 ## Conventions
 
