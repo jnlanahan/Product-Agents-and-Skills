@@ -29,55 +29,34 @@ The PDLC explicitly flags Discover as **human-led** — this gap is partially in
 
 ## Build phase
 
-The biggest gaps. Production-grade product workflows ([W2](workflows/W2-production-saas.md) and [W4](workflows/W4-migrate-to-production.md)) bump into these constantly.
-
 | Missing | Why useful | Workflows affected | Priority |
 |---|---|---|---|
-| **`/add-email`** — Resend-first transactional email (templates, DKIM/SPF setup, send-on-event wiring) | The locked stack preference in `_stack-preferences.md` is Resend, but no skill exists. Email features get scattered into `/build-feature` ad hoc. | W2, W3, W4, W7 | **High** |
-| **`/add-ai`** — Anthropic SDK + Files API + prompt caching + RAG patterns | AI integration is currently scattered into `/setup-project` Wave 7 and `/build-feature`. Deserves its own skill given how often it's needed. | W2, W3, W4, W8 | **High** |
-| **`/setup-ci`** — GitHub Actions / Render auto-deploy / preview environments | `/check-production` *audits* CI but no skill *creates* it. | W2, W4 | Medium |
-| **`/setup-tests`** — first test framework + first tests (Jest / Vitest / Playwright scaffolding) | Currently merged into `/build-feature`; standalone skill would help retrofits and `/migrate-from-vibe` outputs. | W3, W4, W5, W8 | Medium |
-| **`/setup-project --personal`** — a personal-profile branch in `/setup-project` | [W8](workflows/W8-personal-tool.md) needs lighter setup (no Stripe, optional auth, SQLite). Currently requires telling the skill what to skip mid-conversation. | W8 | Medium |
 | **`/extract-module`** — pull a module out into a deep, testable shape | `/refactor` plans this but doesn't ship a recipe for it. | W5 | Low |
 
 ---
 
 ## Validate phase
 
-`/check-production` covers a lot but isn't the whole picture.
-
 | Missing | Why useful | Workflows affected | Priority |
 |---|---|---|---|
-| **`/uat`** — structured user acceptance testing flow | Particularly important for [W4](workflows/W4-migrate-to-production.md), where the migration must preserve behavior the early users already rely on, and [W3](workflows/W3-add-feature.md) staged rollouts. | W2, W3, W4 | Medium |
-| **`/accessibility`** — a11y audit (axe-core scan, keyboard navigation, screen-reader smoke test) | Not currently in `/check-production`'s 9 areas. | W2, W3, W7 | Medium |
 | **`/load-test`** — performance / load testing with k6 or Artillery | Production-readiness without load testing is partial; refactors that target performance benefit from before/after benchmarks. | W2, W5, W7 | Low |
-| **`/check-production --lite`** — a lite mode of the existing audit | `/check-production` is heavyweight; a 30-second sanity-check mode would unblock [W6](workflows/W6-fix-production-bug.md) and [W8](workflows/W8-personal-tool.md). | W6, W8 | Medium |
 | **`/security-pentest`** — beyond static audit: simulated attack patterns | The current audit is static. Some hardening genuinely needs dynamic checks. | W7 | Low |
 
 ---
 
 ## Deploy phase
 
-`/deploy` covers rollout. Rollback, canary, and on-call handoff are gaps.
-
 | Missing | Why useful | Workflows affected | Priority |
 |---|---|---|---|
-| **`/rollback`** — codified rollback playbook (DB migrations, env changes, traffic cutover) | `/deploy` produces a rollout plan but the rollback path is currently manual. Most acute in [W6](workflows/W6-fix-production-bug.md) when a hotfix itself is the rollback condition. | W2, W3, W4, W6 | Medium |
-| **`/canary`** — progressive rollout configuration (percentage-based, region-based, cohort-based) | Manual today. Important for any `/deploy` where blast radius matters. | W2, W3, W7 | Low |
-| **`/runbook`** — generates an operational runbook from the just-deployed state | Useful for on-call handoff; particularly needed in [W4](workflows/W4-migrate-to-production.md) (first real deploy) and [W7](workflows/W7-audit-harden.md) (handover ready). | W2, W4, W7 | Medium |
-| **`/feature-flag`** — wires feature-flag tooling and enforces flag-driven rollout in code | [W3](workflows/W3-add-feature.md) and [W7](workflows/W7-audit-harden.md) frequently want this. | W3, W7 | Medium |
+| **`/canary`** — progressive rollout configuration (percentage-based, region-based, cohort-based) | Manual today. Important for any `/deploy` where blast radius matters. `/feature-flag` covers PostHog-based percentage rollouts, but infrastructure-level canary (Render traffic splitting, Fly.io rolling deploys) is a separate concern. | W2, W3, W7 | Low |
 
 ---
 
 ## Learn phase
 
-The single largest gap. Phase 7 currently has **zero skills**.
-
 | Missing | Why useful | Workflows affected | Priority |
 |---|---|---|---|
-| **`/post-launch-review`** — metric review + retro a few weeks after deploy | Closes the loop on every workflow. Without it, learning is informal and incompletely captured. | All except W6 | **High** for ongoing improvement |
-| **`/ab-test`** — A/B test setup + readout | Particularly relevant for [W3](workflows/W3-add-feature.md) feature decisions. | W3 | Low |
-| **`/postmortem`** — structured postmortem after a severe bug or outage | Today done in a doc by hand; structured generation would be helpful. | W6 | Medium |
+| **`/ab-test`** — A/B test setup + readout (beyond feature flags) | `/feature-flag` covers flag-based rollouts. A full A/B test skill would add statistical significance testing and readout from PostHog experiments. | W3 | Low |
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: 5-Validate-Production-Readiness
-description: MUST BE USED before a production launch or after a big change to the critical path. Runs a deep production-readiness audit and returns a severity-graded report (Critical/High/Medium/Low) with file:line citations and a recommended fix order. Trigger on `/check-production`, "is this ready for production", "audit before launch", or any pre-deploy review request.
+description: MUST BE USED before a production launch or after a big change to the critical path. Runs a deep production-readiness audit and returns a severity-graded report (Critical/High/Medium/Low) with file:line citations and a recommended fix order. Add `--lite` for a fast 30-second sanity check that skips the full auditor. Trigger on `/check-production`, "is this ready for production", "audit before launch", or any pre-deploy review request.
 ---
 
 # /check-production
@@ -13,8 +13,23 @@ You orchestrate a deep production-readiness audit. The actual audit work is dele
 - After a major refactor or new integration
 - Periodic check (quarterly) on a production app
 - After running `/next-steps` and the user wants to drill down on Stage-4 hardening
+- `--lite` flag: quick pre-deploy sanity check for hotfixes (W6) or personal tools (W8)
 
-## Procedure
+## `--lite` Mode (fast sanity check)
+
+When invoked as `/check-production --lite`, skip the full auditor and run a quick pass instead:
+
+1. Run `secret-scanner` only (fastest, highest-signal scan)
+2. Run `stack-detector` to confirm the expected stack is in place
+3. Check that `npm run build` (or equivalent) passes
+4. Check `/api/health` returns 200
+5. Report: pass (no critical secrets found, build green, health OK) or fail (list what broke)
+
+Use `--lite` for: hotfix pre-deploy checks, personal tools (W8), or any situation where a 30-second check is better than a 10-minute one. **Not a substitute for the full audit before a first production launch.**
+
+---
+
+## Full Procedure
 
 ### Step 1: Set context
 

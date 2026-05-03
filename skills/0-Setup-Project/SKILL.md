@@ -1,23 +1,40 @@
 ---
 name: 0-Setup-Project
-description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. NOT for existing projects — for those, run `/next-steps` first.
+description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. Use `--personal` flag for lighter personal tools (no Stripe, optional auth, SQLite). NOT for existing projects — for those, run `/next-steps` first.
 ---
 
 # /setup-project
 
-You set up a new SaaS project from near-empty state using the user's preferred stack from `_stack-preferences.md`. Discipline matters here: each layer goes in as a separate commit, in the right order, with verification.
+You set up a new project from near-empty state using the user's preferred stack from `_stack-preferences.md`. Discipline matters here: each layer goes in as a separate commit, in the right order, with verification.
 
 ## When to Use
 
 - Empty directory or `npm init -y` output
 - Fresh `create-next-app` / `create-vite` / `create-t3-app` scaffold with no real features
-- User explicitly says "start a new SaaS project"
+- User explicitly says "start a new SaaS project" or "start a personal tool"
 
 ## When NOT to Use
 
 - Project has source files beyond a scaffold → run `/next-steps` first to assess
 - Project has an existing auth/payment/db setup → use the targeted `/add-*` skill instead
 - Project came from a vibe-coding tool (Replit/V0/Lovable/Bolt) → run `/migrate-from-vibe` first
+
+## `--personal` Mode (lighter stack for personal tools)
+
+When invoked as `/setup-project --personal`, use a reduced scope:
+
+| Layer | SaaS default | Personal (`--personal`) |
+|---|---|---|
+| DB | Neon Postgres + Drizzle | SQLite + Drizzle (local-first, no cloud account needed) |
+| Auth | Firebase Auth (required) | Optional — ask if needed |
+| Payments | Stripe | Skip |
+| File storage | Firebase Storage | Skip |
+| Monitoring | PostHog + Sentry | Sentry only (optional) |
+| Deploy | Render / Railway | Fly.io or Render (single container) |
+
+Everything else (test infra, CI, CLAUDE.md, security middleware) still applies. Use `--personal` for: internal dashboards, scripts with a UI, personal productivity tools, side projects without a business model.
+
+Skip the "External account setup" step for omitted services. Ask only about the accounts that are actually needed.
 
 ## Procedure
 
