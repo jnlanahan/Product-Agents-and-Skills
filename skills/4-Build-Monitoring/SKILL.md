@@ -1,5 +1,5 @@
----
-name: 4-Build-Monitoring
+﻿---
+name: add-monitoring
 description: MUST BE USED before any production launch. Wires both Sentry (errors) and PostHog (product analytics) — not one or the other. Walks the user through account setup, env vars, and verification with real test events. Identifies authenticated users in both tools so analytics is attributable. Trigger on `/add-monitoring`, "wire Sentry", "wire PostHog", "add observability".
 ---
 
@@ -10,6 +10,12 @@ You wire **both** Sentry and PostHog. They don't overlap:
 - **PostHog** = product analytics + session replay + feature flags + funnels
 
 If only one is wired, add the other. If both are wired, verify config and exit.
+
+## Important
+
+- Both Sentry AND PostHog must be wired — do not deliver half the monitoring stack and call it done.
+- Verify DSN/API keys are set in the environment before finishing; SDKs fail silently if keys are missing.
+- Identify the authenticated user in both tools from the start — anonymous events are hard to act on post-launch.
 
 ## Procedure
 
@@ -52,84 +58,27 @@ Walk the user through both account setups, verbatim:
 
 Wait for the user to confirm.
 
-### Step 4: Use Sentry's wizard for installation
+→ See [sentry-posthog-patterns.md](references/sentry-posthog-patterns.md) for installation commands, user identification code, env var list, and Sentry verification test snippet.
 
-For Next.js projects, run:
+### Step 4: Install Sentry
 
-```bash
-npx @sentry/wizard@latest -i nextjs
-```
-
-The wizard:
-- Installs `@sentry/nextjs`
-- Creates `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`
-- Wraps `next.config.ts` with `withSentryConfig`
-- Creates `instrumentation.ts` if missing
-- Asks for DSN and auth token interactively
-
-For other frameworks (Vite, Express), install manually:
-
-```bash
-npm install @sentry/node @sentry/react   # Express + React
-# or
-npm install @sentry/react                # Vite-only
-```
-
-Then add `Sentry.init({ dsn: process.env.SENTRY_DSN, tracesSampleRate: 0.1 })` early in the entrypoint.
+For Next.js, run `npx @sentry/wizard@latest -i nextjs` — it handles config files, `next.config.ts` wrapping, and `instrumentation.ts`. For Vite/Express, install `@sentry/react` or `@sentry/node` manually and call `Sentry.init()` early in the entrypoint.
 
 ### Step 5: Wire PostHog
 
-Install:
-
-```bash
-npm install posthog-js posthog-node
-```
-
-Create `lib/posthog-client.ts` (client) and `lib/posthog-server.ts` (server). Mirror the project's existing lib/* style. The client wraps `<PostHogProvider client={posthog}>` around your root layout. The server uses `posthog-node` for capture-then-shutdown in serverless.
-
-Use `pattern-finder` to find the project's provider-mount pattern (e.g., is there already a providers wrapper in `app/layout.tsx`?). Mount PostHog there.
+Install `posthog-js posthog-node`. Create `lib/posthog-client.ts` and `lib/posthog-server.ts` mirroring the project's lib/* style. Use `pattern-finder` to find the existing providers wrapper in `app/layout.tsx` and mount PostHog there.
 
 ### Step 6: Identify users on auth events
 
-After successful sign-in (client-side):
-
-```typescript
-import * as Sentry from '@sentry/nextjs';
-import posthog from 'posthog-js';
-
-Sentry.setUser({ id: user.uid, email: user.email });
-posthog.identify(user.uid, { email: user.email, plan: user.plan });
-```
-
-On sign-out: `Sentry.setUser(null); posthog.reset();`
+Call `Sentry.setUser()` and `posthog.identify()` after successful sign-in; call `Sentry.setUser(null)` and `posthog.reset()` on sign-out. See reference file for the exact snippet.
 
 ### Step 7: Set env vars
 
-Add to `.env.example`:
-
-```
-SENTRY_DSN=
-NEXT_PUBLIC_SENTRY_DSN=
-SENTRY_AUTH_TOKEN=
-NEXT_PUBLIC_POSTHOG_KEY=
-NEXT_PUBLIC_POSTHOG_HOST=
-```
-
-Tell the user to set these in their local `.env.local`. Production env vars get set during `/deploy`.
+Add `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `NEXT_PUBLIC_POSTHOG_KEY`, and `NEXT_PUBLIC_POSTHOG_HOST` to `.env.example`. Tell the user to set these in `.env.local`. Production vars get set during `/deploy`.
 
 ### Step 8: Verify
 
-> **Test Sentry** — temporarily add a button or route that throws:
->
-> ```typescript
-> throw new Error('Sentry test error');
-> ```
->
-> 1. Run dev server, hit the throw
-> 2. Open Sentry dashboard → Issues
-> 3. The error should appear within 1 minute
-> 4. Click it — stack trace should show your `.tsx` file (NOT minified `.js`). If minified, source maps aren't uploading; check `SENTRY_AUTH_TOKEN`.
-> 5. Remove the test throw
+> **Test Sentry** — temporarily throw `new Error('Sentry test error')` in a route, hit it, confirm the issue appears in the Sentry dashboard within 1 minute with a readable `.tsx` stack trace (not minified). Remove the throw after confirming.
 
 > **Test PostHog**:
 >
@@ -158,3 +107,10 @@ Skip: every button click, every form input. Session replay covers granular UX.
 - **Mask password fields in PostHog session replay** (`maskAllInputs: true` is the safe default).
 - **Source maps in CI.** Set `SENTRY_AUTH_TOKEN` in CI env so production builds upload source maps automatically. Without this, production stack traces are useless.
 - **Don't log PII to Sentry.** Mask emails/names in `beforeSend` if you store sensitive data in error contexts.
+
+## If Something Goes Wrong
+
+- **Sentry events not appearing** — confirm the DSN is set in `.env` and the server was restarted; use Sentry's test event button (Settings > Projects > your project > "Send a test event").
+- **PostHog not tracking events** — check the API key and host in the PostHog config; confirm `posthog.identify()` is called after login and not before the client initializes.
+- **User identity not showing in Sentry/PostHog** — confirm `Sentry.setUser()` and `posthog.identify()` are called after authentication resolves, not on app mount.
+- **Source maps not uploading to Sentry** — verify `SENTRY_AUTH_TOKEN` and `SENTRY_ORG`/`SENTRY_PROJECT` are set in CI; source maps must be uploaded at build time, not runtime.

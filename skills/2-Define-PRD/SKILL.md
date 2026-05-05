@@ -1,11 +1,16 @@
----
-name: 2-Define-PRD
+﻿---
+name: prd
 description: MUST BE USED when the user wants to create a PRD or product requirements doc. Synthesizes the current conversation and codebase understanding into a comprehensive PRD with functional and non-functional requirements, success metrics, risks, and rollout plan. Writes to `.claude/prd.md`. Does NOT interview the user — just synthesizes what's already known.
 ---
 
 # /prd
 
 Take the current conversation context and codebase understanding and produce a comprehensive PRD. Do NOT interview the user — synthesize what you already know. If something is unknown, write `<TBD>` and call it out at the end.
+
+## Before You Start
+
+- Have a clear description of what you're building — even a rough paragraph is enough context to synthesize a meaningful PRD.
+- If the codebase is brand new or empty, note that in context — the PRD will focus on design intent rather than current state.
 
 ## Process
 
@@ -169,3 +174,9 @@ Anything else relevant — links to research, prior incidents, related ADRs.
 - **Implementation Decisions should survive refactors.** Use module names and behaviors, not file paths.
 - **Write to `.claude/prd.md`**, not GitHub. Recommend the user commit it.
 - **Recommend `/plan` next** in the handoff message.
+
+## If Something Goes Wrong
+
+- **Context too thin to synthesize requirements** — ask the user for a one-paragraph description of the problem and target user before proceeding; do not guess at requirements.
+- **Conflicting signals between conversation and codebase** — surface the conflict explicitly in the PRD under a "Assumptions & Open Questions" section; do not silently pick one.
+- **`.claude/prd.md` write fails** — confirm write permission to `.claude/`; create the directory if needed.

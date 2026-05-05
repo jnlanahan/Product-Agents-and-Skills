@@ -1,11 +1,17 @@
----
-name: 4-Build-CI
+﻿---
+name: setup-ci
 description: MUST BE USED when adding continuous integration to a project that lacks it. Generates GitHub Actions workflows for typecheck, tests, lint, and (optionally) auto-deploy to Render or Railway on merge to main. Adapts to detected test framework and package manager. Trigger on `/setup-ci`, "add CI", "add GitHub Actions", "automate tests on PR", "wire CI/CD", "deploy on push".
 ---
 
 # /setup-ci
 
 You add CI to a project that doesn't have it. Preference is GitHub Actions. Adapts to Render or Railway deploy targets per stack preferences.
+
+## Important
+
+- Confirm the deploy target (Render, Railway, or none) with the user before generating the workflow — deploy steps are platform-specific and non-interchangeable.
+- Show the generated CI config to the user before pushing it; a broken pipeline blocks all PRs.
+- Ensure tests pass locally before wiring CI — a red pipeline on day one destroys confidence in the system.
 
 ## Procedure
 
@@ -196,3 +202,9 @@ Tell the user:
 - **Don't put secrets in workflow YAML** — always `${{ secrets.NAME }}`.
 - **E2E tests are non-blocking until stable** — flaky E2E blocking merges destroys team velocity.
 - **Typecheck is separate from tests** — `tsc --noEmit` catches type errors that test runners often miss.
+
+## If Something Goes Wrong
+
+- **GitHub Actions workflow fails on first run** — check the runner logs for the exact failing step; missing env vars and wrong Node versions are the most common causes.
+- **Deploy step fails with permission denied** — confirm deploy API keys are added to GitHub Secrets (not just local `.env`) and that secret names exactly match the workflow file.
+- **Tests pass locally but fail in CI** — check for filesystem path case sensitivity, missing `NODE_ENV=test`, or tests that depend on local env vars not set in CI.

@@ -1,11 +1,17 @@
----
-name: 6-Deploy
+﻿---
+name: deploy
 description: MUST BE USED when the user wants to deploy a project to production for the first time, or onboard an existing app's deploy story. Covers pre-flight checks, account setup, env vars, custom domain + SSL, third-party reconfigurations (webhooks, allowed origins, email DNS), post-deploy smoke tests, and runbook generation. Heavy on step-by-step browser guidance. Trigger on `/deploy`, "ship to prod", "go live", "deploy this".
 ---
 
 # /deploy
 
 You walk the user — assumed to be a developer with limited deployment experience — through a full production deploy end-to-end. Every external step (account creation, dashboard navigation, DNS records) gets explicit numbered instructions like "1. Open https://railway.app/new. 2. Click 'Deploy from GitHub repo'." The user should be able to follow this skill without prior deploy experience.
+
+## Critical
+
+- The pre-flight checklist (Phase 0) must fully pass before any deploy command runs — do not skip or defer any item.
+- Confirm the target environment (staging vs. production) explicitly with the user before executing deploy commands.
+- If any post-deploy health check fails, stop immediately and run `/rollback` — do not attempt hotfixes on a broken production deploy.
 
 ## When to Use
 
@@ -55,90 +61,15 @@ Determine the platform:
 
 Then walk the user through account setup. Use the relevant section below.
 
-#### Phase 1A — Railway (default)
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) for verbatim browser instructions for Railway, Vercel, and Render account setup.
 
-Tell the user, verbatim:
-
-> **Railway account setup — do these in your browser:**
->
-> 1. Open https://railway.com (or railway.app — they redirect to the same place)
-> 2. Click **"Login"** in the top right
-> 3. Sign in with GitHub (recommended) — Railway needs GitHub access to deploy your repo
-> 4. Once logged in, click **"New Project"**
-> 5. Select **"Deploy from GitHub repo"**
-> 6. If this is your first time: click **"Configure GitHub App"** and grant Railway access to the repo you want to deploy
-> 7. Select your repo from the list
-> 8. Railway will start an initial build — let it run, it will probably fail because env vars aren't set yet (that's fine, we'll fix it next)
-> 9. Reply "done" when you're at the project page (you'll see "Build", "Deploy", "Variables" tabs)
-
-Wait for the user to confirm.
-
-Then, if the user is using Railway Postgres (not Neon):
-
-> **Add a Postgres database (skip if you're using Neon):**
->
-> 1. In your Railway project, click **"+ New"** in the top right
-> 2. Click **"Database"** → **"PostgreSQL"**
-> 3. Railway provisions a Postgres instance and adds `DATABASE_URL` to your service automatically
-> 4. Reply "done" when the database shows up in your project view
-
-If using Neon: skip — the user already has `DATABASE_URL` from the Neon dashboard.
-
-#### Phase 1B — Vercel (if detected)
-
-> **Vercel account setup:**
->
-> 1. Open https://vercel.com/signup
-> 2. Sign up with GitHub
-> 3. Click **"Add New..."** → **"Project"**
-> 4. Import your GitHub repo (you may need to install the Vercel GitHub app first)
-> 5. On the configuration screen, leave defaults — Vercel auto-detects Next.js
-> 6. **Don't deploy yet** — click **"Environment Variables"** to add vars first (next phase)
-> 7. Reply "done" when you're at the env vars screen
-
-#### Phase 1C — Render (if detected)
-
-> **Render account setup:**
->
-> 1. Open https://render.com/register
-> 2. Sign up with GitHub
-> 3. Click **"New +"** → **"Web Service"**
-> 4. Connect your GitHub repo
-> 5. On the configuration screen, set Build Command and Start Command (Claude will give you the right values)
-> 6. **Don't deploy yet** — scroll down to env vars first (next phase)
-> 7. Reply "done"
+Use the relevant section from the reference file and deliver it verbatim to the user. Wait for confirmation before proceeding.
 
 ### Phase 2: Wire env vars + add health check
 
 Claude-side: open `.env.example` and list every required env var the user needs to provide.
 
-Then tell the user, verbatim, with their actual platform's UI:
-
-> **Set these env vars in Railway:**
->
-> 1. In your Railway project, click your service (the one named after your repo)
-> 2. Click the **"Variables"** tab
-> 3. Click **"+ New Variable"** for each of the following. Get the values from these locations:
->
-> | Variable | Where to get it |
-> |---|---|
-> | `DATABASE_URL` | Auto-set if you used Railway Postgres. If using Neon: copy from Neon dashboard → your project → Connection Details → Connection string |
-> | `STRIPE_SECRET_KEY` | Stripe dashboard → Developers → API keys → **"Reveal live key"** (use `sk_live_*` for production, NOT `sk_test_*`) |
-> | `STRIPE_WEBHOOK_SECRET` | We'll set this in Phase 4 after you create the production webhook endpoint. Leave blank for now |
-> | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe dashboard → Developers → API keys → publishable key (`pk_live_*`) |
-> | `FIREBASE_SERVICE_ACCOUNT` | Firebase console → Project Settings → Service Accounts → "Generate new private key" → paste the FULL JSON (with quotes) |
-> | `NEXT_PUBLIC_FIREBASE_API_KEY` (and other `NEXT_PUBLIC_FIREBASE_*`) | Firebase console → Project Settings → General → Your apps → SDK setup and configuration |
-> | `RESEND_API_KEY` | Resend dashboard → API Keys → "Create API Key" |
-> | `NEXT_PUBLIC_POSTHOG_KEY` | PostHog dashboard → Project Settings → Project API Key |
-> | `NEXT_PUBLIC_POSTHOG_HOST` | Usually `https://us.i.posthog.com` (or `https://eu.i.posthog.com` if EU) |
-> | `SENTRY_DSN` | Sentry dashboard → Settings → Projects → [your project] → Client Keys (DSN) |
-> | `NEXT_PUBLIC_SENTRY_DSN` | Same as above (it's safe to expose) |
-> | `SENTRY_AUTH_TOKEN` | Sentry → Settings → Account → Auth Tokens → Create token with `project:releases` scope |
->
-> 4. After all variables are set, Railway will redeploy automatically
-> 5. Reply "done" when all variables are in
-
-Wait for the user.
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Env Vars — Railway" section for the verbatim variable table and where to find each value. Deliver it to the user and wait for "done".
 
 Claude-side: if `/api/health` doesn't exist, add it now (use the project's framework idiom — Next.js `app/api/health/route.ts` or Express `app.get('/api/health', ...)`). Commit and push. Railway auto-deploys.
 
@@ -162,77 +93,13 @@ Then:
 
 This is the most-forgotten phase. The user has services configured for `localhost`; production needs them updated. Walk through each service the project uses (skip ones not detected).
 
-#### Firebase Auth
-
-> **Add your production domain to Firebase Auth:**
->
-> 1. Open https://console.firebase.google.com → your project
-> 2. **Authentication** (left sidebar) → **Settings** tab → **Authorized domains**
-> 3. Click **"Add domain"** → enter your Railway domain (e.g., `your-app.up.railway.app`) and your custom domain if you have one
-> 4. Reply "done"
-
-#### Stripe webhook endpoint
-
-> **Register the production webhook in Stripe:**
->
-> 1. Open https://dashboard.stripe.com → **Developers** → **Webhooks**
-> 2. Make sure you're in **LIVE mode** (toggle in top-right)
-> 3. Click **"+ Add endpoint"**
-> 4. **Endpoint URL**: `https://<your-domain>/api/webhooks/stripe`
-> 5. **Listen to** these events:
->    - `checkout.session.completed`
->    - `customer.subscription.updated`
->    - `customer.subscription.deleted`
->    - `invoice.payment_succeeded`
->    - `invoice.payment_failed`
-> 6. Click **"Add endpoint"**
-> 7. On the endpoint page, find **"Signing secret"** → click **"Reveal"** → copy the value (starts with `whsec_`)
-> 8. Go back to Railway → Variables → set `STRIPE_WEBHOOK_SECRET` to that value
-> 9. Reply "done"
-
-#### Resend domain
-
-> **Verify your sending domain in Resend:**
->
-> 1. Open https://resend.com/domains
-> 2. Click **"Add Domain"**
-> 3. Enter the domain you'll send emails from (e.g., `yourdomain.com` — your custom domain, not `*.up.railway.app`)
-> 4. Resend shows you DNS records to add (SPF, DKIM, DMARC)
-> 5. Add those records in your DNS provider (Phase 5 covers DNS access)
-> 6. Wait for verification (usually < 10 min) — Resend will turn the status green
-> 7. Reply "done" when verified
-
-#### Sentry alerts
-
-> **Set up Sentry alerts:**
->
-> 1. Open https://sentry.io → your project
-> 2. **Settings** → **Alerts** → **Create Alert Rule**
-> 3. Rule: "When a new issue is seen" → notify your email/Slack
-> 4. Reply "done"
-
-#### PostHog
-
-No extra setup needed — PostHog auto-detects environment from the host.
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Third-Party Service Wiring for Production" section for verbatim steps covering Firebase Auth authorized domains, Stripe webhook endpoint, Resend domain verification, and Sentry alert setup. PostHog requires no extra setup — it auto-detects environment from the host.
 
 ### Phase 5: Custom domain (optional but recommended for launch)
 
 If the user wants a custom domain (e.g., `myapp.com` instead of `myapp.up.railway.app`):
 
-> **Add your custom domain to Railway:**
->
-> 1. In Railway → your service → **Settings** → **Public Networking**
-> 2. Click **"+ Custom Domain"** → enter your domain (e.g., `myapp.com`)
-> 3. Railway shows you a CNAME record (something like `cname.up.railway.app`)
-> 4. **At your DNS provider** (where you bought the domain — Namecheap, Cloudflare, GoDaddy, etc.):
->    - Log in to your DNS provider
->    - Find DNS settings for the domain
->    - Add a CNAME record: name = `@` (or your subdomain) → value = the `cname.up.railway.app` value Railway gave you
->    - Save
-> 5. Wait 5-30 minutes for DNS to propagate
-> 6. Railway auto-provisions an SSL certificate
-> 7. Visit `https://yourdomain.com` to verify — should show your app with valid HTTPS
-> 8. Reply "done" when working
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Custom Domain Setup" section for verbatim Railway CNAME and DNS steps.
 
 Then **redo the Phase 4 third-party updates with the new domain** — Firebase authorized domains, Stripe webhook URL, Resend sender address all need the custom domain added.
 
@@ -273,30 +140,9 @@ This is the gate before announcing. Walk through every box. Any FAIL must be fix
 - [ ] Sentry alert configured (Phase 4)
 
 #### E. Operations
-- [ ] CI runs on every PR (typecheck + tests). If not, add `.github/workflows/test.yml`:
-
-```yaml
-name: CI
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '24', cache: 'npm' }
-      - run: npm ci
-      - run: npm run check
-      - run: npm test
-```
-
+- [ ] CI runs on every PR (typecheck + tests). If not, add `.github/workflows/test.yml` — see [platform-setup-steps.md](references/platform-setup-steps.md) "CI Workflow" for the exact YAML.
 - [ ] Production logs accessible (Railway → service → Logs tab)
-- [ ] **Uptime monitor** configured. Walk the user through BetterStack:
-   > 1. Open https://betterstack.com → sign up free
-   > 2. Click **"Create monitor"** → URL = `https://<your-domain>/api/health`
-   > 3. Check interval: 1-3 minutes
-   > 4. Add your email/SMS for alerts
-   > 5. Reply "done"
+- [ ] **Uptime monitor** configured. Walk the user through BetterStack — see [platform-setup-steps.md](references/platform-setup-steps.md) "Uptime Monitor Setup" for verbatim steps.
 - [ ] **Rollback procedure tested**: in Railway → Deployments → previous successful deploy → "Redeploy" → confirm rollback works on a non-critical change
 
 #### F. Legal & content
@@ -307,54 +153,7 @@ jobs:
 
 ### Phase 7: Generate the runbook
 
-Create `LAUNCH_RUNBOOK.md` in the project root:
-
-```markdown
-# Launch Runbook
-
-**Production URL**: https://<your-domain>
-**Status page**: https://<betterstack-status-url>
-**Last updated**: <date>
-
-## Where to look when things break
-
-| Symptom | First place to check |
-|---|---|
-| Site is down | Railway dashboard → service status; BetterStack incidents |
-| Errors spiking | Sentry → Issues |
-| Payments not processing | Stripe dashboard → Webhooks → recent deliveries |
-| Emails not sending | Resend dashboard → Logs |
-| Auth not working | Firebase console → Authentication |
-| Slow responses | Sentry → Performance |
-| Database issues | Neon dashboard → Operations log |
-
-## On-call & alerts
-
-- **Primary**: <user name + contact>
-- **Sentry alerts go to**: <channel/email>
-- **Uptime alerts go to**: <channel/email>
-
-## Common operations
-
-### Roll back a deploy
-1. Railway → Deployments tab → previous successful deploy → Redeploy
-
-### Rotate a leaked secret
-1. Generate new secret in the relevant dashboard
-2. Update env var in Railway → Variables (auto-redeploys)
-3. Revoke the old secret in the original dashboard
-
-### Run a migration in production
-- Migrations run on deploy automatically (start command includes `db:migrate`)
-- Manual: `DATABASE_URL=<prod-url> npm run db:migrate` from local
-
-### View production logs
-- Railway → service → Logs tab
-- Or Sentry → Issues for error-only filtering
-
-## Known issues
-<list, if any>
-```
+→ See [runbook-template.md](references/runbook-template.md) for the full `LAUNCH_RUNBOOK.md` template. Create it at the project root, filling in the production URL, BetterStack status URL, and on-call contacts.
 
 ### Phase 8: Sign-off
 
@@ -377,3 +176,10 @@ If all PASS:
 - **Secrets via platform UI/CLI, never committed.** Even production env files don't go in git.
 - **Refuse to certify if Critical issues remain.** This is the last gate. Don't pass things along with "you should fix this later."
 - **The runbook lives in the repo, not in Notion.** It rots if it's separate from the code.
+
+## If Something Goes Wrong
+
+- **Build fails during deploy** — read the full build log for the first error; common causes are missing env vars, incompatible Node version, or a missing dependency. Fix locally first and verify the build passes before re-deploying.
+- **Custom domain not resolving** — DNS propagation can take up to 48 hours; use `dig yourdomain.com` to check current records; confirm the CNAME or A record matches the platform's instructions exactly.
+- **Health check fails post-deploy** — check application logs in the platform dashboard immediately; a failing health check usually means a missing env var, a migration that did not run, or a startup crash. Run `/rollback` if the service is degraded for users.
+- **Third-party webhooks stop working** — update webhook URLs in Stripe, Resend, and other providers to the new production URL; test each webhook with the provider's test event feature.

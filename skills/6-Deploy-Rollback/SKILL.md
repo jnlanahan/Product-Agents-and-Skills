@@ -1,11 +1,17 @@
----
-name: 6-Deploy-Rollback
+﻿---
+name: rollback
 description: MUST BE USED when a production deploy has introduced a regression and the team needs a rollback plan, or proactively before a risky deploy to document the rollback path. Assesses what changed, classifies rollback complexity, and generates a numbered step-by-step rollback runbook covering code, DB migrations, env vars, and traffic. Trigger on `/rollback`, "rollback plan", "how do I revert production", "undo deploy", "production is broken", "need to rollback".
 ---
 
 # /rollback
 
 You generate and (when the user is ready to execute) walk through a rollback for a broken production deploy.
+
+## Critical
+
+- Confirm that production is actually broken before initiating rollback — misidentified incidents waste rollback capacity and can cause their own outages.
+- Classify whether the rollback involves a database migration reversal before starting; irreversible migrations require a different path than code-only rollbacks.
+- Communicate status to users and stakeholders before executing rollback steps — silent rollbacks erode trust.
 
 ## Procedure
 
@@ -139,3 +145,9 @@ No DB action needed now. Schedule cleanup:
 - **Revert commits, not resets** — use `git revert` (safe, creates new commit) not `git reset --hard` on shared branches.
 - **Notify stakeholders immediately** — users should know about an outage; don't try to fix silently for more than 5 minutes.
 - **Run `/postmortem` after** — document what happened, why, and how to prevent recurrence.
+
+## If Something Goes Wrong
+
+- **Code rollback succeeds but the app is still broken** — the bug may be in an env var or external service config, not the code; check recent changes to Stripe, email, or auth provider settings.
+- **Database migration cannot be reversed** — if the migration is irreversible (e.g., dropped column, renamed table), rollback is a data recovery exercise, not a deploy revert; escalate immediately and stop attempting code rollbacks.
+- **Previous version fails to build** — check if the previous version depended on an env var or service that no longer exists; restore the dependency before deploying the previous version.

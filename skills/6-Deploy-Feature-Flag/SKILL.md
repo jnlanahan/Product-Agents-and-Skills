@@ -1,11 +1,17 @@
----
-name: 6-Deploy-Feature-Flag
+﻿---
+name: feature-flag
 description: MUST BE USED when wiring feature flags to gate a new feature for staged rollout, A/B testing, or kill-switch control. Uses PostHog feature flags (stack preference) or extends detected flag tooling. Generates flag-guarded code and a staged rollout plan. Trigger on `/feature-flag`, "add feature flag", "gate this feature", "staged rollout", "kill switch", "progressive rollout", "dark launch".
 ---
 
 # /feature-flag
 
 You wire feature flags to control feature visibility — for staged rollouts, A/B tests, or kill switches.
+
+## Critical
+
+- Flags must default to OFF (false/null) on creation — never ship a flag that defaults to enabled for all users.
+- Test the flag in staging with it both ON and OFF before enabling it in production; a flag that only works one way is not a flag.
+- Keep the flag-guarded code path clean — do not let flag conditions accumulate without a removal plan (flag debt causes outages).
 
 ## Procedure
 
@@ -162,3 +168,9 @@ Flag can be deleted when: 100% rollout for 2+ weeks, no incident since rollout, 
 - **Server-side flags for sensitive features** — client-side flags are visible in the browser bundle; don't gate admin-only or billing features client-side only.
 - **Always track an exposure event** — without it, PostHog can't tell if flagged users actually saw the feature.
 - **One flag, one feature** — don't reuse a flag key across multiple features.
+
+## If Something Goes Wrong
+
+- **Flag not activating for expected users** — confirm the flag condition in PostHog matches the user properties being sent; check that `posthog.identify()` is called with the correct user ID before flag evaluation.
+- **Feature leaks to all users despite flag being OFF** — check for missing flag checks in server-side routes; a flag guard on the client only is not sufficient if the API is also accessible.
+- **Flag cannot be toggled without a deploy** — the flag must be wired to the PostHog API, not hardcoded; verify the SDK call returns the live flag value on each request.

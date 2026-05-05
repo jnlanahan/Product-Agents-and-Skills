@@ -1,11 +1,17 @@
----
-name: 6-Deploy-Runbook
+﻿---
+name: runbook
 description: MUST BE USED after a successful production deploy to generate an operational runbook for on-call handoff. Reads codebase, deploy config, and monitoring setup to produce a reference doc covering health checks, env vars, startup/shutdown, common failure modes and their fixes, alert response, and rollback steps. Trigger on `/runbook`, "generate runbook", "ops runbook", "on-call handoff", "operational documentation", "incident response guide".
 ---
 
 # /runbook
 
 You generate an operational runbook for the current project — the first-responder reference for anyone keeping this service healthy.
+
+## Critical
+
+- Generate the runbook after a successful deploy, not before — it must reflect the actual deployed configuration, not a plan.
+- Every env var listed must be verified as set in the production environment before the runbook is considered complete.
+- Include rollback steps even if rollback is "unlikely" — the person reading the runbook is always under pressure.
 
 ## Procedure
 
@@ -192,3 +198,9 @@ For DB migration rollback, read the rollback skill first — ordering matters.
 - **Keep it current** — update when infrastructure changes. A stale runbook is worse than none (false confidence).
 - **Link to external dashboards**, don't embed screenshots — URLs are more durable.
 - **Never put credentials in the runbook** — the runbook describes where to find credentials, not what they are.
+
+## If Something Goes Wrong
+
+- **Env var listed in runbook is not set in production** — locate the var in the platform's env settings and add it immediately; do not mark the runbook complete until all vars are verified.
+- **Health check endpoint returns errors** — trace the error to its source (missing DB connection, startup crash, missing dependency); fix the underlying issue rather than removing the health check.
+- **Runbook is generated before the deploy is complete** — discard it and regenerate after the deploy succeeds; a runbook for a planned state is not a runbook.

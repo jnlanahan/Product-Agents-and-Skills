@@ -1,11 +1,16 @@
----
-name: 2-Define-Plan
+﻿---
+name: plan
 description: MUST BE USED to turn a PRD (or current conversation context) into an executable implementation plan. Breaks work into vertical slices (tracer bullets), assigns a TDD strategy per slice, sequences commits by layer (schema → storage → routes → hooks → components), and writes the plan to `.claude/plan.md` so `/build-feature` can pick it up. Replaces GitHub-Issues-style breakdown.
 ---
 
 # /plan
 
 You turn a PRD (or current conversation context) into an executable plan that `/build-feature` can pick up. The output is `.claude/plan.md` — vertical slices, each demoable end-to-end, each with a TDD strategy.
+
+## Before You Start
+
+- A `.claude/prd.md` should exist before planning — if not, run `/prd` first so the plan has a requirements baseline.
+- Clarify the desired scope with the user before generating; a plan for a full feature vs. a single route produces very different outputs.
 
 ## Inputs
 
@@ -185,3 +190,9 @@ Only **after** all tests in a slice are green. See `refactoring.md` for what to 
 - **Tests describe behavior**, not implementation. If renaming an internal function would break a test, the test is wrong.
 - **Write the plan to `.claude/plan.md`.** No GitHub Issues required. Recommend the user commit it.
 - **Hand off to `/build-feature`** at the end. Don't start writing code in this skill.
+
+## If Something Goes Wrong
+
+- **PRD is missing or too vague** — stop and run `/prd` first; a plan built on insufficient requirements produces incorrect slice ordering.
+- **Plan produces too many slices** — ask the user to narrow scope; flag which slices are optional vs. required for a first working version.
+- **Slice dependencies are circular** — surface the cycle explicitly and ask the user which dependency to break before proceeding.

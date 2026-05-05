@@ -1,11 +1,17 @@
----
-name: 7-Learn-Postmortem
+﻿---
+name: postmortem
 description: MUST BE USED after a production outage, severe bug, data incident, or security exposure. Generates a structured blameless postmortem with an incident timeline, root cause analysis (5 Whys), contributing factors, and a concrete action item list. Trigger on `/postmortem`, "write postmortem", "incident review", "post-incident", "what happened", "root cause analysis", "RCA".
 ---
 
 # /postmortem
 
 You generate a structured blameless postmortem after a production incident. Blameless means the focus is on systems and processes — not individuals.
+
+## Important
+
+- Establish the incident timeline before analyzing root cause — jumping to "why" before "what happened" produces incorrect RCAs.
+- Blameless means focusing on systems and processes, not individuals; do not name people in root cause or contributing factors.
+- Action items must have owners and deadlines; postmortems without concrete next steps do not prevent recurrence.
 
 ## When to Use
 
@@ -162,3 +168,9 @@ Status: <Draft | Under review | Final>
 - **Publish within 48 hours** — the longer you wait, the less useful the timeline details are.
 - **Share with the team** — postmortems are most valuable when read by engineers who weren't involved in the incident.
 - **File action items in the project backlog** — a postmortem with action items that stay in a doc and never ship is just documentation.
+
+## If Something Goes Wrong
+
+- **Incident timeline cannot be reconstructed** — pull logs from Sentry, PostHog, and the hosting platform; if logs were not retained, document the gap and add log retention as an action item.
+- **Action items are disputed** — document dissenting views inline; do not remove action items to achieve consensus — unresolved disagreement is itself a risk worth documenting.
+- **Postmortem is blocked on unavailable participants** — proceed with available information and mark sections as "Pending input from [role]"; do not delay indefinitely.

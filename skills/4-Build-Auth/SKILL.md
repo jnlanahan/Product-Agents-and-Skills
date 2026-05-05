@@ -1,11 +1,17 @@
----
-name: 4-Build-Auth
+﻿---
+name: add-auth
 description: MUST BE USED when the user wants to add or extend authentication. Detects existing auth provider (Firebase Auth, Clerk, NextAuth, Supabase Auth, custom JWT) and adapts to it. If none, scaffolds Firebase Auth per stack preferences. Handles sign-up, sign-in, social login, MFA, organizations, and role-based access. Trigger on `/add-auth`, "add login", "add sign-up", "wire auth".
 ---
 
 # /add-auth
 
 You add authentication features. Preference is Firebase Auth. If a different auth provider is detected, adapt to it — never migrate.
+
+## Critical
+
+- Never migrate between auth providers in this skill — if one is already wired, extend it or stop and escalate.
+- Do not modify session handling or token logic without reading the existing implementation first; breaking auth locks users out immediately.
+- Test login, logout, and session expiry end-to-end before committing — a partial auth wiring is worse than none.
 
 ## Procedure
 
@@ -63,136 +69,7 @@ Write the code, mirroring existing patterns from `pattern-finder`.
 - For MFA: enroll, sign out, sign in with MFA challenge
 - Check Sentry/PostHog for any auth-related errors during the flow
 
-## Firebase Auth Patterns
-
-### Initial setup (Next.js + Firebase Auth)
-
-```
-Files:
-  lib/firebase.ts         — client SDK
-  lib/firebase-admin.ts   — server SDK (admin)
-  middleware.ts           — verify ID token on protected routes
-  app/api/auth/session/route.ts — exchange ID token for session cookie (optional)
-  app/(auth)/sign-in/page.tsx
-  app/(auth)/sign-up/page.tsx
-```
-
-### Client SDK
-
-```typescript
-// lib/firebase.ts
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
-};
-
-export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
-export const auth = getAuth(firebaseApp);
-```
-
-### Admin SDK (server)
-
-```typescript
-// lib/firebase-admin.ts
-import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-
-let app: App;
-
-function getAdminApp() {
-  if (getApps().length) return getApps()[0]!;
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT!);
-  app = initializeApp({ credential: cert(serviceAccount) });
-  return app;
-}
-
-export const adminAuth = getAuth(getAdminApp());
-```
-
-### Token verification middleware
-
-```typescript
-// lib/auth.ts
-import { adminAuth } from './firebase-admin';
-
-export async function verifyIdToken(req: Request) {
-  const authHeader = req.headers.get('authorization') ?? '';
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!token) throw new Response('Unauthorized', { status: 401 });
-  try {
-    return await adminAuth.verifyIdToken(token);
-  } catch {
-    throw new Response('Unauthorized', { status: 401 });
-  }
-}
-```
-
-### Sign-in page (Next.js client component)
-
-```tsx
-'use client';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-
-export default function SignInPage() {
-  async function handleEmailSignIn(email: string, password: string) {
-    await signInWithEmailAndPassword(auth, email, password);
-  }
-  async function handleGoogleSignIn() {
-    await signInWithPopup(auth, new GoogleAuthProvider());
-  }
-  // ... form UI
-}
-```
-
-### Calling protected APIs from client
-
-```typescript
-const idToken = await auth.currentUser?.getIdToken();
-const res = await fetch('/api/me', {
-  headers: { Authorization: `Bearer ${idToken}` },
-});
-```
-
-## Clerk Adaptation (when extending existing Clerk)
-
-```typescript
-// Server-side
-import { auth, currentUser } from '@clerk/nextjs/server';
-
-const { userId } = await auth();
-if (!userId) return new Response('Unauthorized', { status: 401 });
-```
-
-```tsx
-// Client
-import { SignIn, SignUp, UserButton } from '@clerk/nextjs';
-```
-
-Adapt all new auth-related code to Clerk's primitives — don't add Firebase alongside.
-
-## NextAuth/Auth.js Adaptation
-
-```typescript
-import { auth } from '@/auth';
-const session = await auth();
-if (!session?.user) return new Response('Unauthorized', { status: 401 });
-```
-
-## Custom JWT Adaptation (e.g., kanolens-style)
-
-If the project uses `jose` + Google OAuth manually:
-- Read existing `lib/auth.ts` for sign/verify patterns
-- Match cookie settings (httpOnly, secure, sameSite, maxAge)
-- Mirror the existing JWT claim structure
-- Flag if you see security issues but don't change them without explicit user request
+→ See [firebase-auth-patterns.md](references/firebase-auth-patterns.md) for implementation patterns (Firebase client/admin SDK, token verification middleware, sign-in page, Clerk/NextAuth/custom JWT adaptations).
 
 ## Common Security Checks
 
@@ -214,3 +91,10 @@ Regardless of provider, verify these in the existing setup OR in your new code:
 - **Match the project's cookie/session conventions** (see `pattern-finder` output).
 - **Test the full flow** — sign-up → sign-in → protected route → sign-out → confirm protection. Auth bugs are disasters.
 - **For Firebase**: ensure `FIREBASE_SERVICE_ACCOUNT` is the JSON service account key, server-side only, never `NEXT_PUBLIC_*`.
+
+## If Something Goes Wrong
+
+- **OAuth redirect mismatch** — confirm the redirect URI in the provider console exactly matches the one in your env var, including protocol and trailing slash.
+- **Social login returns token but user is not created** — check that the provider callback handler writes to the user table; log the raw token to confirm identity data is present.
+- **Session not persisting after page reload** — confirm the session cookie is `httpOnly`, `secure` (in production), and `sameSite=lax`; check the cookie domain matches the app domain.
+- **MFA flow breaks existing sessions** — existing sessions before MFA was enabled may need to be invalidated; add a `mfa_enrolled_at` field and check it on session resume.

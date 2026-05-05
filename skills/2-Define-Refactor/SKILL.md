@@ -1,5 +1,5 @@
----
-name: 2-Define-Refactor
+﻿---
+name: refactor
 description: MUST BE USED when the user wants to refactor code — either to find opportunities ("where's our shallow code?") or to plan a known refactor with safe, tiny commits. Combines opportunity-scanning and plan-and-execute modes. Includes Claude-Code-specific refactoring best practices. Writes the plan to `.claude/refactor-plan.md`.
 ---
 
@@ -9,6 +9,11 @@ Two entry modes — pick based on user intent:
 
 - **Find mode**: scan the codebase for deepening opportunities (turn shallow modules into deep ones, improve testability, improve AI-navigability). Use when the user asks "where should I refactor?" or "what can be improved?"
 - **Plan mode**: the user already has a refactor in mind. Interview, hammer scope, break into tiny commits. Use when the user asks "help me plan this refactor" or names a specific area.
+
+## Before You Start
+
+- For Plan mode: scope the refactor target before starting — open-ended refactors balloon quickly.
+- Run on a clean working tree; commit or stash existing changes first so the refactor diff is unambiguous.
 
 Output: `.claude/refactor-plan.md` (the chosen candidate's full plan). Recommend the user commit it.
 
@@ -196,3 +201,9 @@ When executing a refactor plan with Claude Code, follow these practices to keep 
 - **Tiny commits, working state.** Always.
 - **Write the plan to `.claude/refactor-plan.md`** — recommend the user commit it.
 - **Don't execute the refactor in this skill.** That's `/build-feature` (for feature refactors) or direct work after the plan is approved. This skill produces the plan.
+
+## If Something Goes Wrong
+
+- **No obvious refactor opportunities found** — report that the codebase looks reasonably clean and suggest a specific area for the user to point you to.
+- **Refactor plan too large to execute safely** — break it into independent sub-plans with no shared state changes; tackle one at a time.
+- **Working tree is dirty** — stop and ask the user to commit or stash before proceeding; do not plan a refactor on top of unstaged changes.

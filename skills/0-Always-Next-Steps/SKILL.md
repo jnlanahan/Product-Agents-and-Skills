@@ -1,11 +1,16 @@
----
-name: 0-Always-Next-Steps
+﻿---
+name: next-steps
 description: Run anytime to see the production-readiness state of this project, what changed since you last checked, and which skills to run next. Maintains a living .claude/next-steps.md as your single reference for the project's journey to production. Your default "what should I do next?" command.
 ---
 
 # /next-steps
 
 Your default check-in command. Run anytime to see where the project is, what changed since you last looked, and what to do next. Maintains `.claude/next-steps.md` — a single file you (or a teammate) can open to understand the project's production journey at a glance.
+
+## Before You Start
+
+- If the project type is unclear, run `stack-detector` first so stage detection is accurate.
+- This command is read-only — it surfaces state and recommends next skills but does not execute them automatically.
 
 ## When to Use
 
@@ -260,3 +265,9 @@ Re-run /next-steps anytime to refresh.
 - **Don't classify as Stage N if Stage N-1 has a hard miss.** A project missing auth shouldn't claim Stage 5 just because it has a deploy URL.
 - **`.claude/next-steps.md` should be committed to git.** Add a note at the top of the file recommending so.
 - **Respect user scope.** If the project is a CLI tool or static site, suppress irrelevant SaaS items. The skill should detect non-SaaS and shorten the checklist.
+
+## If Something Goes Wrong
+
+- **stack-detector fails to identify project type** — check for `package.json` and main framework config files; provide the stack manually in context if still undetected.
+- **`.claude/next-steps.md` cannot be written** — confirm write permission to `.claude/`; create the directory with `mkdir .claude` if it does not exist.
+- **Stage detection looks wrong** — override by explicitly stating the current PDLC stage in your message; the model will use that instead.

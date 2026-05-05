@@ -1,11 +1,17 @@
----
-name: 5-Validate-Accessibility
+﻿---
+name: accessibility
 description: MUST BE USED when auditing a project for accessibility (a11y) compliance. Calls accessibility-auditor to scan all component files for WCAG 2.1 AA violations, presents a prioritized fix list, and optionally fixes findings one at a time with user approval. Also provides a manual testing checklist for issues static analysis cannot catch. Trigger on `/accessibility`, "a11y audit", "accessibility check", "screen reader support", "keyboard navigation", "WCAG".
 ---
 
 # /accessibility
 
 You run an accessibility audit using the `accessibility-auditor` agent, then present findings with a prioritized fix plan.
+
+## Important
+
+- Run the `accessibility-auditor` agent first and present the full report before attempting any fixes.
+- Get user approval on each fix before applying it — accessibility changes to markup can break visual layout.
+- Do not mark issues as resolved without retesting the fixed component manually or with a screen reader.
 
 ## Procedure
 
@@ -152,3 +158,9 @@ After static fixes, always output this:
 - **Don't stop at static analysis** — always end with the manual testing checklist.
 - **One fix per commit** — easier to revert if a fix introduces a regression.
 - **Decorative images with `alt=""` are correct** — don't add alt text to purely decorative images; screen readers should skip them.
+
+## If Something Goes Wrong
+
+- **accessibility-auditor agent times out** — reduce the scan scope to one directory at a time; large component trees with many dynamic elements slow static analysis significantly.
+- **Fix breaks visual layout** — revert the specific change and apply a less invasive fix (e.g., use `aria-label` instead of restructuring the DOM); always re-test visually after each fix.
+- **Screen reader behavior differs from static analysis** — test with an actual screen reader (NVDA + Chrome or VoiceOver + Safari); static analysis cannot detect all dynamic ARIA state issues.

@@ -1,11 +1,17 @@
----
-name: 4-Build-Email
+﻿---
+name: add-email
 description: MUST BE USED when adding transactional email to a project. Detects existing email setup; if none, wires Resend per stack preferences. Handles welcome emails, password resets, notification emails, and rich HTML templates with React Email. Always covers DKIM/SPF DNS setup, send-on-event wiring, and delivery verification. Trigger on `/add-email`, "add email", "send email", "transactional email", "welcome email", "password reset email", "email notifications".
 ---
 
 # /add-email
 
 You add transactional email. Preference is Resend. If a different provider is detected, adapt to it — never migrate.
+
+## Important
+
+- Use Resend's sandbox or test mode for all initial integration work — never send real emails to real addresses during development.
+- DNS records (SPF, DKIM, DMARC) must be verified in the email provider's dashboard before marking the integration complete; unverified domains get spam-filtered.
+- Confirm the "from" address domain is one the user owns and controls before configuring it.
 
 ## Procedure
 
@@ -216,3 +222,10 @@ export async function sendEmail({ to, subject, html, text }: { to: string; subje
 - **Rate-limit send endpoints** — especially password reset (prevents enumeration attacks and spam abuse).
 - **Log send failures silently** — don't surface email errors to end users; don't crash user flows over email.
 - **Password reset tokens**: random (`crypto.randomBytes`), short expiry (1 hour), stored hashed in DB, single-use.
+
+## If Something Goes Wrong
+
+- **Email not delivered** — check the Resend dashboard for delivery status; common causes are an unverified domain, a blocked recipient, or a spam filter.
+- **DNS records not verifying** — propagation can take up to 48 hours; use `dig TXT yourdomain.com` to check current records; do not change records again until propagation completes.
+- **Webhook events from Resend not received** — confirm the webhook endpoint is publicly reachable (not localhost) and that the signing secret matches the one in your env.
+- **React Email template renders blank** — check that the template is exported as a default export and that `@react-email/render` is called with `await`.

@@ -1,5 +1,5 @@
----
-name: 4-Build-Database
+﻿---
+name: setup-database
 description: MUST BE USED when the user wants to set up a database, add a table, add a column, add an index, or run a migration. Detects ORM (Drizzle / Prisma / Kysely / raw SQL) and adapts. Walks through migration generation → review → apply → verification, with explicit warnings around destructive migrations. Aimed at amateur users — never silently runs destructive operations. Trigger on `/setup-database`, "add a table", "add a column", "run a migration".
 ---
 
@@ -11,6 +11,12 @@ Database setup and migration helper. Two main jobs:
 2. **Add or change schema** — generate a migration, let the user review it, apply it safely
 
 Aimed at users who haven't run database migrations many times before. Errs heavily on the side of "stop and ask" before anything destructive.
+
+## Critical
+
+- Never run a destructive migration (DROP TABLE, DROP COLUMN, TRUNCATE) without explicit user confirmation and a clear backup strategy.
+- Always show the user the generated SQL before applying it — stop and ask if anything looks unexpected.
+- On production databases, require the user to confirm the target environment before any `migrate` command runs.
 
 ## When to Use
 
@@ -149,3 +155,10 @@ If the user is doing this in production via `/deploy`, the deploy skill takes ov
 - **Always stop and ask before destructive operations.** Drops, type changes, renames, NOT NULL on existing columns.
 - **Always run `npm run db:check` after a migration** — it catches ORM/DB drift early.
 - **For first-time setup, use Neon + Drizzle by default** unless the user has stated otherwise.
+
+## If Something Goes Wrong
+
+- **Migration fails to apply** — read the full error message; common causes are a constraint violation, a column that already exists, or a connection refused. Fix the migration file and re-run; never skip or force.
+- **ORM not detected** — check `package.json` for `drizzle-orm`, `@prisma/client`, or `kysely`; if absent, ask the user which ORM to install before proceeding.
+- **Connection string invalid** — test the connection with `npx prisma db pull` (Prisma) or `drizzle-kit introspect` (Drizzle) to get a clear error before proceeding.
+- **Destructive migration rolled back unexpectedly** — do not retry without reading the database logs; partial migration rollback can leave the schema in an inconsistent state.

@@ -1,11 +1,17 @@
----
-name: 7-Learn-Post-Launch-Review
+﻿---
+name: post-launch-review
 description: MUST BE USED 2–4 weeks after a production launch or major feature ship to close the learn loop. Reviews actual metrics against the PRD's success criteria, surfaces surprises, runs a Start/Stop/Continue retro, and produces a ranked action item list and next-iteration ideas. Trigger on `/post-launch-review`, "post-launch", "launch retro", "how did it go", "review after launch", "metrics review", "check the launch".
 ---
 
 # /post-launch-review
 
 You run a structured post-launch review — the learn loop that closes every workflow. You pull metrics, surface surprises, run a retro, and produce a record of what to do next.
+
+## Important
+
+- Wait at least 2 weeks post-launch before running this review — earlier data is too noisy to draw reliable conclusions.
+- Have actual metric data available (PostHog, Sentry, revenue) before starting; a review built on gut feel misses the point.
+- The goal is honest reflection, not celebration — surface what did not work as clearly as what did.
 
 ## When to Use
 
@@ -132,3 +138,9 @@ Reviewed by: <name>
 - **Don't skip surprises** — surprises are where the most actionable learnings come from.
 - **Connect to the next cycle** — every post-launch review should produce at least one `/prd` candidate or one new `/next-steps` entry.
 - **Blameless** — focus on systems, processes, and decisions. Don't name individuals in the "what didn't work" section.
+
+## If Something Goes Wrong
+
+- **No metric data available** — check PostHog event tracking and confirm events were wired before launch; if data is missing, document the gap and schedule a data-wiring fix before the next review.
+- **PRD success criteria were not defined** — frame the review around observable user behavior (retention, task completion) rather than skipping it; update the PRD with success criteria for the next cycle.
+- **Team disagrees on whether the launch succeeded** — surface the disagreement explicitly in the review doc; use data to adjudicate where possible and document unresolved disagreements as open questions.

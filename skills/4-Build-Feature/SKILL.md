@@ -1,11 +1,17 @@
----
-name: 4-Build-Feature
+﻿---
+name: build-feature
 description: MUST BE USED to implement a new feature in coherent TDD layers (schema → storage → routes → hooks → components). Reads `.claude/plan.md` if it exists; otherwise interviews the user. Adapts to the project's actual layering, mirrors existing patterns, and ships one commit per layer with tests at each layer. Trigger on `/build-feature`, "build this feature", "implement this", "let's start coding".
 ---
 
 # /build-feature
 
 You plan and implement a feature in coherent layers, with tests at each layer. Adapts to whatever architecture the project has. If `.claude/plan.md` exists, execute against it. Otherwise interview the user briefly, then proceed.
+
+## Important
+
+- Run `pattern-finder` before writing any new file — match the project's naming, import, and error-handling conventions exactly.
+- If `.claude/plan.md` exists, execute against it; do not re-plan unless the user explicitly asks for a scope change.
+- Ship one commit per layer; do not bundle schema + routes + components into a single commit.
 
 ## When to Use
 
@@ -45,75 +51,9 @@ If the feature is non-trivial, recommend the user run `/prd` then `/plan` first,
 
 ### Step 3: Write the layered plan
 
-Use the project's actual layering (from `pattern-finder`), not a generic one. Example for the SaaS template:
+Use the project's actual layering (from `pattern-finder`), not a generic one.
 
-```
-LAYERED PLAN: Add "Notes" feature
-==================================
-
-Layer 1: SCHEMA (shared/schema.ts + migration)
-  - notes table: id (serial pk), userId (fk users.id), title (text), body (text), createdAt, updatedAt
-  - Index on userId for list queries
-  - drizzle-zod insertNoteSchema, updateNoteSchema
-
-Layer 2: STORAGE (server/storage/NoteStorage.ts)
-  - createNote(userId, input): returns Note
-  - listNotesByUser(userId): returns Note[]
-  - getNoteByIdForUser(noteId, userId): returns Note | null  // ownership baked in
-  - updateNote(noteId, userId, input): returns Note | null
-  - deleteNote(noteId, userId): returns boolean
-  - Tests: unit tests with mocked db (existing pattern in __tests__)
-
-Layer 3: ROUTES (server/routes/noteRoutes.ts)
-  - GET /api/notes — list current user's notes
-  - POST /api/notes — create
-  - GET /api/notes/:id — get one (storage call enforces ownership)
-  - PATCH /api/notes/:id — update
-  - DELETE /api/notes/:id — delete
-  - All routes use existing requireAuth + Zod validation patterns
-  - Tests: supertest tests with mocked storage (existing pattern)
-
-Layer 4: HOOKS (client/src/hooks/useNotes.ts)
-  - useNotes() — list query
-  - useNote(id) — single query
-  - useCreateNote() — mutation
-  - useUpdateNote() — mutation
-  - useDeleteNote() — mutation
-  - Use existing React Query patterns from useFiles.ts
-
-Layer 5: COMPONENTS (client/src/components/notes/)
-  - NoteList.tsx — list view
-  - NoteCard.tsx — single item display
-  - NoteEditor.tsx — create/edit form (use existing react-hook-form + Zod pattern)
-  - Mount under client/src/pages/notes.tsx
-
-Migration needed: Yes — npm run db:generate then db:migrate
-External deps to add: None
-Risk areas: None — pure CRUD
-Estimated commits: 5 (one per layer)
-```
-
-For Next.js project, layering looks different:
-
-```
-LAYERED PLAN: Add "Notes" feature (Next.js App Router)
-======================================================
-
-Layer 1: SCHEMA (db/schema.ts + drizzle migration)
-  (same as above)
-
-Layer 2: SERVER (db queries + Server Actions)
-  - app/(authed)/notes/_actions.ts:
-    createNote(formData), updateNote(id, formData), deleteNote(id)
-  - These use `'use server'` directive
-  - Auth via auth() helper at top of each action
-
-Layer 3: PAGES + COMPONENTS
-  - app/(authed)/notes/page.tsx — server component, fetches notes via direct db call
-  - app/(authed)/notes/[id]/page.tsx — single note view
-  - app/(authed)/notes/new/page.tsx — create form
-  - components/notes/NoteEditor.tsx — client component, uses Server Action
-```
+→ See [layered-plan-examples.md](references/layered-plan-examples.md) for a complete React+Express example and a Next.js App Router example, showing the expected plan format including layers, file paths, migration notes, and estimated commits.
 
 ### Step 4: Get approval
 
@@ -184,3 +124,10 @@ For vibe-coded projects, `pattern-finder` may report inconsistencies. Strategy:
 - **Tests at each layer.** Even one test per layer is better than no tests.
 - **Ownership enforced server-side.** Don't trust the client's claim about who they are.
 - **Migration files committed.** Never run `db:push` against production; always `db:migrate`.
+
+## If Something Goes Wrong
+
+- **pattern-finder finds no matching pattern** — the feature type may be novel for this codebase; ask the user to point to the closest existing file to use as a reference.
+- **Tests fail after implementation** — run tests in isolation before running the full suite; a failing setup file or shared mock state causes false failures across tests.
+- **Build errors after adding new layer** — confirm all imports are correct and types match; do not proceed to the next layer until the current layer compiles cleanly.
+- **`.claude/plan.md` scope is incorrect** — stop and run `/plan` again with the corrected scope rather than adapting mid-implementation; diverging from the plan compounds errors.

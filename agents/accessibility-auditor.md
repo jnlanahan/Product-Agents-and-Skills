@@ -2,6 +2,7 @@
 name: accessibility-auditor
 description: MUST BE USED by /accessibility to scan the codebase for WCAG 2.1 AA violations. Reads component and template files to detect missing alt text, keyboard trap risks, missing ARIA roles, form labeling gaps, heading structure issues, and missing live regions. Outputs a severity-graded ACCESSIBILITY REPORT with file:line citations. Read-only.
 tools: Read, Grep, Glob
+model: sonnet
 ---
 
 # accessibility-auditor

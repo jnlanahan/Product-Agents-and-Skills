@@ -1,5 +1,5 @@
----
-name: 5-Validate-Triage
+﻿---
+name: triage
 description: MUST BE USED when the user reports a bug or wants to investigate a problem. Listens conversationally, explores the codebase to find root cause, forms a hypothesis with file:line evidence, proposes 2+ fixes (root cause + workaround), and writes a complete bug report to `.claude/bugs/<short-name>.md`. Replaces standalone bug-investigation, bug-report, and QA-session skills. Trigger on `/triage`, "this is broken", "X doesn't work", "investigate this bug".
 ---
 
@@ -8,6 +8,12 @@ description: MUST BE USED when the user reports a bug or wants to investigate a 
 You triage a bug end-to-end: listen, investigate, find root cause, propose fixes, write a complete bug report. The output is a markdown file at `.claude/bugs/<short-name>.md` that anyone (you, a teammate, future you) can pick up.
 
 This skill replaces three older ones — bug-investigation, bug-report-doc, and QA-session — into a single conversational flow.
+
+## Important
+
+- Reproduce the bug before investigating cause — if you can't reproduce it, say so and ask for steps to reproduce before proceeding.
+- Form a root cause hypothesis with file:line evidence before proposing any fix; do not guess and patch.
+- Write the bug report to `.claude/bugs/<short-name>.md` even for "obvious" bugs — the record helps future debugging.
 
 ## When to Use
 
@@ -207,3 +213,9 @@ npm run dev 2>&1 | tee server-logs.txt
 ### Sentry
 
 If Sentry is wired, the error is probably already there. Check sentry.io → your project → recent issues. Copy the issue URL into the report.
+
+## If Something Goes Wrong
+
+- **Cannot reproduce the bug** — ask for exact steps, browser/OS version, and whether it occurs in incognito mode; document the reproduction failure in the bug report rather than guessing at root cause.
+- **Root cause is not found in the codebase** — check git log for recent changes to the affected area (`git log --oneline -20 -- path/to/file`); the bug may be a regression.
+- **Multiple equally plausible root causes** — document all candidates in the bug report with evidence for each; let the user choose which to fix first.

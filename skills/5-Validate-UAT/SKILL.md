@@ -1,11 +1,17 @@
----
-name: 5-Validate-UAT
+﻿---
+name: uat
 description: MUST BE USED before migrating users to a new version or shipping a feature that changes existing behavior. Generates a structured user acceptance testing (UAT) checklist from the codebase and recent changes, walks through each scenario with the user, and records pass/fail/blocked results with a final ship/no-ship decision. Trigger on `/uat`, "user acceptance test", "UAT", "acceptance testing", "test before launch", "test with real users".
 ---
 
 # /uat
 
 You run a structured user acceptance test session. You generate the test plan from the codebase and recent changes, walk through each scenario with the user, and produce a UAT report with a clear pass/fail/conditional decision.
+
+## Important
+
+- Generate and show the full test plan to the user before walking through any scenario — get agreement on scope before testing begins.
+- Walk through every scenario even if early ones pass; partial UAT creates false confidence.
+- A "Conditional" result requires the blocking issue to be fixed and re-tested before ship; do not treat it as a soft pass.
 
 ## When to Use
 
@@ -124,3 +130,9 @@ If FAIL: offer to open triage sessions for failed scenarios.
 - **Blocked ≠ Failed** — a blocked scenario (can't even start it) needs different remediation than a failed one.
 - **Produce a binary decision** — PASS / FAIL / CONDITIONAL PASS. "It mostly works" is not a UAT result.
 - **Save the report** — it's the record that justifies the rollout decision.
+
+## If Something Goes Wrong
+
+- **Test scenario cannot be reproduced** — check that the test environment has the same data setup as described in the scenario; seed required data before retesting.
+- **Stakeholder is unavailable to complete UAT** — document which scenarios are blocked and who is needed; do not issue a ship decision without covering all Critical and High scenarios.
+- **All scenarios are blocked by the same root bug** — stop UAT, file a triage ticket for the root bug, and re-run UAT after the fix; do not issue a Conditional pass for a systemic blocker.

@@ -1,11 +1,17 @@
----
-name: 4-Build-File-Storage
+﻿---
+name: add-files
 description: MUST BE USED when the user wants to add or extend file uploads, file sharing, folders, tags, image transforms, or per-user quotas. Detects existing storage (Firebase Storage, S3, R2, UploadThing) and extends it; if none, scaffolds Firebase Storage. Always enforces server-side validation, ownership checks, and magic-byte MIME verification. Trigger on `/add-files`, "add file uploads", "add file storage".
 ---
 
 # /add-files
 
 You add file features. Preference is Firebase Storage. If a different provider is detected, adapt to it.
+
+## Important
+
+- Server-side validation (file type, size, ownership) is non-negotiable — never rely on client-side checks alone.
+- Confirm storage bucket permissions (public vs. private) with the user before wiring; public buckets can expose sensitive uploads.
+- Check storage quotas and pricing implications before enabling large-file uploads.
 
 ## Procedure
 
@@ -253,3 +259,10 @@ export const ourFileRouter = {
 - **Per-user storage paths** — `users/{uid}/...` pattern; storage rules enforce isolation.
 - **Quotas enforced before upload** — don't accept the file then reject.
 - **Cleanup orphans** — when DB row is deleted, also delete the storage object.
+
+## If Something Goes Wrong
+
+- **Upload fails with CORS error** — confirm the storage bucket's CORS policy allows your app's origin; add `localhost` for development and the production domain for production.
+- **File validation rejecting valid files** — check magic-byte MIME detection logic; browser-reported MIME types can be spoofed and should not be trusted alone.
+- **Storage quota exceeded** — check bucket usage in the provider console; add a user-level quota check before the upload rather than after.
+- **Ownership check fails for valid user** — confirm the ownership field in the DB record matches the authenticated user ID format (UUID vs. integer mismatch is common).

@@ -1,11 +1,17 @@
----
-name: 5-Validate-Production-Readiness
+﻿---
+name: check-production
 description: MUST BE USED before a production launch or after a big change to the critical path. Runs a deep production-readiness audit and returns a severity-graded report (Critical/High/Medium/Low) with file:line citations and a recommended fix order. Add `--lite` for a fast 30-second sanity check that skips the full auditor. Trigger on `/check-production`, "is this ready for production", "audit before launch", or any pre-deploy review request.
 ---
 
 # /check-production
 
 You orchestrate a deep production-readiness audit. The actual audit work is delegated to the `prod-readiness-auditor` agent; this skill assembles the inputs, runs supporting scans in parallel, and presents the result with a clear "what to fix in what order" recommendation.
+
+## Critical
+
+- This skill is audit-only — it does not apply fixes. Resist the urge to fix findings mid-audit; finish the full report first.
+- Do not substitute `--lite` mode for a full audit before a first production launch; use `--lite` only for repeat checks after fixes are applied.
+- Critical-severity findings must be resolved before launch — do not ship with any open Critical items.
 
 ## When to Use
 
@@ -78,63 +84,7 @@ If yes: walk through fixes one at a time, getting approval before each. Do NOT b
 
 If no: save the report to `PRODUCTION_AUDIT_<date>.md` in the project root and end the skill.
 
-## Report Format
-
-The auditor returns its standard format. You wrap it like this:
-
-```markdown
-# Production Readiness Audit
-**Project**: <name>
-**Date**: <YYYY-MM-DD>
-**Stack**: <one-line summary>
-**Classification**: <greenfield | wired | vibe-coded>
-
-## Executive Summary
-<2-3 sentences: how production-ready is this, what's the biggest risk, what's the recommended next step>
-
-## Severity Counts
-- Critical: <N>
-- High: <N>
-- Medium: <N>
-- Low: <N>
-
-## Critical Findings (fix before launch — show-stoppers)
-<from auditor — verbatim>
-
-## High Findings (fix in first month of production)
-<from auditor>
-
-## Medium Findings (fix when you have time)
-<from auditor>
-
-## Low Findings (nice-to-haves)
-<from auditor>
-
-## Cross-Cutting Actions
-<things that span multiple files>
-
-## Recommended Fix Order
-1. <action> — <one-line rationale> (~<N> hours)
-2. <action> — <rationale> (~<N> hours)
-3. <action> — <rationale> (~<N> hours)
-
-## Positive Observations
-<from auditor — keep morale up>
-
-## Next Steps
-<which skills to run after this; e.g., "/add-monitoring then /deploy">
-```
-
-## Common Patterns by Classification
-
-### Greenfield project
-Audit will mostly find Mediums (no tests, no CI, missing nice-to-haves). That's expected. Don't overstate severity. Recommend running `/setup-project` if not done.
-
-### Wired project (this template)
-Audit should find few Criticals. Most findings will be specific things to harden (e.g., "rate limit endpoint X is unprotected"). Treat as a polish exercise.
-
-### Vibe-coded project
-Audit will surface real risks — committed secrets, missing webhook verification, no CI, no error tracking. Lead with rotation if secrets are exposed. The recommended fix order matters most here; sequencing prevents the user from doing things in dangerous orders (e.g., enabling Sentry source maps before rotating Sentry auth token in CI).
+→ See [audit-output-format.md](references/audit-output-format.md) for the full report template structure and calibration notes by project classification (greenfield / wired / vibe-coded).
 
 ## Rules
 
@@ -143,3 +93,9 @@ Audit will surface real risks — committed secrets, missing webhook verificatio
 - **Save the report.** It's a document the user will reference. Write it to disk if they decline immediate fixes.
 - **No silent fixes.** If the user opts in to fixes, get confirmation per finding. Auditing is read-only; fixing is collaborative.
 - **Don't bundle fixes by file.** Each finding is its own commit, even if two findings live in the same file. Easier to review and revert.
+
+## If Something Goes Wrong
+
+- **prod-readiness-auditor times out** — run `--lite` mode for a quick scan and follow up with a full audit on a targeted area; do not skip the audit entirely.
+- **Critical finding is disputed** — document the disagreement in `.claude/next-steps.md` with the justification for overriding; do not silently mark it resolved without evidence.
+- **Audit finds no Critical items but the app feels fragile** — run `secret-scanner` and `dependency-currency-checker` separately; the auditor may have incomplete coverage for the specific stack.

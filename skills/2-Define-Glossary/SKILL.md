@@ -1,11 +1,16 @@
----
-name: 2-Define-Glossary
+﻿---
+name: glossary
 description: Use when the user wants to extract project domain terms into a consistent glossary — flagging ambiguous terms, proposing canonical names, and writing the result to `.claude/glossary.md`. Trigger on phrases like "build a glossary", "harden terminology", "sharpen language", or "define domain terms".
 ---
 
 # /glossary
 
 Extract and formalize domain terminology from the current conversation into a consistent glossary, saved to `.claude/glossary.md`.
+
+## Before You Start
+
+- Run this after enough conversation context exists to surface real domain terms — running it on an empty session produces a shallow result.
+- If `.claude/glossary.md` already exists, this skill extends it rather than overwrites it; review the existing file for terms to preserve.
 
 ## Process
 
@@ -90,3 +95,9 @@ When invoked again in the same conversation:
 3. Update definitions if understanding has evolved
 4. Re-flag any new ambiguities
 5. Rewrite the example dialogue to incorporate new terms
+
+## If Something Goes Wrong
+
+- **No domain terms found** — the conversation or codebase may be too thin; ask the user to paste a short description of the domain before re-running.
+- **Terms are too ambiguous to define** — flag them explicitly as "Needs Clarification" in the glossary rather than guessing at meaning.
+- **Existing `.claude/glossary.md` conflicts with new terms** — surface the conflict and ask the user which definition to keep.

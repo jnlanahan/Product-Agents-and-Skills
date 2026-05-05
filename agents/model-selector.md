@@ -2,6 +2,7 @@
 name: model-selector
 description: MUST BE USED by /add-ai before choosing a Claude model. Reads the codebase to understand the app's domain, then asks up to 5 targeted questions to classify the AI use case. Outputs a structured AI REQUIREMENTS PROFILE with recommended model tier (Haiku/Sonnet/Opus), streaming preference, prompt caching strategy, tool use flag, and LangSmith eval recommendation. Read-only.
 tools: Read, Grep, Glob
+model: sonnet
 ---
 
 # model-selector

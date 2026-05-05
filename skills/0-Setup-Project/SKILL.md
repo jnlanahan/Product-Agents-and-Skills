@@ -1,11 +1,17 @@
----
-name: 0-Setup-Project
+﻿---
+name: setup-project
 description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. Use `--personal` flag for lighter personal tools (no Stripe, optional auth, SQLite). NOT for existing projects — for those, run `/next-steps` first.
 ---
 
 # /setup-project
 
 You set up a new project from near-empty state using the user's preferred stack from `_stack-preferences.md`. Discipline matters here: each layer goes in as a separate commit, in the right order, with verification.
+
+## Critical
+
+- Only run on an empty directory or fresh scaffold — this skill scaffolds opinionated structure and will overwrite conflicting files.
+- For existing projects, run `/next-steps` first; do NOT run `/setup-project` on a project that already has real code.
+- Verify the target directory before starting (`ls`) and confirm it is empty or contains only a README or basic scaffold.
 
 ## When to Use
 
@@ -150,89 +156,7 @@ After each wave: `npm run build && npm run check`. If broken, fix before next wa
 
 ### Step 7: Generate CLAUDE.md with skills index
 
-Write `CLAUDE.md` at the repo root. Use this exact structure (replace `<...>` placeholders with actual values):
-
-```markdown
-# CLAUDE.md — <project name>
-
-This file is read by Claude Code on every conversation. Keep it short.
-
-## Project Overview
-
-<one-paragraph description of what this app does and who it's for>
-
-## Stack
-
-- Framework: <Next.js App Router | React + Vite + Express>
-- DB: Neon Postgres + Drizzle ORM
-- Auth: Firebase Auth
-- Payments: Stripe
-- File storage: Firebase Storage
-- Monitoring: Sentry (errors) + PostHog (product analytics)
-- Tests: <Vitest | Jest>
-- Deploy: Railway
-
-## Conventions
-
-- TypeScript strict mode
-- Validation at every API boundary using Zod
-- Server-side ownership checks on every protected route
-- Migrations via `npm run db:generate` then `npm run db:migrate` (never `db:push` against prod)
-- One layer per commit when adding features
-- Conventional commits: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
-
-## What Not to Touch
-
-- `server/migrations/` — never edit applied migrations; create new ones instead
-- `firebase-storage.rules` — review carefully, deploy separately
-- `.env.example` — keep in sync with actual env vars used; do NOT add real values
-
-## Available Skills
-
-The agent has access to these skills. It will suggest the right one based on what you're doing.
-
-**Setup**
-- /next-steps — production-readiness check + what to do next
-- /setup-project — scaffold a new SaaS from empty
-
-**Define (turn ideas into specs)**
-- /prd — produce a comprehensive PRD from current context
-- /plan — turn the PRD into vertical slices with TDD strategy
-- /refactor — find or plan a refactor with safe small commits
-- /glossary — extract project's domain terms
-- /grill-me — stress-test a plan with relentless questions
-
-**Design**
-- /prototype — generate 3 clickable HTML design variants
-
-**Build**
-- /code-map — explain a code area at a higher level
-- /setup-database — wire DB schema + migrations safely
-- /migrate-from-vibe — move a Replit/V0/Lovable project to a real stack
-- /add-auth, /add-payment, /add-files, /add-monitoring
-- /build-feature — implement a feature in TDD layers
-
-**Validate**
-- /check-production — full production-readiness audit
-- /triage — interactive bug session (root cause + fix plan)
-
-**Deploy**
-- /deploy — walk through deployment end-to-end
-
-## Git & GitHub Basics
-
-- Branch naming: `feat/<short-desc>`, `fix/<short-desc>`, `refactor/<short-desc>`
-- Commit message format: `<type>: <imperative summary>` (max 72 chars subject line)
-- One layer per commit when shipping a feature
-- PR title matches the branch's primary commit; description should reference any relevant `.claude/plan.md` or `.claude/refactor-plan.md`
-- Never `git push --force` to `main`; force-push only your own feature branches if needed
-
-## Tests
-
-- `npm test` — run the suite
-- Tests verify behavior through public interfaces (API responses, UI state) — not internals
-- Mock at system boundaries (DB, third-party APIs, time, randomness) — never internal collaborators
-```
+→ See [claude-md-template.md](references/claude-md-template.md) for the exact `CLAUDE.md` structure to write at the repo root. Fill in the `<...>` placeholders with actual project values.
 
 ### Step 8: End-to-end verification
 
@@ -264,3 +188,10 @@ The agent has access to these skills. It will suggest the right one based on wha
 - **Don't deploy.** That's `/deploy`.
 - **Don't run `db:push` against a production database.** Local dev only. Production uses `db:migrate`.
 - **Always generate `CLAUDE.md` with the skills index.** Without it, the agent can't suggest commands the user has forgotten.
+
+## If Something Goes Wrong
+
+- **Package install fails** — check Node/pnpm version matches the scaffold requirements; delete `node_modules` and lockfile, then retry.
+- **First migration fails** — confirm the database connection string is correct and the database server is running before re-running the migration.
+- **Account setup step blocked** (Vercel, Supabase, etc.) — skip the step, continue with local setup, and revisit the account setup separately; do not abort the whole scaffold.
+- **Git push rejected** — confirm the remote is set correctly (`git remote -v`) and you have push permission to the repo.

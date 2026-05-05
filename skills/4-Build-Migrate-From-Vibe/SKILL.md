@@ -1,11 +1,17 @@
----
-name: 4-Build-Migrate-From-Vibe
+﻿---
+name: migrate-from-vibe
 description: MUST BE USED when the user wants to move a project off a vibe-coding platform (Replit, V0, Lovable, Bolt, Cursor-only, ChatGPT-generated) onto a real local stack. Detects the source platform from file markers, maps env vars and integrations, extracts the working app, and rewires it onto the user's preferred stack. Preserves working features; flags inconsistencies as out-of-scope rather than fixing them. Trigger on `/migrate-from-vibe`, "move from Replit", "off V0", "off Lovable", "off Bolt".
 ---
 
 # /migrate-from-vibe
 
 You move a project off a vibe-coding platform (Replit, V0, Lovable, Bolt) onto a real local stack the user can develop, test, and deploy normally. Preserve what works. Flag inconsistencies; don't fix them inline.
+
+## Critical
+
+- Complete the full inventory (Step 2) before touching any files — do not rename, move, or delete anything until the working feature list is confirmed.
+- Never delete source platform files until the migrated version passes smoke tests; keep originals as a reference.
+- Flag every inconsistency discovered during migration as out-of-scope rather than silently fixing it — surprises here cause regressions.
 
 ## When to Use
 
@@ -197,3 +203,10 @@ Tell the user:
 - **Flag, don't fix.** Inconsistencies, security issues, missing patterns → `OUT_OF_SCOPE.md`. Address them later with the right skill.
 - **Preserve working features bit-for-bit.** A working page that works the same after the port is a win. A "improved" page that breaks subtly is a loss.
 - **After the port, run `/next-steps` and `/check-production`** — don't claim done until those pass.
+
+## If Something Goes Wrong
+
+- **Source platform files are unreadable or missing** — ask the user to export the project as a ZIP from the platform before running this skill; do not proceed without the source files.
+- **Env vars are undocumented** — check the platform's "Settings" or "Secrets" panel; scan the source code for `process.env.*` or `import.meta.env.*` references and list them as unknowns.
+- **A working feature breaks after migration** — restore the original source files and compare the broken version against the original; do not patch blindly.
+- **Database schema is inconsistent** — flag all inconsistencies in a "Known Issues" section of the migration notes; do not silently fix them as they may have been intentional.

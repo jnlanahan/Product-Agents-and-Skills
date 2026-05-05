@@ -1,5 +1,5 @@
----
-name: 3-Design-Prototype
+﻿---
+name: prototype
 description: MUST BE USED when the user wants to design or visualize a feature's UI before building it. Generates 3 radically different clickable HTML prototypes (TailwindCSS via CDN, mock data, fake auth, fake API). Saves to `prototypes/variant-A.html`, `variant-B.html`, `variant-C.html`. The user opens each in a browser, picks one, and that variant becomes the design reference for `/build-feature`. Trigger on `/prototype`, "design this feature", "what should this look like", "show me UI options".
 ---
 
@@ -8,6 +8,11 @@ description: MUST BE USED when the user wants to design or visualize a feature's
 You generate three radically different clickable HTML prototypes for a feature. The user opens each in a browser, navigates around, picks the one they like, and that becomes the design reference for `/build-feature`.
 
 **These are throwaways.** No backend, no real auth, no real API calls — fake everything. The point is to compare three distinct interaction models and visual approaches before committing to a design.
+
+## Before You Start
+
+- Agree on the feature scope with the user before generating — wide or ambiguous scope produces bloated, unfocused prototypes.
+- These are disposable HTML files (no backend, no real auth); do not invest time in pixel perfection.
 
 ## When to Use
 
@@ -213,3 +218,9 @@ Each variant fills in `renderList`, `renderDetail`, `renderCreate`, `renderEmpty
 - **Polished enough to judge.** Not a wireframe. Real-looking text, real spacing, real interactions. But not pixel-perfect — that comes later.
 - **Don't carry into the build.** When `/build-feature` runs, it builds against the project's actual stack and component library. The prototype is a reference for layout/interaction, not code to copy.
 - **Save to `prototypes/`** at the repo root. Add `prototypes/` to `.gitignore` unless the user wants to commit them as design reference.
+
+## If Something Goes Wrong
+
+- **Prototype file does not open in browser** — check that the file is saved to `prototypes/` and open it directly from the filesystem (`File > Open`); it does not need a server.
+- **TailwindCSS CDN does not load** — the user may be offline; fall back to inline styles for the prototype session.
+- **User cannot decide between variants** — ask two specific questions: "Which one felt fastest to navigate?" and "Which one would you show to a potential user today?"

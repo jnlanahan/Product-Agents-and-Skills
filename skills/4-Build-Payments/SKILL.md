@@ -1,11 +1,17 @@
----
-name: 4-Build-Payments
+﻿---
+name: add-payment
 description: MUST BE USED when the user wants to add or extend payments. Stripe-first; detects existing Stripe setup and extends, or detects a different processor (Paddle, Lemon Squeezy) and adapts. Always handles webhook signature verification, idempotency, and Customer Portal. Trigger on `/add-payment`, "add subscription", "add billing", "add Stripe".
 ---
 
 # /add-payment
 
 You add or extend payment functionality. Stripe-only — if the project uses a different processor (Paddle, Lemon Squeezy), surface that and ask whether to proceed with the existing processor or migrate.
+
+## Critical
+
+- Always start with Stripe test-mode keys (`sk_test_...`). Never wire live keys (`sk_live_...`) until the full flow is verified in test mode.
+- Webhook signature verification is non-negotiable — never skip it, even for a quick demo.
+- Do not handle raw card data in application code — all card collection must go through Stripe Elements or Stripe Checkout.
 
 ## Procedure
 
@@ -87,100 +93,7 @@ After execution:
 4. Verify DB row updated correctly
 5. Verify Customer Portal link works (if relevant)
 
-## Stripe Patterns You MUST Use
-
-Regardless of mode, these are non-negotiable for any Stripe code you write:
-
-### Webhook signature verification
-
-```typescript
-// Next.js App Router (app/api/webhooks/stripe/route.ts)
-import { headers } from 'next/headers';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-export async function POST(req: Request) {
-  const body = await req.text(); // raw body, NOT json()
-  const sig = (await headers()).get('stripe-signature');
-  if (!sig) return new Response('No signature', { status: 400 });
-
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err) {
-    return new Response('Invalid signature', { status: 400 });
-  }
-
-  // Idempotency: skip if event already processed
-  const seen = await db.query.processedEvents.findFirst({
-    where: eq(processedEvents.id, event.id),
-  });
-  if (seen) return new Response('Already processed', { status: 200 });
-
-  // Handle event...
-  await db.insert(processedEvents).values({ id: event.id, type: event.type });
-
-  return new Response('OK', { status: 200 });
-}
-```
-
-For Express:
-
-```typescript
-// MUST register webhook route BEFORE express.json() middleware
-app.post('/api/webhooks/stripe',
-  express.raw({ type: 'application/json' }),
-  async (req, res) => {
-    const sig = req.headers['stripe-signature'] as string;
-    let event: Stripe.Event;
-    try {
-      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-    } catch (err) {
-      return res.status(400).send('Invalid signature');
-    }
-    // idempotency + handle...
-  }
-);
-```
-
-### Checkout Session creation
-
-- Pass `client_reference_id: user.id` so webhook can identify the user
-- Set `success_url` and `cancel_url` to actual app routes
-- For subscriptions: `mode: 'subscription'`, set `customer` (existing Stripe customer ID) or `customer_email`
-- For one-time: `mode: 'payment'`
-- Use `metadata` to attach app-specific data; read it in webhook
-
-### Customer Portal
-
-- Server endpoint creates a Portal Session: `stripe.billingPortal.sessions.create({ customer, return_url })`
-- Returns the `url` to the client; client redirects
-- Configure portal features in Stripe Dashboard (cancel, update payment, view invoices)
-
-### Events to handle
-
-For subscriptions:
-- `checkout.session.completed` — initial signup; mark user as paid
-- `customer.subscription.updated` — tier change, payment method update
-- `customer.subscription.deleted` — cancellation took effect; downgrade
-- `invoice.payment_succeeded` — renewal; extend access
-- `invoice.payment_failed` — dunning; consider grace period before downgrade
-
-For one-time payments:
-- `checkout.session.completed` — fulfill the purchase
-
-### Things to NOT do
-
-- Don't trust amounts from the client — set them server-side from your price config
-- Don't store full card numbers — Stripe handles all of that
-- Don't poll Stripe API in webhooks — handle the event payload directly
-- Don't return 4xx for events you don't care about — return 200 (Stripe will retry on 4xx/5xx)
-- Don't put the webhook route behind auth middleware (it's authenticated by signature)
+→ See [stripe-patterns.md](references/stripe-patterns.md) for implementation patterns (webhook signature verification, Checkout Session creation, Customer Portal, events to handle, and anti-patterns).
 
 ## Rules
 
@@ -189,3 +102,10 @@ For one-time payments:
 - **Use Customer Portal for subscription management** — don't build your own cancel/upgrade UI.
 - **Test with `stripe listen` before deploying.** The webhook signature secret is different in test vs prod.
 - **Mirror existing patterns** if Stripe is already wired (file location, error style, response shape).
+
+## If Something Goes Wrong
+
+- **Webhook not received** — confirm the Stripe CLI is running in test mode (`stripe listen --forward-to localhost:3000/api/webhooks/stripe`) and the endpoint is publicly reachable in production.
+- **Webhook signature verification fails** — confirm `STRIPE_WEBHOOK_SECRET` is the signing secret for this specific endpoint (each endpoint has its own secret) and that the raw request body is passed to `constructEvent`, not a parsed JSON body.
+- **Payment fails in test mode** — use Stripe's test card numbers (`4242 4242 4242 4242`); confirm the test API key starts with `sk_test_`.
+- **Customer Portal not loading** — confirm the Portal is configured in the Stripe dashboard (Settings > Billing > Customer Portal) with at least one product and return URL.
