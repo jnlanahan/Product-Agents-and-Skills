@@ -33,6 +33,9 @@ A library you publish for others (and yourself) to install into their global Cla
 4. **All agents in this repo are read-only** — no Write/Edit tools. If you propose a write-capable agent, justify it against best practice #10 in [AGENTS.md](AGENTS.md#design-principles).
 5. **Every workflow doc contains:** *when to use*, *PDLC mapping*, *skill sequence*, *Mermaid diagram*, *agents called*, *gaps surfaced*, *example walkthrough*.
 
+6. **Model tiers for agents**: `haiku` = fast structured read-only agents called freely per skill invocation (stack-detector, codebase-classifier, pattern-finder). `sonnet` = deep analysis agents called once per workflow (prod-readiness-auditor, secret-scanner, etc.). Skills themselves carry no model field; users invoke planning sessions with `/model opus` for best reasoning quality on `/prd` and `/plan`.
+7. **Keep SKILL.md concise**: Core skill instructions must stay under 5,000 words. Move large reference material (templates, examples, API patterns) into a `references/` subfolder and link from the skill with `→ See [file.md](references/file.md)`. This prevents context window bloat when many skills are loaded simultaneously.
+
 ## What NOT to do
 
 - Don't add migration skills between auth providers or payment processors. See [GAPS.md](GAPS.md#principles-for-what-we-deliberately-do-not-add).

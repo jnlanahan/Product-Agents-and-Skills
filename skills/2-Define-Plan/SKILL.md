@@ -1,6 +1,6 @@
 ﻿---
 name: plan
-description: MUST BE USED to turn a PRD (or current conversation context) into an executable implementation plan. Breaks work into vertical slices (tracer bullets), assigns a TDD strategy per slice, sequences commits by layer (schema → storage → routes → hooks → components), and writes the plan to `.claude/plan.md` so `/build-feature` can pick it up. Replaces GitHub-Issues-style breakdown.
+description: MUST BE USED to turn a PRD (or current conversation context) into an executable implementation plan. Breaks work into vertical slices (tracer bullets), assigns a TDD strategy per slice, sequences commits by layer (schema → storage → routes → hooks → components), and writes the plan to `.claude/plan.md` so `/build-feature` can pick it up. Replaces GitHub-Issues-style breakdown. Do NOT use without a PRD or clear requirements — run `/prd` first so the plan has a solid requirements baseline to slice against.
 ---
 
 # /plan
@@ -76,6 +76,19 @@ Tell the user the plan is at `.claude/plan.md` and recommend `/build-feature` to
 - **TDD**: red → green → refactor, per layer; tests verify behavior through public interfaces, not internals (see TDD Workflow below)
 - **Layering** (as detected in this project): <schema → storage → routes → hooks → components | server actions → server components → client components | other>
 - **Test mocking boundary**: <DB, third-party APIs, time, randomness> — see `mocking.md`
+
+## Validation Contract
+
+*Written before implementation begins. These assertions are independent of how the feature is built — they describe observable outcomes verifiable by a fresh reviewer who has not seen the implementation.*
+
+| # | Assertion | Verification method | Acceptance threshold |
+|---|---|---|---|
+| 1 | <observable behavior, e.g. "User can create a note and see it in the list"> | Manual: create → reload → confirm visible | Must work in Chrome + Safari |
+| 2 | <permission boundary, e.g. "User B cannot read User A's notes"> | API test: GET with User B token → 403/404 | Zero leakage |
+| 3 | <data integrity, e.g. "Deleting a note removes it from the DB"> | DB query after delete → row count decrements | Row must not exist |
+| 4 | <error handling, e.g. "Submitting empty title shows validation error"> | UI: submit blank form → inline error shown | Error before server call |
+
+**How to use**: After all slices are implemented, a fresh agent or the user runs through each row without looking at the implementation path. A contract violation is not a test failure to explain away — it means the feature is not done.
 
 ## Slice Order
 

@@ -122,6 +122,7 @@ OUT-OF-SCOPE NOTES
 
 ## Rules
 
+- **Cap output**: Report at most 20 findings total across all 9 areas. If more exist, note "N additional findings suppressed — re-run with `--area <name>` for full detail." Order by severity descending (Critical first). Never expand a finding with more than 5 lines.
 - **Cite file:line for every finding.** No hand-waving.
 - **Quote code in evidence** — actual snippets, not summaries.
 - **Don't write fixes.** Describe what should change in one sentence per finding. The skill orchestrates the actual change in a follow-up.

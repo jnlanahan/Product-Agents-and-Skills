@@ -73,6 +73,7 @@ NOT IN SCOPE (skipped)
 
 ## Rules
 
+- **Cap output**: Report at most 10 dependencies. Prioritize: (1) critical security vulnerabilities, (2) major-version drift in production deps, (3) devDependencies last. Cap the full report at ~150 lines. If more dependencies need review, note the count and stop.
 - **Don't include every dep** — only the ones from the always-check list. The output stays scannable.
 - **Don't recommend specific upgrade commands.** The skill calling you decides whether to bundle upgrades or stagger them.
 - **Don't fabricate changelog summaries.** If you don't know what changed in v5 of some package, write "check changelog at https://github.com/<owner>/<repo>/releases."

@@ -69,7 +69,20 @@ One commit per layer:
 4. Hooks commit (if needed) — data fetching + mutations
 5. Components commit — UI
 
-After each commit: `npm run check && npm test` (or whatever the project uses).
+After each commit: `npm run check && npm test` (or whatever the project uses). Then emit a handoff block before moving to the next layer:
+
+```
+LAYER HANDOFF
+=============
+layer_completed : <schema | storage | routes | hooks | components>
+files_changed   : <list of created/modified files>
+tests_passing   : <yes | no>
+build_clean     : <yes | no>
+issues_found    : <any unexpected discoveries, or "none">
+next_layer      : <what comes next and its key files>
+```
+
+Do not proceed to the next layer if `tests_passing: no` or `build_clean: no`.
 
 ### Step 6: Verify end-to-end
 
@@ -80,6 +93,16 @@ Manually exercise the full feature:
 - Delete it
 - Try to access another user's record → should 403/404
 - Test edge case (empty list, very long title, special characters)
+
+### Step 7: Independent verification
+
+After all slices are done and end-to-end verification passes:
+
+1. Ask the user to run `/check-production --lite` against the branch. This invokes `prod-readiness-auditor` (a separate agent with no memory of the build context) to flag anything the implementation missed.
+2. If a `.claude/plan.md` Validation Contract exists, walk through each contract assertion row-by-row with the user — do not read the implementation to justify failures; just check if each observable outcome is true.
+3. Only declare the feature complete when the contract passes and `--lite` shows no Critical or High findings related to the new feature.
+
+This step exists because the implementing agent has success bias — a fresh agent or the user running the validation contract catches errors the implementer explains away.
 
 ## TDD Approach (vertical slices, one test → one impl)
 
