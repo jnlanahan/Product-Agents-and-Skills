@@ -1,6 +1,6 @@
 ﻿---
 name: setup-project
-description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. Use `--personal` flag for lighter personal tools (no Stripe, optional auth, SQLite). NOT for existing projects — for those, run `/next-steps` first.
+description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. Use `--personal` flag for lighter personal tools (no Stripe, optional auth, SQLite). NOT for existing projects — for those, run `/next` first.
 ---
 
 # /setup-project
@@ -20,7 +20,7 @@ You set up a new project from near-empty state using the user's preferred stack 
 ## Critical
 
 - Only run on an empty directory or fresh scaffold — this skill scaffolds opinionated structure and will overwrite conflicting files.
-- For existing projects, run `/next-steps` first; do NOT run `/setup-project` on a project that already has real code.
+- For existing projects, run `/next` first; do NOT run `/setup-project` on a project that already has real code.
 - Verify the target directory before starting (`ls`) and confirm it is empty or contains only a README or basic scaffold.
 
 ## When to Use
@@ -31,7 +31,7 @@ You set up a new project from near-empty state using the user's preferred stack 
 
 ## When NOT to Use
 
-- Project has source files beyond a scaffold → run `/next-steps` first to assess
+- Project has source files beyond a scaffold → run `/next` first to assess
 - Project has an existing auth/payment/db setup → use the targeted `/add-*` skill instead
 - Project came from a vibe-coding tool (Replit/V0/Lovable/Bolt) → run `/migrate-from-vibe` first
 
@@ -58,7 +58,7 @@ Skip the "External account setup" step for omitted services. Ask only about the 
 
 Run `stack-detector` and `codebase-classifier` in parallel. If classification is **not** `greenfield`:
 
-> Stop. Tell the user: "This project is `<wired|vibe-coded>`. `/setup-project` is greenfield only. Run `/next-steps` to understand what's there, then use targeted `/add-*` skills."
+> Stop. Tell the user: "This project is `<wired|vibe-coded>`. `/setup-project` is greenfield only. Run `/next` to understand what's there, then use targeted `/add-*` skills."
 
 ### Step 2: Confirm framework
 
@@ -186,7 +186,7 @@ After each wave: `npm run build && npm run check`. If broken, fix before next wa
 > - Run `/prd` to produce a PRD for your first feature
 > - Then `/plan` to turn it into vertical slices
 > - Then `/build-feature` to implement
-> - Run `/next-steps` anytime to see project state
+> - Run `/next` anytime to see project state
 > - When ready to ship: `/check-production` then `/deploy`
 
 ## Rules

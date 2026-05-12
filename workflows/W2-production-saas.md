@@ -37,7 +37,7 @@ If you're a solo developer building for yourself with no plans to charge or scal
 13. **`/check-production`** — full audit before launch
 14. **`/triage`** — fix any Critical / High findings
 15. **`/deploy`** — go live
-16. *(loop)* `/next-steps` between any of the above to stay oriented
+16. *(loop)* `/next` between any of the above to stay oriented
 
 ## Diagram
 
@@ -64,13 +64,13 @@ flowchart TD
 
 ## Agents called
 
-Across the workflow, all six agents fire at different points:
+Across the workflow, agents fire at different points:
 
 - **`stack-detector`** — start of every `/add-*` and `/build-feature` invocation
-- **`codebase-classifier`** — by `/next-steps` and `/check-production`
+- **`codebase-classifier`** — by `/next` and `/check-production`
 - **`pattern-finder`** — before any new file is written by `/build-feature`, `/add-auth`, `/add-payment`, etc.
 - **`secret-scanner`** — by `/check-production` and as a `/deploy` pre-flight gate
-- **`dependency-currency-checker`** — by `/next-steps` and `/check-production`
+- **`dependency-currency-checker`** — by `/next` and `/check-production`
 - **`prod-readiness-auditor`** — orchestrated by `/check-production`
 
 ## Gaps surfaced

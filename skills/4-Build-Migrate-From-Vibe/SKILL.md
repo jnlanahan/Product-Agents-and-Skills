@@ -169,7 +169,7 @@ Mirror `/setup-project`'s wave discipline. One commit per wave, verify between e
 Tell the user:
 
 > Migration complete. Run:
-> - `/next-steps` — see what stage the project is at now and what's next
+> - `/next` — see what stage the project is at now and what's next
 > - `/check-production` — full audit (vibe-coded apps usually have hidden issues)
 > - Address each `OUT_OF_SCOPE.md` item one at a time using `/refactor` or `/triage`
 > - When ready, `/deploy` will walk you through production deployment
@@ -212,7 +212,7 @@ Tell the user:
 - **Verify between waves.** `npm run build && npm run dev` after each.
 - **Flag, don't fix.** Inconsistencies, security issues, missing patterns → `OUT_OF_SCOPE.md`. Address them later with the right skill.
 - **Preserve working features bit-for-bit.** A working page that works the same after the port is a win. A "improved" page that breaks subtly is a loss.
-- **After the port, run `/next-steps` and `/check-production`** — don't claim done until those pass.
+- **After the port, run `/next` and `/check-production`** — don't claim done until those pass.
 
 ## If Something Goes Wrong
 

@@ -3,8 +3,8 @@
 > A curated library of [Claude Code](https://claude.com/claude-code) **agents** and **skills** that drive a full Product Development Lifecycle — from prototyping a new idea to shipping a production-grade SaaS, with eight named workflows that compose them.
 
 [![PDLC](https://img.shields.io/badge/PDLC-7%20phases-1f6feb)](PDLC_Phases.md)
-[![Agents](https://img.shields.io/badge/agents-6-2da44e)](AGENTS.md#agents-read-only-diagnostics)
-[![Skills](https://img.shields.io/badge/skills-19-2da44e)](AGENTS.md#skills-by-pdlc-phase)
+[![Agents](https://img.shields.io/badge/agents-10-2da44e)](AGENTS.md#agents-read-only-diagnostics)
+[![Skills](https://img.shields.io/badge/skills-27-2da44e)](AGENTS.md#skills-by-pdlc-phase)
 [![Workflows](https://img.shields.io/badge/workflows-8-orange)](WORKFLOWS.md)
 [![Map](https://img.shields.io/badge/map-one--page-8957e5)](MAP.md)
 
@@ -43,36 +43,58 @@ It's organized around a **7-phase Product Development Lifecycle** — Discover �
 ├── LICENSE
 ├── settings.snippet.json      ← optional Claude Code hook config
 │
-├── agents/                    ← 6 read-only diagnostic agents
+├── agents/                    ← 10 read-only diagnostic agents
 │   ├── stack-detector.md
 │   ├── codebase-classifier.md
 │   ├── pattern-finder.md
 │   ├── prod-readiness-auditor.md
 │   ├── secret-scanner.md
-│   └── dependency-currency-checker.md
+│   ├── dependency-currency-checker.md
+│   ├── model-selector.md
+│   ├── accessibility-auditor.md
+│   ├── project-state-detector.md
+│   └── design-tokens-detector.md
 │
-├── skills/                    ← 19 conversational skills (slash-commands)
+├── skills/                    ← 27 conversational skills (slash-commands)
 │   ├── _stack-preferences.md  ← locked greenfield stack
 │   ├── _adaptation-playbook.md← rules for adapting to existing codebases
-│   ├── 0-Always-Next-Steps/
+│   ├── 0-Next/
+│   ├── 0-Resume/
 │   ├── 0-Setup-Project/
-│   ├── 2-Define-PRD/
-│   ├── 2-Define-Plan/
-│   ├── 2-Define-Refactor/
+│   ├── 0-Skills/
+│   ├── 0-Start/
+│   ├── 1-Discover/
 │   ├── 2-Define-Glossary/
 │   ├── 2-Define-Grill-Me/
+│   ├── 2-Define-Measurement/
+│   ├── 2-Define-Plan/
+│   ├── 2-Define-PRD/
+│   ├── 2-Define-Refactor/
+│   ├── 3-Architect/
 │   ├── 3-Design-Prototype/
+│   ├── 4-Build-AI/
+│   ├── 4-Build-Auth/
+│   ├── 4-Build-CI/
 │   ├── 4-Build-Code-Map/
 │   ├── 4-Build-Database/
-│   ├── 4-Build-Auth/
-│   ├── 4-Build-Payments/
-│   ├── 4-Build-File-Storage/
-│   ├── 4-Build-Monitoring/
+│   ├── 4-Build-Email/
 │   ├── 4-Build-Feature/
+│   ├── 4-Build-File-Storage/
 │   ├── 4-Build-Migrate-From-Vibe/
-│   ├── 5-Validate-Triage/
+│   ├── 4-Build-Monitoring/
+│   ├── 4-Build-Payments/
+│   ├── 4-Build-Tests/
+│   ├── 5-Validate-Accessibility/
 │   ├── 5-Validate-Production-Readiness/
-│   └── 6-Deploy/
+│   ├── 5-Validate-Triage/
+│   ├── 5-Validate-UAT/
+│   ├── 6-Deploy/
+│   ├── 6-Deploy-Feature-Flag/
+│   ├── 6-Deploy-Rollback/
+│   ├── 6-Deploy-Runbook/
+│   ├── 6-Handoff/
+│   ├── 7-Learn-Post-Launch-Review/
+│   └── 7-Learn-Postmortem/
 │
 └── workflows/                 ← per-workflow pages with diagrams
     ├── W1-prototype-new-idea.md
@@ -110,20 +132,26 @@ cp -r skills/* ~/.claude/skills/
 Then in any project, in Claude Code, the slash-commands are available:
 
 ```
-/next-steps      ← always a good first command
+/start           ← initialize project context (first time)
+/resume          ← recover session in 30 seconds
+/next            ← always a good first command; shows state + what to run next
+/skills          ← browse all skills grouped by PDLC phase
+/discover        ← structured problem discovery before building
 /prd             ← synthesize a PRD
+/architect       ← architecture decisions before code
 /prototype       ← three clickable HTML mockups
 /setup-project   ← scaffold a new SaaS
+/build-feature   ← implement a feature with TDD layers
 /check-production ← deep readiness audit
 /deploy          ← ship to prod
-… and 13 more
+… and 15 more
 ```
 
 ### Pick a workflow
 
 Open [MAP.md](MAP.md) for the one-page view of how workflows, skills, and agents fit together — diagrams plus cross-reference tables. Or jump straight to [WORKFLOWS.md](WORKFLOWS.md) and find the row that matches what you're doing. Each workflow has a diagram, an ordered skill sequence, and an example walkthrough.
 
-If you're not sure, run `/next-steps` in your project — it tells you where you're at and what to run next.
+If you're not sure, run `/next` in your project — it tells you where you're at and what to run next. Or run `/start` if this is your first session.
 
 ---
 
@@ -134,13 +162,13 @@ Every agent and skill follows the same rubric ([10 best practices](AGENTS.md#des
 1. **Right mechanism** — subagents for delegated diagnostic work, skills for repeating procedural workflows
 2. **Action-oriented descriptions** — every agent's `description` is a delegation trigger, not a summary
 3. **Tools scoped explicitly** — least-privilege; reviewers get `Read, Grep, Glob`; only one agent has network access
-4. **One job per agent** — six small specialists, not one mega-agent
+4. **One job per agent** — ten small specialists, not one mega-agent
 5. **Stateless invocations** — every needed input is passed in the prompt
 6. **Behavior in the body** — concrete constraints live in the system prompt, not the description
 7. **Structured output** — `STACK PROFILE`, `PATTERN`, `SECRET SCAN REPORT` — every agent returns a labeled block
 8. **Skills for procedural knowledge that repeats** — anything you find yourself re-explaining belongs in a skill
 9. **Evaluate before optimizing** — these were built against real project failures, not imagined ones
-10. **Read-only first** — all six agents are read-only by design; write capability lives in skills with the user in the loop
+10. **Read-only first** — all ten agents are read-only by design; write capability lives in skills with the user in the loop
 
 ---
 

@@ -22,7 +22,7 @@ If the codebase is a chaotic prototype rather than a real product, you're in [W4
 
 ## Skill sequence
 
-1. **`/next-steps`** — see what's been changing, where you're at
+1. **`/next`** — see what's been changing, where you're at
 2. **`/prd`** — scoped PRD for this feature only
 3. **`/plan`** — vertical slices for this feature
 4. **`/code-map`** — understand the existing area before touching it
@@ -38,7 +38,7 @@ If the codebase is a chaotic prototype rather than a real product, you're in [W4
 
 ```mermaid
 flowchart TD
-    Start([Feature ask]) --> Next[/next-steps/]
+    Start([Feature ask]) --> Next[/next/]
     Next --> PRD[/prd scoped/]
     PRD --> Plan[/plan/]
     Plan --> Map[/code-map/]
@@ -78,7 +78,7 @@ flowchart TD
 
 The team ships "saved searches" on top of ReviewQueue (built in [W2](W2-production-saas.md)).
 
-1. `/next-steps` confirms the project is on `wired` status, deploys clean, no Critical findings open.
+1. `/next` confirms the project is on `wired` status, deploys clean, no Critical findings open.
 2. `/prd` produces a 1-page scoped PRD: users save filter combinations, get notified when matching PRs appear.
 3. `/plan` slices into M1 schema + storage. M2 save/list API. M3 UI in sidebar. M4 notifications via existing webhook plumbing.
 4. `/code-map` zooms out on the filtering area: shows `useFilters` hook → `pr-search` storage method → `/api/prs/search` route. Public interface clear; internals hidden.

@@ -46,8 +46,11 @@ This file is read by Claude Code on every conversation. Keep it short.
 
 The agent has access to these skills. It will suggest the right one based on what you're doing.
 
-**Setup**
-- /next-steps — production-readiness check + what to do next
+**Setup & Navigation**
+- /next — see project state and what to run next
+- /start — initialize session context
+- /resume — recover session in 30 seconds
+- /skills — browse all available skills by phase
 - /setup-project — scaffold a new SaaS from empty
 
 **Define (turn ideas into specs)**

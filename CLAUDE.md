@@ -8,7 +8,7 @@ A library you publish for others (and yourself) to install into their global Cla
 
 ## What it contains
 
-- **8 agents** in [agents/](agents/) — read-only diagnostic helpers (stack-detector, codebase-classifier, pattern-finder, prod-readiness-auditor, secret-scanner, dependency-currency-checker, project-state-detector, design-tokens-detector).
+- **10 agents** in [agents/](agents/) — read-only diagnostic helpers (stack-detector, codebase-classifier, pattern-finder, prod-readiness-auditor, secret-scanner, dependency-currency-checker, model-selector, accessibility-auditor, project-state-detector, design-tokens-detector).
 - **27 skills** in [skills/](skills/) — conversational slash-command workflows organized by PDLC phase (`0-Setup-*`, `1-Discover-*`, `2-Define-*`, `3-*`, `4-Build-*`, `5-Validate-*`, `6-Deploy-*`, `7-Learn-*`).
 - **8 workflows** in [workflows/](workflows/) — named end-to-end paths through the agents and skills for different intents.
 - **Reference docs** — [PDLC_Phases.md](PDLC_Phases.md), [skills/_stack-preferences.md](skills/_stack-preferences.md), [skills/_adaptation-playbook.md](skills/_adaptation-playbook.md).

@@ -40,7 +40,7 @@ Source of truth for each entry is the `description` field in the file's YAML fro
 
 ## Agents (read-only diagnostics)
 
-All eight agents are **read-only by design** (best practice #10). They detect, classify, and report. They never write. Skills call them to gather context before proposing changes.
+All ten agents are **read-only by design** (best practice #10). They detect, classify, and report. They never write. Skills call them to gather context before proposing changes.
 
 ### `stack-detector`
 
@@ -443,7 +443,7 @@ Every agent and skill in this repo is checked against these ten best practices.
 7. **Demand structured output.** Every agent returns a labeled block (`STACK PROFILE`, `PATTERN`, `SECRET SCAN REPORT`, etc.) so callers parse cleanly.
 8. **Skills for procedural knowledge that repeats.** A SKILL.md plus optional scripts and references — not prompts re-explained each session.
 9. **Evaluate before optimizing.** Run on real tasks, find where it fails, fix what actually breaks.
-10. **Start read-only.** Reviewer / auditor / research agents first. The six agents in this repo are all read-only; write capability lives in skills where the user is in the loop.
+10. **Start read-only.** Reviewer / auditor / research agents first. The ten agents in this repo are all read-only; write capability lives in skills where the user is in the loop.
 11. **Creator-verifier separation.** The agent (or skill) that builds a feature should not be the same one that judges whether it's complete. `/build-feature` ends with an explicit handoff to the user + `/check-production` (a separate agent with no build context) for verification. Never let the implementer self-certify.
 
 Plus two repo-level rules:

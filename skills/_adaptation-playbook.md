@@ -66,7 +66,7 @@ When `codebase-classifier` returns `vibe-coded`:
 | Wired | Detect existing integration. Extend it. Mirror file/folder pattern exactly. |
 | Vibe-coded | Detect what's there. Identify gaps (missing webhook signature? missing rate limit? hardcoded secret?). Surface gaps. Make the requested addition. |
 
-### `check-production` and `next-steps`
+### `check-production` and `next`
 
 Read-only on any class. Output a structured report. Make no changes without explicit follow-up.
 
@@ -80,7 +80,7 @@ Read-only on any class. Output a structured report. Make no changes without expl
 
 ### `setup-project`
 
-Greenfield only. For wired/vibe-coded, redirect to `/next-steps` first.
+Greenfield only. For wired/vibe-coded, redirect to `/next` first.
 
 ### `migrate-from-vibe`
 

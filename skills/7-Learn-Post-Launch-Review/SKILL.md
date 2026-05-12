@@ -146,7 +146,7 @@ Reviewed by: <name>
 - **Use actual numbers**, not vibes. If metrics aren't available, add "instrument X" as a P2 action item.
 - **Every action item needs an owner and timeline** — "we should do X" with no owner isn't an action item.
 - **Don't skip surprises** — surprises are where the most actionable learnings come from.
-- **Connect to the next cycle** — every post-launch review should produce at least one `/prd` candidate or one new `/next-steps` entry.
+- **Connect to the next cycle** — every post-launch review should produce at least one `/prd` candidate or one new entry in `.claude/progress.md`.
 - **Blameless** — focus on systems, processes, and decisions. Don't name individuals in the "what didn't work" section.
 
 ## If Something Goes Wrong

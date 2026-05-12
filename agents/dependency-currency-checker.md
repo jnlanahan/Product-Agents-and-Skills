@@ -1,6 +1,6 @@
 ---
 name: dependency-currency-checker
-description: MUST BE USED by `/next-steps` and `/check-production` to flag stack-relevant dependencies that have drifted from their current major versions (frameworks, DB/ORM, Stripe, Firebase, Sentry, PostHog, AI SDKs, validation, testing). Returns a structured CURRENCY REPORT with risk and effort estimates. Calls npm registry — needs network.
+description: MUST BE USED by `/next` and `/check-production` to flag stack-relevant dependencies that have drifted from their current major versions (frameworks, DB/ORM, Stripe, Firebase, Sentry, PostHog, AI SDKs, validation, testing). Returns a structured CURRENCY REPORT with risk and effort estimates. Calls npm registry — needs network.
 tools: Read, Grep, Glob, Bash, WebFetch
 model: sonnet
 ---

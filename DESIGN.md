@@ -8,7 +8,7 @@
 
 Most AI agent setups for product development are monolithic: one giant prompt or one all-knowing agent that tries to take you from "idea" to "deployed app" in a single run. These fail in practice because a single long context loses coherence, one agent has no checks on its own decisions, and there's no way to enter the workflow at the step that actually matches where you are.
 
-This library is built differently: **8 named mini-workflows composed from 27 independent, interchangeable tools** — 8 read-only diagnostic agents and 19 conversational skills. Each tool does one job well. You enter the lifecycle at the step that matches your current situation, not at the beginning every time.
+This library is built differently: **8 named mini-workflows composed from 37 independent, interchangeable tools** — 10 read-only diagnostic agents and 27 conversational skills. Each tool does one job well. You enter the lifecycle at the step that matches your current situation, not at the beginning every time.
 
 | | Monolithic agent | This library |
 |---|---|---|
@@ -24,7 +24,7 @@ This library is built differently: **8 named mini-workflows composed from 27 ind
 
 ### Read-Only Agents, Write-Capable Skills
 
-All 8 agents are **strictly read-only** (`Read, Grep, Glob` only). They detect, classify, and report. They never write. Skills call them before deciding what to do — detect first, adapt second, write last. This eliminates a whole class of agent mistakes: an agent cannot break what it is analyzing.
+All 10 agents are **strictly read-only** (`Read, Grep, Glob` only). They detect, classify, and report. They never write. Skills call them before deciding what to do — detect first, adapt second, write last. This eliminates a whole class of agent mistakes: an agent cannot break what it is analyzing.
 
 Write capability lives exclusively in skills, where the human is always in the loop. No skill has an auto-fix mode. Every write operation follows the pattern: detect → propose → wait for approval → execute.
 

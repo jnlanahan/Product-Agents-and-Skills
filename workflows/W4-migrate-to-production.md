@@ -33,7 +33,7 @@ This is harder than [W2](W2-production-saas.md) because you're working around ex
 9. **`/check-production`** — full audit; expect many findings
 10. **`/triage`** — work the findings list. Fix Critical/High. Park or document Medium/Low.
 11. **`/deploy`** — first real deploy to production hosting
-12. **`/next-steps`** — keeps you oriented as the file count grows
+12. **`/next`** — keeps you oriented as the file count grows
 
 ## Diagram
 

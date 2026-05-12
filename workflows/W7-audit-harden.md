@@ -22,7 +22,7 @@ The audit drives everything. You don't pre-decide what to fix; you let the audit
 
 ## Skill sequence
 
-1. **`/next-steps`** — orient: what's the current state?
+1. **`/next`** — orient: what's the current state?
 2. **`/check-production`** — full audit. **This is the driving artifact.** Returns Critical / High / Medium / Low findings with `file:line` citations and recommended fix order.
 3. **For each Critical / High finding (in order):**
    - **`/triage`** — investigate, propose fixes, write bug report
@@ -36,7 +36,7 @@ The audit drives everything. You don't pre-decide what to fix; you let the audit
 
 ```mermaid
 flowchart TD
-    Start([App exists, not yet scrutinized]) --> Next[/next-steps/]
+    Start([App exists, not yet scrutinized]) --> Next[/next/]
     Next --> Audit[/check-production/]
     Audit --> Findings{Critical or High?}
     Findings -- Yes --> Tri[/triage finding/]
@@ -59,7 +59,7 @@ flowchart TD
 
 ## Agents called
 
-This is the agent-heaviest workflow. `/check-production` orchestrates parallel runs of all six:
+This is the agent-heaviest workflow. `/check-production` orchestrates parallel runs of key agents:
 
 - **`stack-detector`** — what stack are we hardening?
 - **`codebase-classifier`** — wired vs vibe-coded shapes the recommendation tone
@@ -78,7 +78,7 @@ This is the agent-heaviest workflow. `/check-production` orchestrates parallel r
 
 You inherit "FormCraft" — built by a contractor, in production for 8 months, no one has touched it in 4. Your team is taking it over.
 
-1. **`/next-steps`** says: codebase classified `wired` but with significant dependency drift; `_stack-preferences.md` differs in 3 places; no Sentry detected.
+1. **`/next`** says: codebase classified `wired` but with significant dependency drift; `_stack-preferences.md` differs in 3 places; no Sentry detected.
 2. **`/check-production`** returns: **2 Critical** (`.env.production` checked into the repo months ago; webhook secret not verified). **5 High** (rate-limit missing on auth endpoints; unscoped CORS; 14-month-old Next.js major; no Sentry; admin endpoint reachable without RBAC). **8 Medium**. **11 Low**.
 3. **Crit #1** (`.env`): `/triage` writes the bug report. You rotate every credential surfaced by `secret-scanner`, `git filter-repo` the file out of history, force-push (with team coordination). Re-run `secret-scanner` — clean.
 4. **Crit #2** (webhook): `/triage` → `/build-feature` mini-slice adds signature verification + idempotency.

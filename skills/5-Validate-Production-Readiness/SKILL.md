@@ -28,7 +28,7 @@ You orchestrate a deep production-readiness audit. The actual audit work is dele
 - Before going live with a new app
 - After a major refactor or new integration
 - Periodic check (quarterly) on a production app
-- After running `/next-steps` and the user wants to drill down on Stage-4 hardening
+- After running `/next` and the user wants to drill down on Stage-4 hardening
 - `--lite` flag: quick pre-deploy sanity check for hotfixes (W6) or personal tools (W8)
 
 ## `--lite` Mode (fast sanity check)
@@ -107,5 +107,5 @@ If no: save the report to `PRODUCTION_AUDIT_<date>.md` in the project root and e
 ## If Something Goes Wrong
 
 - **prod-readiness-auditor times out** — run `--lite` mode for a quick scan and follow up with a full audit on a targeted area; do not skip the audit entirely.
-- **Critical finding is disputed** — document the disagreement in `.claude/next-steps.md` with the justification for overriding; do not silently mark it resolved without evidence.
+- **Critical finding is disputed** — document the disagreement in `.claude/progress.md` with the justification for overriding; do not silently mark it resolved without evidence.
 - **Audit finds no Critical items but the app feels fragile** — run `secret-scanner` and `dependency-currency-checker` separately; the auditor may have incomplete coverage for the specific stack.
