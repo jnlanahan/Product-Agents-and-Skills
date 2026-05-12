@@ -15,7 +15,7 @@ This is harder than [W2](W2-production-saas.md) because you're working around ex
 | 1 · Discover | *(done — there's already a prototype)* | |
 | 2 · Define | `/code-map` → *(optional)* `/prd` retrofit → `/plan` | Understand what's there; document; plan the gap fixes |
 | 3 · Design | *(usually skipped)* | Design exists in the working UI |
-| 4 · Build | `/migrate-from-vibe` → `/setup-database` → `/add-auth` → `/add-payment` (if needed) → `/add-monitoring` | Wave 1: extract. Then fill gaps. |
+| 4 · Build | `/migrate-from-vibe` → *(optional)* `/unvibe` → `/setup-database` → `/add-auth` → `/add-payment` (if needed) → `/add-monitoring` | Wave 1: extract. Wave 2: rehabilitate the leftover mess. Then fill gaps. |
 | 5 · Validate | `/check-production` (heavy findings expected) → `/triage` | Audit will return many Highs — work through them |
 | 6 · Deploy | `/deploy` | First real production deploy |
 | 7 · Learn | *(human-led)* | Decide what stayed broken intentionally vs. what to circle back on |
@@ -23,10 +23,11 @@ This is harder than [W2](W2-production-saas.md) because you're working around ex
 ## Skill sequence
 
 1. **`/code-map`** — first pass: what *is* this app? Where does data flow?
-2. **`/migrate-from-vibe`** — detects the source platform, extracts the working app, ports to the user's preferred local stack in waves (one commit per wave)
-3. *(optional)* **`/prd`** — retrofit a PRD so future work has a north star
-4. **`/plan`** — plan the gap fixes (auth missing? monitoring missing? payments wonky?)
-5. **`/setup-database`** — bring schema under proper migration control
+2. **`/migrate-from-vibe`** — detects the source platform, extracts the working app, ports to the user's preferred local stack in waves (one commit per wave); flags inconsistencies as out-of-scope
+3. *(optional but recommended)* **`/unvibe`** — work through the out-of-scope items from `/migrate-from-vibe`: strip leftover platform artifacts, remove dead code, consolidate duplicates, converge competing patterns, harden production basics. Read-only assess first, then waves of approved changes.
+4. *(optional)* **`/prd`** — retrofit a PRD so future work has a north star
+5. **`/plan`** — plan the gap fixes (auth missing? monitoring missing? payments wonky?)
+6. **`/setup-database`** — bring schema under proper migration control
 6. **`/add-auth`** — if auth is fake or hand-rolled
 7. **`/add-payment`** — if payments need to be production-real
 8. **`/add-monitoring`** — almost always missing in vibe-coded apps
@@ -41,7 +42,10 @@ This is harder than [W2](W2-production-saas.md) because you're working around ex
 flowchart TD
     Start([Vibe-coded prototype]) --> Map[/code-map/]
     Map --> Mig[/migrate-from-vibe/]
-    Mig --> PRD{Retrofit PRD?}
+    Mig --> Unv{Rehabilitate leftovers?}
+    Unv -- Yes --> UnvDo[/unvibe/]
+    Unv -- No --> PRD{Retrofit PRD?}
+    UnvDo --> PRD
     PRD -- Yes --> PRDdo[/prd/]
     PRD -- No --> Plan[/plan/]
     PRDdo --> Plan
@@ -66,6 +70,7 @@ flowchart TD
 - **`secret-scanner`** — vibe-coded apps frequently contain committed `.env` or hard-coded keys
 - **`dependency-currency-checker`** — catches old dependencies that the platform was holding back
 - **`prod-readiness-auditor`** — the final big audit
+- **`vibe-artifact-detector`**, **`duplication-detector`**, **`dead-code-detector`**, **`architecture-drift-detector`** — the four read-only detectors `/unvibe` orchestrates to surface what to clean up
 
 ## Gaps surfaced
 
