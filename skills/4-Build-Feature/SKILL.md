@@ -7,6 +7,16 @@ description: MUST BE USED to implement a new feature in coherent TDD layers (sch
 
 You plan and implement a feature in coherent layers, with tests at each layer. Adapts to whatever architecture the project has. If `.claude/plan.md` exists, execute against it. Otherwise interview the user briefly, then proceed.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Run `pattern-finder` before writing any new file — match the project's naming, import, and error-handling conventions exactly.

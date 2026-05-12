@@ -7,6 +7,16 @@ description: MUST BE USED when the user wants to move a project off a vibe-codin
 
 You move a project off a vibe-coding platform (Replit, V0, Lovable, Bolt) onto a real local stack the user can develop, test, and deploy normally. Preserve what works. Flag inconsistencies; don't fix them inline.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - Complete the full inventory (Step 2) before touching any files — do not rename, move, or delete anything until the working feature list is confirmed.

@@ -7,6 +7,16 @@ description: Use when the user wants to extract project domain terms into a cons
 
 Extract and formalize domain terminology from the current conversation into a consistent glossary, saved to `.claude/glossary.md`.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Before You Start
 
 - Run this after enough conversation context exists to surface real domain terms — running it on an empty session produces a shallow result.

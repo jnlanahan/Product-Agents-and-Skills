@@ -7,6 +7,16 @@ description: MUST BE USED before a production launch or after a big change to th
 
 You orchestrate a deep production-readiness audit. The actual audit work is delegated to the `prod-readiness-auditor` agent; this skill assembles the inputs, runs supporting scans in parallel, and presents the result with a clear "what to fix in what order" recommendation.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - This skill is audit-only — it does not apply fixes. Resist the urge to fix findings mid-audit; finish the full report first.

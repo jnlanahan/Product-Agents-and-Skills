@@ -9,6 +9,16 @@ You triage a bug end-to-end: listen, investigate, find root cause, propose fixes
 
 This skill replaces three older ones — bug-investigation, bug-report-doc, and QA-session — into a single conversational flow.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Reproduce the bug before investigating cause — if you can't reproduce it, say so and ask for steps to reproduce before proceeding.

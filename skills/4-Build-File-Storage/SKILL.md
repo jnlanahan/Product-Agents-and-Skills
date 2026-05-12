@@ -7,6 +7,16 @@ description: MUST BE USED when the user wants to add or extend file uploads, fil
 
 You add file features. Preference is Firebase Storage. If a different provider is detected, adapt to it.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Server-side validation (file type, size, ownership) is non-negotiable — never rely on client-side checks alone.

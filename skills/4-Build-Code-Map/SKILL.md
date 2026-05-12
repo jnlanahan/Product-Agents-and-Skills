@@ -7,6 +7,16 @@ description: Use when the user is unfamiliar with a section of code, asks the ag
 
 I don't know this area of code well. Go up a layer of abstraction. Give me a map of all the relevant modules and callers, what they do at a glance, and how data flows between them. Surface the public interfaces; hide the internals.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Before You Start
 
 - Specify the area of code to map — running this against the whole project produces an overwhelming result.

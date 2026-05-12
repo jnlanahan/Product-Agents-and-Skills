@@ -9,6 +9,16 @@ You generate three radically different clickable HTML prototypes for a feature. 
 
 **These are throwaways.** No backend, no real auth, no real API calls — fake everything. The point is to compare three distinct interaction models and visual approaches before committing to a design.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Before You Start
 
 - Agree on the feature scope with the user before generating — wide or ambiguous scope produces bloated, unfocused prototypes.

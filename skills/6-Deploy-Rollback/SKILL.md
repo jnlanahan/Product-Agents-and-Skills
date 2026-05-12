@@ -7,6 +7,16 @@ description: MUST BE USED when a production deploy has introduced a regression a
 
 You generate and (when the user is ready to execute) walk through a rollback for a broken production deploy.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - Confirm that production is actually broken before initiating rollback — misidentified incidents waste rollback capacity and can cause their own outages.

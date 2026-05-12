@@ -7,6 +7,16 @@ description: MUST BE USED when the user wants to deploy a project to production 
 
 You walk the user — assumed to be a developer with limited deployment experience — through a full production deploy end-to-end. Every external step (account creation, dashboard navigation, DNS records) gets explicit numbered instructions like "1. Open https://railway.app/new. 2. Click 'Deploy from GitHub repo'." The user should be able to follow this skill without prior deploy experience.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - The pre-flight checklist (Phase 0) must fully pass before any deploy command runs — do not skip or defer any item.

@@ -7,6 +7,16 @@ description: MUST BE USED when adding transactional email to a project. Detects 
 
 You add transactional email. Preference is Resend. If a different provider is detected, adapt to it — never migrate.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Use Resend's sandbox or test mode for all initial integration work — never send real emails to real addresses during development.

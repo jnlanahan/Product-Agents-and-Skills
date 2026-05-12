@@ -7,6 +7,30 @@ description: MUST BE USED when the user wants to create a PRD or product require
 
 Take the current conversation context and codebase understanding and produce a comprehensive PRD. Do NOT interview the user — synthesize what you already know. If something is unknown, write `<TBD>` and call it out at the end.
 
+## Pre-flight routing
+
+Before running the PRD synthesis, evaluate whether the user has enough context to produce a useful PRD:
+
+- Is a specific customer or persona named?
+- Is a concrete problem articulated?
+- Is the scope of "what to build" clear?
+
+If two or more of these are missing or vague, suggest `/discover` instead of proceeding. Phrase it as a suggestion, not a block:
+
+> "Your inputs look thin for a PRD synthesis. I can either proceed with what's here, or run `/discover` to surface the problem before structuring it. Which do you prefer?"
+
+Proceed with the PRD if the user confirms, regardless of input quality. The routing is a suggestion, never a gate.
+
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Before You Start
 
 - Have a clear description of what you're building — even a rough paragraph is enough context to synthesize a meaningful PRD.

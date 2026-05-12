@@ -10,6 +10,16 @@ Two entry modes — pick based on user intent:
 - **Find mode**: scan the codebase for deepening opportunities (turn shallow modules into deep ones, improve testability, improve AI-navigability). Use when the user asks "where should I refactor?" or "what can be improved?"
 - **Plan mode**: the user already has a refactor in mind. Interview, hammer scope, break into tiny commits. Use when the user asks "help me plan this refactor" or names a specific area.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Before You Start
 
 - For Plan mode: scope the refactor target before starting — open-ended refactors balloon quickly.

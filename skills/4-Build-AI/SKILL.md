@@ -7,6 +7,16 @@ description: MUST BE USED when adding AI / LLM capabilities to a project. Runs m
 
 You add AI capabilities to the current project: model selection via `model-selector`, Anthropic SDK wiring, prompt caching, and LangSmith tracing + evals.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Run `model-selector` first — do not choose a model tier by default; the use case determines cost and latency tradeoffs.

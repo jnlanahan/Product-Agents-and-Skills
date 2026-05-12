@@ -7,6 +7,16 @@ description: MUST BE USED when the user wants to add or extend payments. Stripe-
 
 You add or extend payment functionality. Stripe-only — if the project uses a different processor (Paddle, Lemon Squeezy), surface that and ask whether to proceed with the existing processor or migrate.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - Always start with Stripe test-mode keys (`sk_test_...`). Never wire live keys (`sk_live_...`) until the full flow is verified in test mode.

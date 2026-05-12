@@ -93,13 +93,18 @@ Which skills each workflow touches. **●** = always used. **○** = conditional
 
 | Skill | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| `/next-steps` | | ● | ● | ● | ● | ○ | ● | ○ |
+| `/start` | ○ | ● | ○ | ○ | ○ | | | ○ |
+| `/next` | | ● | ● | ● | ● | ○ | ● | ○ |
+| `/resume` | ○ | ● | ● | ● | ● | ○ | ● | ○ |
 | `/setup-project` | | ● | | | | | | ● |
+| `/discover` | ○ | ● | ○ | | | | | |
 | `/prd` | ○ | ● | ● | ○ | | | | ○ |
 | `/plan` | ○ | ● | ● | ● | ● | | | ○ |
+| `/measure` | | ● | ○ | | | | | |
 | `/refactor` | | | ○ | | ● | ○ | ○ | |
 | `/glossary` | ○ | ● | ○ | | | | | |
 | `/grill-me` | ○ | ● | ○ | | ● | | | |
+| `/architect` | | ● | ○ | | | | | |
 | `/prototype` | ● | ● | ○ | | | | | ○ |
 | `/code-map` | | | ● | ● | ● | ○ | | |
 | `/setup-database` | | ● | ○ | ● | | | ○ | ● |
@@ -110,8 +115,16 @@ Which skills each workflow touches. **●** = always used. **○** = conditional
 | `/build-feature` | | ● | ● | ○ | ● | ● | ● | ● |
 | `/migrate-from-vibe` | | | | ● | | | | |
 | `/triage` | | ● | ● | ● | ● | ● | ● | ○ |
+| `/uat` | | ● | ● | ● | ○ | | ○ | |
+| `/accessibility` | | ● | ○ | ● | | | ● | |
 | `/check-production` | | ● | ● | ● | ● | ● | ● | ○ |
+| `/feature-flag` | | ● | ● | ○ | | | | |
+| `/rollback` | | ○ | ○ | ○ | | ● | | |
+| `/runbook` | | ● | ○ | ● | | | | |
 | `/deploy` | ○ | ● | ● | ● | ● | ● | ● | ● |
+| `/handoff` | | ● | ○ | ○ | | | | |
+| `/post-launch-review` | | ● | ○ | ● | | | | |
+| `/postmortem` | | ○ | ○ | | | ○ | ○ | |
 
 ---
 

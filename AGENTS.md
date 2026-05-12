@@ -12,6 +12,7 @@ For the lifecycle this library is built around, see [PDLC_Phases.md](PDLC_Phases
 - [Agents (read-only diagnostics)](#agents-read-only-diagnostics)
 - [Skills by PDLC phase](#skills-by-pdlc-phase)
   - [Stage 0 — Setup & Navigation](#stage-0--setup--navigation)
+  - [Stage 1 — Discover](#stage-1--discover)
   - [Stage 2 — Define](#stage-2--define)
   - [Stage 3 — Design](#stage-3--design)
   - [Stage 4 — Build](#stage-4--build)
@@ -39,7 +40,7 @@ Source of truth for each entry is the `description` field in the file's YAML fro
 
 ## Agents (read-only diagnostics)
 
-All six agents are **read-only by design** (best practice #10). They detect, classify, and report. They never write. Skills call them to gather context before proposing changes.
+All eight agents are **read-only by design** (best practice #10). They detect, classify, and report. They never write. Skills call them to gather context before proposing changes.
 
 ### `stack-detector`
 
@@ -83,7 +84,7 @@ All six agents are **read-only by design** (best practice #10). They detect, cla
 
 ### `dependency-currency-checker`
 
-- **Use when** — `/next-steps` and `/check-production` use this to flag stack-relevant dependencies that have drifted from their current major versions
+- **Use when** — `/next` and `/check-production` use this to flag stack-relevant dependencies that have drifted from their current major versions
 - **Tools** — `Read, Grep, Glob, Bash, WebFetch`
 - **Output** — `CURRENCY REPORT` with risk and effort estimates per dependency
 - **File** — [agents/dependency-currency-checker.md](agents/dependency-currency-checker.md)
@@ -105,6 +106,22 @@ All six agents are **read-only by design** (best practice #10). They detect, cla
 - **File** — [agents/accessibility-auditor.md](agents/accessibility-auditor.md)
 - **Notes** — static analysis only (~30% of a11y issues); the skill always appends a manual testing checklist for the remaining 70%
 
+### `project-state-detector`
+
+- **Use when** — `/next`, `/resume`, `/skills`, and any skill that needs to know the current PDLC phase and project maturity
+- **Tools** — `Read, Glob`
+- **Output** — structured `PROJECT STATE` block: MODE, MATURITY, RECOMMENDED_NEXT, OFF_PATTERN_SKILLS, SIGNALS
+- **File** — [agents/project-state-detector.md](agents/project-state-detector.md)
+- **Notes** — cheap and fast (haiku); reads `.claude/` directory and git activity. Never blocks — surfaces warnings only. Pairs with PATTERNS.md for pattern recognition.
+
+### `design-tokens-detector`
+
+- **Use when** — `/prototype` needs to generate UI that respects the existing design system. Called before generating prototype variants.
+- **Tools** — `Read, Grep, Glob`
+- **Output** — writes `.claude/design-tokens.md` with color, spacing, typography tokens extracted from Tailwind config, CSS variables, and component library imports
+- **File** — [agents/design-tokens-detector.md](agents/design-tokens-detector.md)
+- **Notes** — no Figma integration. Covers Tailwind, CSS custom properties, and component library detection (shadcn, Radix, Chakra, MUI, etc.)
+
 ---
 
 ## Skills by PDLC phase
@@ -113,12 +130,36 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 
 ### Stage 0 — Setup & Navigation
 
-#### `/next-steps` — `0-Always-Next-Steps`
+#### `/start` — `0-Start`
 
-- **Use when** — anytime you want to see the production-readiness state, what changed since the last check, and which skills to run next. The default "what should I do next?" command.
-- **Output** — updated `.claude/next-steps.md` with the project's living journey to production
-- **Calls agents** — `stack-detector`, `codebase-classifier`, `dependency-currency-checker`
-- **File** — [skills/0-Always-Next-Steps/SKILL.md](skills/0-Always-Next-Steps/SKILL.md)
+- **Use when** — initializing a new project, or updating context at the start of a new engagement
+- **Output** — `.claude/context.md` (stack, conventions, constraints, stakeholders), `.claude/progress.md` seeded with first entry
+- **File** — [skills/0-Start/SKILL.md](skills/0-Start/SKILL.md)
+- **Notes** — re-runnable; offers section updates if context.md already exists. Never asks which workflow.
+
+#### `/resume` — `0-Resume`
+
+- **Use when** — opening a project with prior history at the start of a new chat. Recovers session state in under 30 seconds.
+- **Output** — 5–10 line orientation summary (mode, last activity, artifacts, open threads, recommended next)
+- **Calls agents** — `project-state-detector`
+- **File** — [skills/0-Resume/SKILL.md](skills/0-Resume/SKILL.md)
+- **Notes** — read-only; does not append to progress.md
+
+#### `/next` — `0-Next`
+
+- **Use when** — anytime you're disoriented, want a one-screen dashboard of project state, or just finished a skill and want to know what's next
+- **Output** — one-screen dashboard: mode, maturity, artifact freshness, recommended next skill with rationale, off-pattern warnings
+- **Calls agents** — `project-state-detector`, `dependency-currency-checker`
+- **File** — [skills/0-Next/SKILL.md](skills/0-Next/SKILL.md)
+- **Notes** — read-only. Replaces `/next-steps`.
+
+#### `/skills` — `0-Skills`
+
+- **Use when** — discovering what skills are available without memorizing slash commands
+- **Output** — full skill list grouped by PDLC phase, with on-mode skills highlighted based on current project state
+- **Calls agents** — `project-state-detector`
+- **File** — [skills/0-Skills/SKILL.md](skills/0-Skills/SKILL.md)
+- **Notes** — read-only
 
 #### `/setup-project` — `0-Setup-Project`
 
@@ -127,6 +168,17 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **Flags** — `--personal`: lighter stack (SQLite, optional auth, no Stripe/Storage) for personal tools and internal dashboards
 - **Calls agents** — `stack-detector` (sanity check that this is greenfield)
 - **File** — [skills/0-Setup-Project/SKILL.md](skills/0-Setup-Project/SKILL.md)
+
+---
+
+### Stage 1 — Discover
+
+#### `/discover` — `1-Discover`
+
+- **Use when** — the user has a vague or unvalidated idea and needs to surface the real problem before writing a PRD. Also triggered by `/prd` routing when inputs are thin.
+- **Output** — `.claude/discovery-notes.md` with 5 sections (frame, customer, problem, stakes, bridge). Feeds directly into `/prd`.
+- **File** — [skills/1-Discover/SKILL.md](skills/1-Discover/SKILL.md)
+- **Notes** — step-decomposed (5 steps across sessions). Optional — PMs with confirmed problems skip it. State tracked in discovery-notes.md frontmatter.
 
 ---
 
@@ -164,9 +216,25 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **Output** — surfaced unknowns, decided trade-offs, sharper plan
 - **File** — [skills/2-Define-Grill-Me/SKILL.md](skills/2-Define-Grill-Me/SKILL.md)
 
+#### `/measure` — `2-Define-Measurement`
+
+- **Use when** — defining success metrics, event schema, telemetry destinations, and failure signals before building
+- **Output** — `.claude/measurement.md` with success metrics table, event schema, telemetry plan, failure signals
+- **Pairs with** — `/add-monitoring` (implements what `/measure` specifies)
+- **File** — [skills/2-Define-Measurement/SKILL.md](skills/2-Define-Measurement/SKILL.md)
+- **Notes** — optional for trivial features; recommended for any feature with user-facing impact
+
 ---
 
 ### Stage 3 — Design
+
+#### `/architect` — `3-Architect`
+
+- **Use when** — making architecture decisions explicit before building — for greenfield products or features involving novel infrastructure
+- **Output** — `.claude/architecture.md` assembled from 5 steps (detect stack → data model → integrations → tradeoffs → output). Optionally logs load-bearing decisions to `.claude/decisions.md`.
+- **Calls agents** — `stack-detector`, `codebase-classifier`
+- **File** — [skills/3-Architect/SKILL.md](skills/3-Architect/SKILL.md)
+- **Notes** — step-decomposed. Skip for trivial CRUD features. Required for greenfield products and significant infrastructure changes.
 
 #### `/prototype` — `3-Design-Prototype`
 
@@ -323,6 +391,13 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **Output** — pre-flight checks, account setup, env vars, custom domain + SSL, third-party reconfigurations (webhooks, allowed origins, email DNS), post-deploy smoke tests, runbook. Heavy on step-by-step browser guidance.
 - **Calls agents** — `secret-scanner` (pre-deploy gate), `prod-readiness-auditor` (if not already run)
 - **File** — [skills/6-Deploy/SKILL.md](skills/6-Deploy/SKILL.md)
+
+#### `/handoff` — `6-Handoff`
+
+- **Use when** — packaging PRD, plan, and architecture into a standalone document for stakeholders without codebase access (contractors, executives, design partners)
+- **Output** — `.claude/handoff-<feature-name>.md` with plain-language scope, PM-readable acceptance criteria, key decisions, and contacts
+- **File** — [skills/6-Handoff/SKILL.md](skills/6-Handoff/SKILL.md)
+- **Notes** — requires `.claude/prd.md` to exist. Acceptance criteria are PM-readable, not engineer-readable.
 
 ---
 

@@ -1,273 +1,80 @@
-﻿---
-name: next-steps
-description: Run anytime to see the production-readiness state of this project, what changed since you last checked, and which skills to run next. Maintains a living .claude/next-steps.md as your single reference for the project's journey to production. Your default "what should I do next?" command.
+---
+name: next
+description: Run anytime to see where the project is, what's stale, and which skill to run next. State-aware dashboard powered by project-state-detector. Your default "what should I do?" command. Read-only.
 ---
 
-# /next-steps
+# /next
 
-Your default check-in command. Run anytime to see where the project is, what changed since you last looked, and what to do next. Maintains `.claude/next-steps.md` — a single file you (or a teammate) can open to understand the project's production journey at a glance.
+Your default orientation command. Run it anytime you're unsure what to do next, haven't worked on the project in a while, or just want a one-screen summary of where things stand.
 
-## Before You Start
+## Pre-flight
 
-- If the project type is unclear, run `stack-detector` first so stage detection is accurate.
-- This command is read-only — it surfaces state and recommends next skills but does not execute them automatically.
+- Read `.claude/progress.md` (last 5 entries). If it doesn't exist, note that no progress log has been started.
+- Read `.claude/context.md` if it exists.
+- Call `project-state-detector`.
 
 ## When to Use
 
-- **Don't know what to do next?** → `/next-steps`
-- **Haven't worked on this project in a while?** → `/next-steps` (catches you up)
-- **Just merged a big PR or did major refactoring?** → `/next-steps` (updates the picture)
-- **Onboarding a teammate?** → point them at `.claude/next-steps.md`
-- **Forgot which skill to use for X?** → `.claude/next-steps.md` lists them all with use cases
-
-You can run this on a brand-new project, on a vibe-coded mess, on this template, or on a launched production app. It calibrates to where you are.
+- **Don't know what to do next?** → `/next`
+- **New chat on an existing project?** → `/next` (or `/resume` for a deeper orientation)
+- **Just finished a skill and want to know what's next?** → `/next`
+- **Onboarding a teammate?** → point them at the output
 
 ## When NOT to Use
 
-- For a deep audit with code-level findings → use `/check-production`
-- For executing a specific change → use the targeted skill (e.g., `/add-payment`)
-
-`/next-steps` is the **navigation** skill. The others are the **action** skills.
+- For a deep code-level audit → `/check-production`
+- For executing a specific change → use the targeted skill directly
+- For full session recovery with context replay → `/resume`
 
 ## Procedure
 
-### Step 1: Read previous next-steps file (if it exists)
+### Step 1: Read state
 
-Check for `.claude/next-steps.md`. If it exists:
-- Read it
-- Note the `Last assessed` date
-- Capture previous state (stack, classification, completed checklist items) for diffing in Step 5
+From `project-state-detector` output, capture:
+- MODE and MATURITY
+- RECOMMENDED_NEXT
+- OFF_PATTERN_SKILLS
+- SIGNALS
 
-If it doesn't exist: this is the first run. Greet accordingly.
+From `progress.md` (last 5 entries), note:
+- Most recent skill and timestamp
+- Any open / deferred items mentioned
 
-### Step 2: Detect current state
+### Step 2: Check artifact freshness
 
-Run in parallel:
-- `stack-detector` — current stack
-- `codebase-classifier` — current classification
+Glob `.claude/`. For each artifact found:
+- If not referenced in `progress.md` for 14+ days while project is active → flag as stale
 
-Read `_stack-preferences.md` (so you can call out drift, not migrations).
+### Step 3: Output one-screen dashboard
 
-### Step 3: Quick checklist scan
-
-You're not running a deep audit (that's `/check-production`). You're checking the boxes in the **Detailed Checklist** section below. Each box has a clear pass/fail signal you can determine in one or two file reads or grep.
-
-### Step 4: Determine the project's stage
-
-Stages are progressive — you must mostly complete each before the next:
-
-| Stage | Definition | Skills relevant here |
-|---|---|---|
-| **1. Foundation** | Framework + TS + DB connected + env structured | `/setup-project`, `/setup-database` |
-| **2. Integrations** | Auth + payments + files wired (as needed) | `/add-auth`, `/add-payment`, `/add-files` |
-| **3. Product** | At least one user-facing feature shipped beyond the templates | `/prd` → `/plan` → `/build-feature` |
-| **4. Hardening** | Security middleware, monitoring, tests, CI | `/add-monitoring`, `/check-production` |
-| **5. Launch-ready** | Domain, SSL, prod env, runbook, uptime monitor | `/deploy` |
-
-A project is "in" the lowest stage with incomplete items. So a project with deploy + monitoring + features but missing security middleware is "in Stage 4," not Stage 5.
-
-### Step 5: Diff vs previous (if applicable)
-
-If a previous next-steps file exists, compute:
-- Items that flipped from ❌ to ✅ since last check
-- Items that flipped from ✅ to ❌ (regression — flag prominently)
-- Stack changes (new dep, removed dep, version bump)
-- New stage achieved
-
-### Step 6: Pick the next 3-5 actions
-
-The actions you recommend depend on stage + classification:
-
-- If Stage 1 incomplete → start with `/setup-project` (or `/setup-database` for the DB piece)
-- If Stage 2 has gaps → recommend the specific `/add-*` skills for missing integrations
-- If Stage 3 has nothing → start with `/prd` to define the first feature
-- If Stage 4 incomplete → `/add-monitoring` (most-asked-for missing piece) and `/check-production`
-- If Stage 5 incomplete → `/deploy` (handles deploy + launch verification end-to-end)
-- If everything is ✅ → "you're in maintenance mode; run `/next-steps` quarterly to catch drift"
-
-Each recommendation includes:
-- The skill to run (or "manual: <action>" if no skill applies)
-- Why now (what unblocks it / what it unblocks)
-- Estimated effort (rough hours)
-
-### Step 7: Write the next-steps file
-
-Write `.claude/next-steps.md` using the template below. Create the `.claude/` directory if it doesn't exist.
-
-### Step 8: Show summary in chat
-
-Show:
-- Current stage + progress bar
-- 3 most important next actions with the exact skill commands
-- Path to the full file: `.claude/next-steps.md`
-
-Don't dump the full file into chat. The file is the artifact; chat is the executive summary.
-
-## Output: `.claude/next-steps.md` Template
-
-```markdown
-# Next Steps: <project name>
-
-*Last assessed: <YYYY-MM-DD HH:MM> · Auto-generated by `/next-steps` · Re-run anytime to refresh*
-*Commit this file so collaborators can see where the project stands.*
-
-## Stage: <N> of 5 — <stage name>
-
-[████████████████░░░░] 80%   ← visual progress bar (use ASCII blocks)
-
-Foundation → Integrations → Product → **Hardening (you are here)** → Launch-ready
-
-## Stack Snapshot
-
-| Layer | Detected |
-|---|---|
-| Framework | <detected> |
-| Backend | <detected> |
-| DB / ORM | <detected> |
-| Auth | <detected> |
-| Payments | <detected> |
-| File storage | <detected> |
-| Analytics | <detected> |
-| Errors | <detected> |
-| Deploy | <detected> |
-| CI | <detected> |
-| Tests | <detected> |
-
-## What's Next (do these first)
-
-1. **`/add-monitoring`** — Sentry isn't wired yet; without it you're flying blind in production. (~1 hour)
-2. **`/check-production`** — full audit before adding more features. (~2 hours)
-3. **Manual: rotate STRIPE_SECRET_KEY** — `.env` was committed to git in commit a1b2c3d. (~10 min)
-
-## Recent Changes (since <last-assessed>)
-
-✅ **Newly complete**: <items that flipped to done>
-🔁 **Stack additions**: <new dependencies>
-⚠️ **Regressions** (need attention): <items that flipped back>
-
-## Detailed Checklist
-
-### Stage 1: Foundation
-- [ ] TypeScript configured (strict)
-- [ ] Framework chosen
-- [ ] Database connected
-- [ ] ORM configured + migrations system in place
-- [ ] `.env.example` exists and is complete
-
-### Stage 2: Integrations
-- [ ] Auth wired
-- [ ] Payments wired (if SaaS)
-- [ ] File storage wired (if needed)
-
-### Stage 3: Product
-- [ ] At least one user-facing feature beyond scaffolding
-
-### Stage 4: Hardening
-- [ ] Security headers
-- [ ] CORS configured
-- [ ] Tests exist
-- [ ] Sentry wired
-- [ ] PostHog wired
-- [ ] Rate limiting on expensive endpoints
-- [ ] CI pipeline
-
-### Stage 5: Launch-Ready
-- [ ] Production deploy live
-- [ ] Custom domain + SSL
-- [ ] All prod env vars set (no `*_test_*` in production)
-- [ ] Webhook URLs point to production
-- [ ] Auth provider authorized domains include production domain
-- [ ] Email domain verified (SPF/DKIM/DMARC)
-- [ ] Uptime monitor configured
-- [ ] Runbook generated (`LAUNCH_RUNBOOK.md`)
-
-## Stack Drift From Preferences (informational)
-
-<list anything different from `_stack-preferences.md`>
-*Skills will adapt to the actual stack — these are not action items, just FYI.*
-
-## Available Skills
-
-Run any of these in this project:
-
-| Skill | When to use |
-|---|---|
-| `/next-steps` | This doc — re-run anytime to refresh |
-| `/setup-project` | Greenfield only — scaffold from preferences |
-| `/setup-database` | Wire DB schema + migrations, or add tables/columns safely |
-| `/migrate-from-vibe` | Move a Replit/V0/Lovable/Bolt project to a real stack |
-| `/prd` | Produce a comprehensive PRD from current context |
-| `/plan` | Turn a PRD into vertical slices with TDD strategy |
-| `/refactor` | Find or plan a refactor with safe small commits |
-| `/glossary` | Extract project's domain terms |
-| `/grill-me` | Stress-test a plan with relentless questions |
-| `/prototype` | Generate 3 clickable HTML design variants |
-| `/code-map` | Explain a code area at a higher level |
-| `/add-auth` | Add/extend auth (Firebase/Clerk/NextAuth/etc.) |
-| `/add-payment` | Add/extend payments (Stripe by default) |
-| `/add-files` | Add file uploads/sharing/folders |
-| `/add-monitoring` | Wire Sentry + PostHog |
-| `/build-feature` | Plan a multi-layer feature with TDD |
-| `/check-production` | Deep production-readiness audit |
-| `/triage` | Interactive bug session (root cause + fix plan) |
-| `/deploy` | Walk through production deploy |
-
-## Agents Reference
-
-These run automatically when skills need them — you don't usually invoke directly:
-
-| Agent | Job |
-|---|---|
-| `stack-detector` | Detect framework, db, auth, payments, etc. |
-| `codebase-classifier` | Greenfield vs. wired vs. vibe-coded |
-| `pattern-finder` | Find existing project patterns to mirror |
-| `prod-readiness-auditor` | Deep production audit (called by `/check-production`) |
-| `secret-scanner` | Hunt for committed secrets |
-| `dependency-currency-checker` | Check for major-version drift in stack deps |
-
-## History
-
-| Date | Stage | Notable change |
-|---|---|---|
-| <YYYY-MM-DD> | <N>/5 | <change> |
-```
-
-## Chat Output (after writing the file)
-
-Keep this short — the file has the detail.
+Produce a concise dashboard. Must fit on one screen. Format:
 
 ```
-Next steps updated → .claude/next-steps.md
+MODE: <mode> (<maturity>)
+SIGNAL: <one-line evidence>
 
-Stage 4 of 5 (Hardening) — 3 of 7 done
-   [████████████████░░░░] 80% overall
+ARTIFACTS
+  ✓ .claude/context.md
+  ✓ .claude/prd.md
+  ⚠ .claude/plan.md  [stale — last touched 2026-04-15]
+  ✗ .claude/architecture.md  [missing]
 
-Top 3 actions:
-   1. /add-monitoring — wire Sentry (1h)
-   2. Manual: rotate STRIPE_SECRET_KEY (committed in a1b2c3d) (urgent)
-   3. /check-production — full check before next feature (2h)
+RECOMMENDED NEXT
+  /<skill-name> — <one-line rationale>
 
-One regression noted: rate limiting on /api/chat
-   See .claude/next-steps.md for details.
+ALSO AVAILABLE NOW
+  /<skill>  /<skill>  /<skill>
 
-Re-run /next-steps anytime to refresh.
+OFF-PATTERN (callable but not the priority)
+  /<skill>  /<skill>
 ```
 
-## Rules
+## Post-flight
 
-- **Always write `.claude/next-steps.md`.** The file is the point. Chat is the summary.
-- **Always include the Available Skills + Agents reference sections.** That's the "I forgot what I have" defense.
-- **Maintain history.** Append to the History table; don't overwrite.
-- **Cap diffs at most-recent two runs.** The file shouldn't grow unbounded.
-- **Don't fix anything in this skill.** Only navigate. The user picks an action and runs the corresponding skill.
-- **Cite commits for changes.** When showing diffs vs previous, cite the commit SHAs that introduced changes.
-- **Be honest about regressions.** ✅ → ❌ items are loud and lead the "Recent Changes" section.
-- **Don't classify as Stage N if Stage N-1 has a hard miss.** A project missing auth shouldn't claim Stage 5 just because it has a deploy URL.
-- **`.claude/next-steps.md` should be committed to git.** Add a note at the top of the file recommending so.
-- **Respect user scope.** If the project is a CLI tool or static site, suppress irrelevant SaaS items. The skill should detect non-SaaS and shorten the checklist.
+This skill is read-only. Do not append to `progress.md`.
 
-## If Something Goes Wrong
+## Constraints
 
-- **stack-detector fails to identify project type** — check for `package.json` and main framework config files; provide the stack manually in context if still undetected.
-- **`.claude/next-steps.md` cannot be written** — confirm write permission to `.claude/`; create the directory with `mkdir .claude` if it does not exist.
-- **Stage detection looks wrong** — override by explicitly stating the current PDLC stage in your message; the model will use that instead.
+- Never modify any files.
+- Off-pattern skills are surfaced as information only — never blocked.
+- If `.claude/` is entirely missing, the dashboard should say "No project state found. Run `/start` to initialize."

@@ -7,6 +7,16 @@ description: MUST BE USED when adding continuous integration to a project that l
 
 You add CI to a project that doesn't have it. Preference is GitHub Actions. Adapts to Render or Railway deploy targets per stack preferences.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Confirm the deploy target (Render, Railway, or none) with the user before generating the workflow — deploy steps are platform-specific and non-interchangeable.

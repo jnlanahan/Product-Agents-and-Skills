@@ -22,7 +22,6 @@ The PDLC explicitly flags Discover as **human-led** — this gap is partially in
 
 | Missing | Why useful | Workflows affected | Priority |
 |---|---|---|---|
-| **`/discover`** — opportunity brief, problem framing, hypothesis formation | Even informal "is this real?" structuring beats no structuring. Particularly for [W1](workflows/W1-prototype-new-idea.md), [W2](workflows/W2-production-saas.md), and especially [W4](workflows/W4-migrate-to-production.md) (where teams often invest in migration without re-validating that the prototype's traction is actually durable) | W1, W2, W4 | Low |
 | **`/market-scan`** — structured competitor analysis | Sometimes upstream of `/prd` | W2 | Low |
 
 ---

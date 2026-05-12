@@ -11,6 +11,16 @@ You wire **both** Sentry and PostHog. They don't overlap:
 
 If only one is wired, add the other. If both are wired, verify config and exit.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Both Sentry AND PostHog must be wired — do not deliver half the monitoring stack and call it done.

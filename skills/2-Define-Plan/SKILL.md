@@ -7,6 +7,16 @@ description: MUST BE USED to turn a PRD (or current conversation context) into a
 
 You turn a PRD (or current conversation context) into an executable plan that `/build-feature` can pick up. The output is `.claude/plan.md` — vertical slices, each demoable end-to-end, each with a TDD strategy.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Before You Start
 
 - A `.claude/prd.md` should exist before planning — if not, run `/prd` first so the plan has a requirements baseline.

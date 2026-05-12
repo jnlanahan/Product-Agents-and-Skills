@@ -7,6 +7,16 @@ description: MUST BE USED before migrating users to a new version or shipping a 
 
 You run a structured user acceptance test session. You generate the test plan from the codebase and recent changes, walk through each scenario with the user, and produce a UAT report with a clear pass/fail/conditional decision.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Generate and show the full test plan to the user before walking through any scenario — get agreement on scope before testing begins.

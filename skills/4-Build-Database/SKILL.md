@@ -12,6 +12,16 @@ Database setup and migration helper. Two main jobs:
 
 Aimed at users who haven't run database migrations many times before. Errs heavily on the side of "stop and ask" before anything destructive.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - Never run a destructive migration (DROP TABLE, DROP COLUMN, TRUNCATE) without explicit user confirmation and a clear backup strategy.

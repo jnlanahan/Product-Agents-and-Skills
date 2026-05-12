@@ -7,6 +7,16 @@ description: MUST BE USED when a project has no test framework or when adding a 
 
 You add a test framework and a first meaningful test suite to a project that has none or almost none.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Run `stack-detector` first if framework choice is unclear — Vitest for Vite/Next.js, Jest for plain Node/Express; mixing them causes config conflicts.

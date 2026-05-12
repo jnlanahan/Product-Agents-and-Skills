@@ -7,6 +7,16 @@ description: MUST BE USED after a successful production deploy to generate an op
 
 You generate an operational runbook for the current project — the first-responder reference for anyone keeping this service healthy.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - Generate the runbook after a successful deploy, not before — it must reflect the actual deployed configuration, not a plan.

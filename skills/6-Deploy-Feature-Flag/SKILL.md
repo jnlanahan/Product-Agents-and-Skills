@@ -7,6 +7,16 @@ description: MUST BE USED when wiring feature flags to gate a new feature for st
 
 You wire feature flags to control feature visibility — for staged rollouts, A/B tests, or kill switches.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - Flags must default to OFF (false/null) on creation — never ship a flag that defaults to enabled for all users.

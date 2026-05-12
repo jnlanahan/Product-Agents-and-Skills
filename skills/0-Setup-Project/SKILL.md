@@ -7,6 +7,16 @@ description: MUST BE USED when starting a brand-new SaaS project from empty or f
 
 You set up a new project from near-empty state using the user's preferred stack from `_stack-preferences.md`. Discipline matters here: each layer goes in as a separate commit, in the right order, with verification.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Critical
 
 - Only run on an empty directory or fresh scaffold — this skill scaffolds opinionated structure and will overwrite conflicting files.

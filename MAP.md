@@ -9,8 +9,8 @@ Every artifact in this library — agent, skill, workflow — earns its place by
 If you only read one file, this is it. The pieces are:
 
 - **PDLC** (7 phases) — the spine. Everything else is positioned against it.
-- **Skills** (19) — slash-commands the user runs *inside* a phase.
-- **Agents** (6) — read-only diagnostics that skills delegate to *during* their phase.
+- **Skills** (27) — slash-commands the user runs *inside* a phase.
+- **Agents** (8) — read-only diagnostics that skills delegate to *during* their phase.
 - **Workflows** (8) — opinionated paths *through* the phases at different rigor levels.
 
 Source-of-truth docs: [PDLC_Phases.md](PDLC_Phases.md) · [AGENTS.md](AGENTS.md) · [WORKFLOWS.md](WORKFLOWS.md) · [GAPS.md](GAPS.md)
@@ -34,18 +34,18 @@ The 7 phases, one-line goal per phase, and which skills + agents live there. Eve
 
 ```mermaid
 flowchart LR
-    P1["1 · Discover<br/><i>Is the problem worth solving?</i><br/><br/>skills: —<br/>agents: —"]
-    P2["2 · Define<br/><i>What to build, how to know it worked.</i><br/><br/>skills: /prd /plan /glossary<br/>/grill-me /refactor<br/>agents: —"]
-    P3["3 · Design<br/><i>How it looks, flows, is built.</i><br/><br/>skills: /prototype<br/>agents: —"]
+    P1["1 · Discover<br/><i>Is the problem worth solving?</i><br/><br/>skills: /discover<br/>agents: project-state-detector"]
+    P2["2 · Define<br/><i>What to build, how to know it worked.</i><br/><br/>skills: /prd /plan /glossary<br/>/grill-me /refactor /measure<br/>agents: —"]
+    P3["3 · Design<br/><i>How it looks, flows, is built.</i><br/><br/>skills: /architect /prototype<br/>agents: stack-detector<br/>codebase-classifier<br/>design-tokens-detector"]
     P4["4 · Build<br/><i>Produce a working release candidate.</i><br/><br/>skills: /setup-project /code-map<br/>/setup-database /add-auth<br/>/add-payment /add-files<br/>/add-monitoring /build-feature<br/>/migrate-from-vibe<br/>agents: stack-detector<br/>pattern-finder<br/>codebase-classifier"]
-    P5["5 · Validate<br/><i>Confirm it's safe, correct, useful.</i><br/><br/>skills: /triage<br/>/check-production<br/>agents: secret-scanner<br/>dependency-currency-checker<br/>prod-readiness-auditor"]
-    P6["6 · Deploy<br/><i>Get to prod, get to users.</i><br/><br/>skills: /deploy<br/>agents: secret-scanner<br/>prod-readiness-auditor"]
-    P7["7 · Learn<br/><i>Did it work? What next?</i><br/><br/>skills: —<br/>agents: —"]
+    P5["5 · Validate<br/><i>Confirm it's safe, correct, useful.</i><br/><br/>skills: /triage /uat<br/>/accessibility /check-production<br/>agents: secret-scanner<br/>dependency-currency-checker<br/>prod-readiness-auditor<br/>accessibility-auditor"]
+    P6["6 · Deploy<br/><i>Get to prod, get to users.</i><br/><br/>skills: /deploy /feature-flag<br/>/rollback /runbook /handoff<br/>agents: secret-scanner<br/>prod-readiness-auditor"]
+    P7["7 · Learn<br/><i>Did it work? What next?</i><br/><br/>skills: /post-launch-review<br/>/postmortem<br/>agents: —"]
 
     P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
     P7 -. iterate .-> P1
 
-    NS(["/next-steps<br/><i>cross-phase compass</i>"]):::cross
+    NS(["/next /resume /start /skills<br/><i>cross-phase navigation</i>"]):::cross
     NS -.-> P2 & P4 & P5
 
     classDef phase fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
@@ -53,7 +53,7 @@ flowchart LR
     class P1,P2,P3,P4,P5,P6,P7 phase;
 ```
 
-Phases 1 (Discover) and 7 (Learn) intentionally have no skills today — they're human-led. See [GAPS.md](GAPS.md). `/next-steps` is the always-on compass that orients you wherever you are in the lifecycle.
+`/next`, `/resume`, `/start`, and `/skills` are cross-phase navigation tools — run them at any point to orient, resume, or discover what's available. `project-state-detector` powers all of them.
 
 ---
 
@@ -63,14 +63,13 @@ A two-line description per phase, the skills available, the agents they pull in,
 
 ### 1 · Discover — *is this worth solving?*
 
-Decide whether a real problem exists, who hurts, how big, and whether you have or can get the data to validate it. Outside the code; outside the library today.
+Surface the real problem before structuring it. `/discover` walks through 5 steps across sessions — frame → customer → problem → stakes → bridge — and produces `.claude/discovery-notes.md` for `/prd` to consume.
 
 | Item | Detail |
 |---|---|
-| Skills | *(none — human-led)* |
-| Agents | *(none)* |
-| Output | Opportunity brief, validated problem statement, rough sizing, data-availability note |
-| Gap | A `/discover` skill could synthesize interview notes — see [GAPS.md](GAPS.md#discover-phase) |
+| Skills | `/discover` (optional — skip if problem is confirmed) |
+| Agents | `project-state-detector` (for routing) |
+| Output | `.claude/discovery-notes.md` |
 
 ### 2 · Define — *what to build & how to know it worked*
 
@@ -78,19 +77,19 @@ Synthesize the problem into a writeable scope: PRD, success metrics, plan, vocab
 
 | Item | Detail |
 |---|---|
-| Skills | `/prd` · `/plan` · `/glossary` · `/grill-me` · `/refactor` (when refactoring is the work) |
+| Skills | `/prd` · `/plan` · `/measure` · `/glossary` · `/grill-me` · `/refactor` |
 | Agents | *(none — these skills work in conversation + the codebase)* |
-| Output | `.claude/prd.md` · `.claude/plan.md` · `.claude/glossary.md` · `.claude/refactor-plan.md` |
+| Output | `.claude/prd.md` · `.claude/plan.md` · `.claude/measurement.md` · `.claude/glossary.md` · `.claude/refactor-plan.md` |
 
-### 3 · Design — *how it looks and flows*
+### 3 · Design — *how it looks, flows, and is built*
 
-Make the design decisions explicit. For UI work, the prototype is the design.
+Make architecture and UI decisions explicit before building. `/architect` produces the architecture doc; `/prototype` produces three clickable UI variants.
 
 | Item | Detail |
 |---|---|
-| Skills | `/prototype` (three clickable HTML variants — pick one) |
-| Agents | *(none)* |
-| Output | `prototypes/variant-A.html` · `variant-B.html` · `variant-C.html` |
+| Skills | `/architect` (step-decomposed, 5 checkpoints) · `/prototype` (three clickable HTML variants — pick one) |
+| Agents | `stack-detector` · `codebase-classifier` · `design-tokens-detector` (for `/prototype` to respect existing tokens) |
+| Output | `.claude/architecture.md` · `.claude/decisions.md` · `prototypes/variant-A.html` · `variant-B.html` · `variant-C.html` |
 
 ### 4 · Build — *produce a release candidate*
 
@@ -104,23 +103,23 @@ Where most of the library lives. Scaffold, wire third-party services, ship featu
 
 ### 5 · Validate — *safe, correct, useful*
 
-Catch what shouldn't ship. `/check-production` orchestrates all five validating agents in parallel; `/triage` turns findings (or user reports) into structured bug reports.
+Catch what shouldn't ship. `/check-production` orchestrates all validating agents in parallel; `/triage` turns findings into structured bug reports; `/uat` runs structured user acceptance testing; `/accessibility` checks WCAG 2.1 AA compliance.
 
 | Item | Detail |
 |---|---|
-| Skills | `/triage` · `/check-production` |
-| Agents | `secret-scanner` · `dependency-currency-checker` · `prod-readiness-auditor` (+ `stack-detector` and `codebase-classifier` for context) |
-| Output | Severity-graded readiness report (Critical/High/Medium/Low) · `.claude/bugs/<name>.md` |
+| Skills | `/triage` · `/uat` · `/accessibility` · `/check-production` |
+| Agents | `secret-scanner` · `dependency-currency-checker` · `prod-readiness-auditor` · `accessibility-auditor` (+ `stack-detector` and `codebase-classifier` for context) |
+| Output | Severity-graded readiness report · `.claude/bugs/<name>.md` · `.claude/uat-<feature>-<date>.md` |
 
 ### 6 · Deploy — *get to prod, get to users*
 
-Two distinct steps: code in production, feature available to users. Plus the operational scaffolding (env, domain, SSL, runbook).
+Code in production, feature visible to users, operations ready for handoff. Includes rollback planning, runbooks, feature flags for staged rollout, and stakeholder handoff docs.
 
 | Item | Detail |
 |---|---|
-| Skills | `/deploy` |
+| Skills | `/deploy` · `/feature-flag` · `/rollback` · `/runbook` · `/handoff` |
 | Agents | `secret-scanner` (pre-flight gate) · `prod-readiness-auditor` (if not already run) |
-| Output | Deployed app, env vars, custom domain + SSL, post-deploy smoke tests, runbook |
+| Output | Deployed app, env vars, custom domain + SSL, post-deploy smoke tests, runbook · `.claude/handoff-<name>.md` |
 
 ### 7 · Learn — *did it work?*
 
@@ -128,10 +127,9 @@ Compare against Define's success metrics. Decide: double down, iterate, sunset. 
 
 | Item | Detail |
 |---|---|
-| Skills | *(none — human-led)* |
+| Skills | `/post-launch-review` · `/postmortem` |
 | Agents | *(none)* |
-| Output | Launch review, decision, backlog updates |
-| Gap | A `/post-launch-review` skill is on the wishlist — see [GAPS.md](GAPS.md#learn-phase) |
+| Output | `.claude/post-launch-review-<date>.md` · `.claude/postmortem-<date>-<slug>.md` |
 
 ---
 
@@ -193,13 +191,18 @@ Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), k
 
 | Skill | W1 Prototype | W2 SaaS | W3 Feature | W4 Migrate | W5 Refactor | W6 Hotfix | W7 Audit | W8 Personal |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| `/next-steps` | | ● | ● | ● | ● | ○ | ● | ○ |
+| `/start` | ○ | ● | ○ | ○ | ○ | | | ○ |
+| `/next` | | ● | ● | ● | ● | ○ | ● | ○ |
+| `/resume` | ○ | ● | ● | ● | ● | ○ | ● | ○ |
 | `/setup-project` | | ● | | | | | | ● |
+| `/discover` | ○ | ● | ○ | | | | | |
 | `/prd` | ○ | ● | ● | ○ | | | | ○ |
 | `/plan` | ○ | ● | ● | ● | ● | | | ○ |
+| `/measure` | | ● | ○ | | | | | |
 | `/refactor` | | | ○ | | ● | ○ | ○ | |
 | `/glossary` | ○ | ● | ○ | | | | | |
 | `/grill-me` | ○ | ● | ○ | | ● | | | |
+| `/architect` | | ● | ○ | | | | | |
 | `/prototype` | ● | ● | ○ | | | | | ○ |
 | `/code-map` | | | ● | ● | ● | ○ | | |
 | `/setup-database` | | ● | ○ | ● | | | ○ | ● |
@@ -210,8 +213,16 @@ Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), k
 | `/build-feature` | | ● | ● | ○ | ● | ● | ● | ● |
 | `/migrate-from-vibe` | | | | ● | | | | |
 | `/triage` | | ● | ● | ● | ● | ● | ● | ○ |
+| `/uat` | | ● | ● | ● | ○ | | ○ | |
+| `/accessibility` | | ● | ○ | ● | | | ● | |
 | `/check-production` | | ● | ● | ● | ● | ● | ● | ○ |
+| `/feature-flag` | | ● | ● | ○ | | | | |
+| `/rollback` | | ○ | ○ | ○ | | ● | | |
+| `/runbook` | | ● | ○ | ● | | | | |
 | `/deploy` | ○ | ● | ● | ● | ● | ● | ● | ● |
+| `/handoff` | | ● | ○ | ○ | | | | |
+| `/post-launch-review` | | ● | ○ | ● | | | | |
+| `/postmortem` | | ○ | ○ | | | ○ | ○ | |
 
 ---
 
@@ -219,21 +230,26 @@ Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), k
 
 Which agents each skill delegates to. **●** = primary caller. **○** = ad-hoc / conditional.
 
-| Skill ↓ \ Agent → | `stack-detector` | `codebase-classifier` | `pattern-finder` | `secret-scanner` | `dependency-currency-checker` | `prod-readiness-auditor` |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|
-| `/next-steps` | ● | ● | | | ● | |
-| `/setup-project` | ● | | | | | |
-| `/setup-database` | ● | | ● | | | |
-| `/add-auth` | ● | | ● | | | |
-| `/add-payment` | ● | | ● | | | |
-| `/add-files` | ● | | ● | | | |
-| `/build-feature` | ● | | ● | | | |
-| `/migrate-from-vibe` | ● | ● | ● | | | |
-| `/triage` | ○ | | ○ | ○ | | |
-| `/check-production` | ● | ● | | ● | ● | ● |
-| `/deploy` | | | | ● | | ● |
+| Skill ↓ \ Agent → | `stack-detector` | `codebase-classifier` | `pattern-finder` | `secret-scanner` | `dependency-currency-checker` | `prod-readiness-auditor` | `project-state-detector` | `design-tokens-detector` | `accessibility-auditor` |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| `/next` | | | | | ● | | ● | | |
+| `/resume` | | | | | | | ● | | |
+| `/skills` | | | | | | | ● | | |
+| `/setup-project` | ● | | | | | | | | |
+| `/architect` | ● | ● | | | | | | | |
+| `/prototype` | | | | | | | | ● | |
+| `/setup-database` | ● | | ● | | | | | | |
+| `/add-auth` | ● | | ● | | | | | | |
+| `/add-payment` | ● | | ● | | | | | | |
+| `/add-files` | ● | | ● | | | | | | |
+| `/build-feature` | ● | | ● | | | | | | |
+| `/migrate-from-vibe` | ● | ● | ● | | | | | | |
+| `/triage` | ○ | | ○ | ○ | | | | | |
+| `/accessibility` | | | | | | | | | ● |
+| `/check-production` | ● | ● | | ● | ● | ● | | | |
+| `/deploy` | | | | ● | | ● | | | |
 
-Skills not listed (`/prd`, `/plan`, `/refactor`, `/glossary`, `/grill-me`, `/prototype`, `/code-map`, `/add-monitoring`) call no agents — they work in conversation.
+Skills not listed (`/start`, `/discover`, `/prd`, `/plan`, `/measure`, `/refactor`, `/glossary`, `/grill-me`, `/code-map`, `/add-monitoring`, `/add-ai`, `/add-email`, `/setup-ci`, `/setup-tests`, `/uat`, `/feature-flag`, `/rollback`, `/runbook`, `/handoff`, `/post-launch-review`, `/postmortem`) call no agents — they work in conversation or with the codebase directly.
 
 ---
 

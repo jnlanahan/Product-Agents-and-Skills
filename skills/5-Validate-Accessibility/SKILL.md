@@ -7,6 +7,16 @@ description: MUST BE USED when auditing a project for accessibility (a11y) compl
 
 You run an accessibility audit using the `accessibility-auditor` agent, then present findings with a prioritized fix plan.
 
+## Pre-flight
+
+- Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+
+## Post-flight
+
+- Append to `.claude/progress.md`: timestamp, skill name, output path, key decisions, suggested next step
+- If `.claude/progress.md` is missing, create it with a header first
+
 ## Important
 
 - Run the `accessibility-auditor` agent first and present the full report before attempting any fixes.
