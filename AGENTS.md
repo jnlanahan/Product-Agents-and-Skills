@@ -2,6 +2,8 @@
 
 This repository is a curated library of **Claude Code agents and skills** that drive a full Product Development Lifecycle (PDLC). Agents are read-only diagnostic helpers; skills are conversational workflows that orchestrate the work. Both are designed to be installed under `~/.claude/agents/` and `~/.claude/skills/` and used globally across projects.
 
+> **Index counts:** 12 agents · 28 skills · 8 workflows.
+
 For the lifecycle this library is built around, see [PDLC_Phases.md](PDLC_Phases.md). For composed end-to-end paths through these tools, see [WORKFLOWS.md](WORKFLOWS.md). For a list of known coverage gaps, see [GAPS.md](GAPS.md).
 
 ---
@@ -40,7 +42,7 @@ Source of truth for each entry is the `description` field in the file's YAML fro
 
 ## Agents (read-only diagnostics)
 
-All eight agents are **read-only by design** (best practice #10). They detect, classify, and report. They never write. Skills call them to gather context before proposing changes.
+All twelve agents are **read-only by design** (best practice #10). They detect, classify, and report. They never write. Skills call them to gather context before proposing changes.
 
 ### `stack-detector`
 
@@ -122,6 +124,38 @@ All eight agents are **read-only by design** (best practice #10). They detect, c
 - **File** — [agents/design-tokens-detector.md](agents/design-tokens-detector.md)
 - **Notes** — no Figma integration. Covers Tailwind, CSS custom properties, and component library detection (shadcn, Radix, Chakra, MUI, etc.)
 
+### `vibe-artifact-detector`
+
+- **Use when** — `/unvibe` scans a codebase for vibe-coding-platform leftovers (Replit, Lovable, v0, Bolt, StackBlitz, Cursor, Windsurf, ChatGPT/Claude pasted code)
+- **Tools** — `Read, Grep, Glob`
+- **Output** — `VIBE ARTIFACTS REPORT`: platform signatures, AI boilerplate comment density, mock data in production paths, hardcoded "should-be-env" values, scratch/leftover files, committed secrets
+- **File** — [agents/vibe-artifact-detector.md](agents/vibe-artifact-detector.md)
+- **Notes** — truncates suspected secrets to first 8 chars + `***`; never reads `.env` contents; pairs with `secret-scanner` for the deep secrets pass
+
+### `duplication-detector`
+
+- **Use when** — `/unvibe` (Wave 2 — Consolidate) needs to surface near-duplicate files, components, utilities, and types so the calling skill can pick a canonical
+- **Tools** — `Read, Grep, Glob`
+- **Output** — `DUPLICATION REPORT`: utility function clusters, component clusters, route handler conflicts, type definition clusters, each with a recommended canonical and rationale
+- **File** — [agents/duplication-detector.md](agents/duplication-detector.md)
+- **Notes** — distinguishes intentional polymorphism (variants) from regenerated duplication (clusters); recommends canonicals but never deletes
+
+### `dead-code-detector`
+
+- **Use when** — `/unvibe` (Wave 1 — Clean) needs unreferenced files, unused exports, and orphaned dependencies surfaced with confidence levels
+- **Tools** — `Read, Grep, Glob, Bash`
+- **Output** — `DEAD CODE REPORT`: high/medium/low confidence buckets for files; unused named exports; orphaned `dependencies` / `devDependencies`; respected entrypoints
+- **File** — [agents/dead-code-detector.md](agents/dead-code-detector.md)
+- **Notes** — defensive about dynamic imports — anything whose basename appears in a string literal is downgraded to low confidence; optional `knip` corroboration if installed
+
+### `architecture-drift-detector`
+
+- **Use when** — `/unvibe` (Wave 3 — Converge) needs competing patterns identified across state, validation, HTTP, routing, styling, forms, auth, and DB; also flags half-implemented features
+- **Tools** — `Read, Grep, Glob`
+- **Output** — `ARCHITECTURE DRIFT REPORT`: competing patterns per concern with recommended canonical, half-implemented features, convention drift within one pattern, migration-effort estimates
+- **File** — [agents/architecture-drift-detector.md](agents/architecture-drift-detector.md)
+- **Notes** — `sonnet` tier (judgment-heavy); distinguishes intentional layering (server Zod + client RHF) from genuine drift; recommends migration order
+
 ---
 
 ## Skills by PDLC phase
@@ -168,6 +202,14 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **Flags** — `--personal`: lighter stack (SQLite, optional auth, no Stripe/Storage) for personal tools and internal dashboards
 - **Calls agents** — `stack-detector` (sanity check that this is greenfield)
 - **File** — [skills/0-Setup-Project/SKILL.md](skills/0-Setup-Project/SKILL.md)
+
+#### `/unvibe` — `0-Setup-Unvibe`
+
+- **Use when** — rehabilitating a vibe-coded project: strip platform artifacts (Replit/Lovable/v0/Bolt/Cursor/etc.), remove dead code, consolidate duplicates, converge competing patterns, harden into a maintainable codebase. The rehabilitation counterpart to `/migrate-from-vibe` — that skill *moves* the project off the platform; `/unvibe` *fixes the mess it left behind*.
+- **Output** — `.claude/unvibe-plan.md` (assess → 4 waves of Clean / Consolidate / Converge / Harden, one commit per wave, decisions log), updated codebase per approved waves
+- **Calls agents** — `stack-detector`, `codebase-classifier`, `project-state-detector`, `vibe-artifact-detector`, `duplication-detector`, `dead-code-detector`, `architecture-drift-detector`, `secret-scanner`, `dependency-currency-checker`, `pattern-finder`
+- **File** — [skills/0-Setup-Unvibe/SKILL.md](skills/0-Setup-Unvibe/SKILL.md)
+- **Notes** — read-only until Step 4; nothing changes without explicit user approval per wave; safe stopping point between every wave; expects multiple sessions on non-trivial codebases. Run AFTER `/migrate-from-vibe` if the project is still platform-locked.
 
 ---
 
