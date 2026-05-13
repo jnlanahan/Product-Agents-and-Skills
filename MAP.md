@@ -10,7 +10,7 @@ If you only read one file, this is it. The pieces are:
 
 - **PDLC** (7 phases) — the spine. Everything else is positioned against it.
 - **Skills** (28) — slash-commands the user runs *inside* a phase.
-- **Agents** (8) — read-only diagnostics that skills delegate to *during* their phase.
+- **Agents** (12) — read-only diagnostics that skills delegate to *during* their phase.
 - **Workflows** (8) — opinionated paths *through* the phases at different rigor levels.
 
 Source-of-truth docs: [PDLC_Phases.md](PDLC_Phases.md) · [AGENTS.md](AGENTS.md) · [WORKFLOWS.md](WORKFLOWS.md) · [GAPS.md](GAPS.md)
@@ -37,7 +37,7 @@ flowchart LR
     P1["1 · Discover<br/><i>Is the problem worth solving?</i><br/><br/>skills: /discover<br/>agents: project-state-detector"]
     P2["2 · Define<br/><i>What to build, how to know it worked.</i><br/><br/>skills: /prd /plan /glossary<br/>/grill-me /refactor /measure<br/>agents: —"]
     P3["3 · Design<br/><i>How it looks, flows, is built.</i><br/><br/>skills: /architect /prototype<br/>agents: stack-detector<br/>codebase-classifier<br/>design-tokens-detector"]
-    P4["4 · Build<br/><i>Produce a working release candidate.</i><br/><br/>skills: /setup-project /code-map<br/>/setup-database /add-auth<br/>/add-payment /add-files<br/>/add-monitoring /build-feature<br/>/migrate-from-vibe<br/>agents: stack-detector<br/>pattern-finder<br/>codebase-classifier"]
+    P4["4 · Build<br/><i>Produce a working release candidate.</i><br/><br/>skills: /setup-project /unvibe<br/>/code-map /setup-database<br/>/add-auth /add-payment /add-files<br/>/add-monitoring /build-feature<br/>/migrate-from-vibe<br/>agents: stack-detector<br/>pattern-finder<br/>codebase-classifier<br/>vibe-artifact-detector<br/>duplication-detector<br/>dead-code-detector<br/>architecture-drift-detector"]
     P5["5 · Validate<br/><i>Confirm it's safe, correct, useful.</i><br/><br/>skills: /triage /uat<br/>/accessibility /check-production<br/>agents: secret-scanner<br/>dependency-currency-checker<br/>prod-readiness-auditor<br/>accessibility-auditor"]
     P6["6 · Deploy<br/><i>Get to prod, get to users.</i><br/><br/>skills: /deploy /feature-flag<br/>/rollback /runbook /handoff<br/>agents: secret-scanner<br/>prod-readiness-auditor"]
     P7["7 · Learn<br/><i>Did it work? What next?</i><br/><br/>skills: /post-launch-review<br/>/postmortem<br/>agents: —"]
@@ -97,9 +97,9 @@ Where most of the library lives. Scaffold, wire third-party services, ship featu
 
 | Item | Detail |
 |---|---|
-| Skills | `/setup-project` · `/code-map` · `/setup-database` · `/add-auth` · `/add-payment` · `/add-files` · `/add-monitoring` · `/build-feature` · `/migrate-from-vibe` |
-| Agents | `stack-detector` · `pattern-finder` · `codebase-classifier` (for `/migrate-from-vibe`) |
-| Output | Working code in coherent waves, one commit per layer, tests at each layer |
+| Skills | `/setup-project` · `/unvibe` · `/code-map` · `/setup-database` · `/add-auth` · `/add-payment` · `/add-files` · `/add-monitoring` · `/build-feature` · `/migrate-from-vibe` |
+| Agents | `stack-detector` · `pattern-finder` · `codebase-classifier` · `vibe-artifact-detector` · `duplication-detector` · `dead-code-detector` · `architecture-drift-detector` (the last four are the rehabilitation detector set for `/unvibe`) |
+| Output | Working code in coherent waves, one commit per layer, tests at each layer; for `/unvibe`: `.claude/unvibe-plan.md` + a series of commits across Clean / Consolidate / Converge / Harden waves |
 
 ### 5 · Validate — *safe, correct, useful*
 
@@ -213,6 +213,7 @@ Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), k
 | `/add-monitoring` | | ● | ○ | ● | | | ● | |
 | `/build-feature` | | ● | ● | ○ | ● | ● | ● | ● |
 | `/migrate-from-vibe` | | | | ● | | | | |
+| `/unvibe` | | ○ | | ● | ○ | | ○ | |
 | `/triage` | | ● | ● | ● | ● | ● | ● | ○ |
 | `/uat` | | ● | ● | ● | ○ | | ○ | |
 | `/accessibility` | | ● | ○ | ● | | | ● | |
@@ -231,25 +232,26 @@ Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), k
 
 Which agents each skill delegates to. **●** = primary caller. **○** = ad-hoc / conditional.
 
-| Skill ↓ \ Agent → | `stack-detector` | `codebase-classifier` | `pattern-finder` | `secret-scanner` | `dependency-currency-checker` | `prod-readiness-auditor` | `project-state-detector` | `design-tokens-detector` | `accessibility-auditor` |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| `/next` | | | | | ● | | ● | | |
-| `/resume` | | | | | | | ● | | |
-| `/skills` | | | | | | | ● | | |
-| `/workflow` | | | | | | | ● | | |
-| `/setup-project` | ● | | | | | | | | |
-| `/architect` | ● | ● | | | | | | | |
-| `/prototype` | | | | | | | | ● | |
-| `/setup-database` | ● | | ● | | | | | | |
-| `/add-auth` | ● | | ● | | | | | | |
-| `/add-payment` | ● | | ● | | | | | | |
-| `/add-files` | ● | | ● | | | | | | |
-| `/build-feature` | ● | | ● | | | | | | |
-| `/migrate-from-vibe` | ● | ● | ● | | | | | | |
-| `/triage` | ○ | | ○ | ○ | | | | | |
-| `/accessibility` | | | | | | | | | ● |
-| `/check-production` | ● | ● | | ● | ● | ● | | | |
-| `/deploy` | | | | ● | | ● | | | |
+| Skill ↓ \ Agent → | `stack-detector` | `codebase-classifier` | `pattern-finder` | `secret-scanner` | `dependency-currency-checker` | `prod-readiness-auditor` | `project-state-detector` | `design-tokens-detector` | `accessibility-auditor` | `vibe-artifact-detector` | `duplication-detector` | `dead-code-detector` | `architecture-drift-detector` |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| `/next` | | | | | ● | | ● | | | | | | |
+| `/resume` | | | | | | | ● | | | | | | |
+| `/skills` | | | | | | | ● | | | | | | |
+| `/workflow` | | | | | | | ● | | | | | | |
+| `/setup-project` | ● | | | | | | | | | | | | |
+| `/architect` | ● | ● | | | | | | | | | | | |
+| `/prototype` | | | | | | | | ● | | | | | |
+| `/setup-database` | ● | | ● | | | | | | | | | | |
+| `/add-auth` | ● | | ● | | | | | | | | | | |
+| `/add-payment` | ● | | ● | | | | | | | | | | |
+| `/add-files` | ● | | ● | | | | | | | | | | |
+| `/build-feature` | ● | | ● | | | | | | | | | | |
+| `/migrate-from-vibe` | ● | ● | ● | | | | | | | | | | |
+| `/unvibe` | ● | ● | ● | ● | ● | | ● | | | ● | ● | ● | ● |
+| `/triage` | ○ | | ○ | ○ | | | | | | | | | |
+| `/accessibility` | | | | | | | | | ● | | | | |
+| `/check-production` | ● | ● | | ● | ● | ● | | | | | | | |
+| `/deploy` | | | | ● | | ● | | | | | | | |
 
 Skills not listed (`/start`, `/discover`, `/prd`, `/plan`, `/measure`, `/refactor`, `/glossary`, `/grill-me`, `/code-map`, `/add-monitoring`, `/add-ai`, `/add-email`, `/setup-ci`, `/setup-tests`, `/uat`, `/feature-flag`, `/rollback`, `/runbook`, `/handoff`, `/post-launch-review`, `/postmortem`) call no agents — they work in conversation or with the codebase directly.
 
