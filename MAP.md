@@ -9,7 +9,7 @@ Every artifact in this library — agent, skill, workflow — earns its place by
 If you only read one file, this is it. The pieces are:
 
 - **PDLC** (7 phases) — the spine. Everything else is positioned against it.
-- **Skills** (27) — slash-commands the user runs *inside* a phase.
+- **Skills** (28) — slash-commands the user runs *inside* a phase.
 - **Agents** (8) — read-only diagnostics that skills delegate to *during* their phase.
 - **Workflows** (8) — opinionated paths *through* the phases at different rigor levels.
 
@@ -45,7 +45,7 @@ flowchart LR
     P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
     P7 -. iterate .-> P1
 
-    NS(["/next /resume /start /skills<br/><i>cross-phase navigation</i>"]):::cross
+    NS(["/next /resume /start /skills /workflow<br/><i>cross-phase navigation</i>"]):::cross
     NS -.-> P2 & P4 & P5
 
     classDef phase fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
@@ -53,7 +53,7 @@ flowchart LR
     class P1,P2,P3,P4,P5,P6,P7 phase;
 ```
 
-`/next`, `/resume`, `/start`, and `/skills` are cross-phase navigation tools — run them at any point to orient, resume, or discover what's available. `project-state-detector` powers all of them.
+`/next`, `/resume`, `/start`, `/skills`, and `/workflow` are cross-phase navigation tools — run them at any point to orient, resume, or discover what's available. `project-state-detector` powers all of them. `/workflow` is the workflow-aware pilot: it tracks position through a chosen Wn end-to-end (state in `.claude/workflow-state.md`) while keeping every transition under user control.
 
 ---
 
@@ -194,6 +194,7 @@ Same data as [WORKFLOWS.md § heatmap](WORKFLOWS.md#workflow--skills-heatmap), k
 | `/start` | ○ | ● | ○ | ○ | ○ | | | ○ |
 | `/next` | | ● | ● | ● | ● | ○ | ● | ○ |
 | `/resume` | ○ | ● | ● | ● | ● | ○ | ● | ○ |
+| `/workflow` | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | `/setup-project` | | ● | | | | | | ● |
 | `/discover` | ○ | ● | ○ | | | | | |
 | `/prd` | ○ | ● | ● | ○ | | | | ○ |
@@ -235,6 +236,7 @@ Which agents each skill delegates to. **●** = primary caller. **○** = ad-hoc
 | `/next` | | | | | ● | | ● | | |
 | `/resume` | | | | | | | ● | | |
 | `/skills` | | | | | | | ● | | |
+| `/workflow` | | | | | | | ● | | |
 | `/setup-project` | ● | | | | | | | | |
 | `/architect` | ● | ● | | | | | | | |
 | `/prototype` | | | | | | | | ● | |

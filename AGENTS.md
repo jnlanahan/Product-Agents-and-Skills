@@ -161,6 +161,14 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **File** — [skills/0-Skills/SKILL.md](skills/0-Skills/SKILL.md)
 - **Notes** — read-only
 
+#### `/workflow` — `0-Workflow`
+
+- **Use when** — piloting through one of the eight named workflows (W1–W8) end-to-end. Asks which workflow you're on (or reads `.claude/workflow-state.md`), reads the matching `workflows/Wn-*.md` for the canonical skill sequence, walks you through it step-by-step with explicit run / skip / mark done / pause / switch / off-script options at every transition.
+- **Output** — `.claude/workflow-state.md` — a human-readable position-of-record file (current step, completed steps, skips, detours, decisions). Survives context resets — re-derives position from the state file + `.claude/` artifacts on every invocation.
+- **Calls agents** — `project-state-detector`
+- **File** — [skills/0-Workflow/SKILL.md](skills/0-Workflow/SKILL.md)
+- **Notes** — never auto-invokes another skill; recommends and waits for user confirmation. Designed for veering off — ad-hoc skills mid-workflow, switching workflows mid-stream, and freeform "off-script" mode are all first-class. The workflow file (`workflows/Wn-*.md`) is the source of truth for sequences; the pilot reads it fresh every run.
+
 #### `/setup-project` — `0-Setup-Project`
 
 - **Use when** — starting a brand-new SaaS project from empty or fresh-scaffold state. **Not** for existing projects.
