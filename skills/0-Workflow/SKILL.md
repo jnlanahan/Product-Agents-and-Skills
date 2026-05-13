@@ -42,15 +42,23 @@ You are a workflow pilot. You take one of the eight named workflows (W1–W8 fro
 
 ## The state file: `.claude/workflow-state.md`
 
-This is the pilot's memory. It is human-readable and the user can edit it directly. Format:
+This is the pilot's memory. Format follows the repo's `.claude/` convention: **YAML frontmatter for machine-readable state, Markdown body for the human-readable checklist.** The user can edit either side directly; the pilot reconciles on next run.
 
 ```markdown
-# Workflow State
+---
+workflow_id: W4
+workflow_name: Migrate a Prototype to Production
+started: 2026-05-13
+last_active: 2026-05-13T14:32:00Z
+mode: active                 # active | paused | off-script | completed
+current_step_index: 3
+current_step_slug: /unvibe
+next_step_slug: /prd
+total_steps: 12
+completed_count: 2
+---
 
-**workflow:** W4 — Migrate a Prototype to Production
-**started:** 2026-05-13
-**last_active:** 2026-05-13T14:32
-**mode:** active | paused | off-script | completed
+# Workflow State
 
 ## Position
 **current:** step 3 of 12 — `/unvibe`
@@ -77,6 +85,8 @@ This is the pilot's memory. It is human-readable and the user can edit it direct
 ## Decisions and skips
 - 2026-05-13: skipped `/prd` retrofit — user already has a clear product spec.
 ```
+
+The frontmatter keys are the **source of truth for position** (`current_step_index`, `mode`, `last_active`). The body's checklist is the human-readable view of the same state. When they disagree (e.g., the user manually edited the body), the pilot reconciles: it trusts the body's markers and rewrites the frontmatter to match.
 
 Status markers:
 - `[ ]` pending
@@ -109,7 +119,7 @@ Ask the user which workflow to start. Show this menu:
 >
 > Or describe what you're doing and I'll suggest one.
 >
-> *(See [WORKFLOWS.md](WORKFLOWS.md) for the "pick when" cheat sheet.)*
+> *(See [WORKFLOWS.md](../../WORKFLOWS.md) for the "pick when" cheat sheet.)*
 
 If user describes a goal instead of picking, suggest the best fit with a one-line rationale, then confirm.
 
