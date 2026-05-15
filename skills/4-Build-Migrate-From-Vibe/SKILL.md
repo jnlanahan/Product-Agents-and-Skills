@@ -69,13 +69,13 @@ Produce a concise summary for the user: "Here's what I found." Wait for confirma
 
 Read `_stack-preferences.md`. By default the target is:
 
-- Next.js App Router OR React+Vite+Express (ask user)
+- Next.js App Router (preferred) or React+Vite+Express (ask user)
 - Drizzle + Neon Postgres
-- Firebase Auth (or whatever the source already had wired — don't migrate auth providers)
+- Neon Auth via Better Auth (or whatever the source already had wired — don't migrate auth providers mid-port)
 - Stripe (or whatever was wired)
-- Firebase Storage (or whatever was wired)
+- AWS S3 + CloudFront (or whatever storage was wired)
 - Sentry + PostHog
-- Deploy to Render or Railway
+- Deploy to Vercel
 
 Confirm with user. If something different was wired (Supabase Auth, Vercel Postgres, etc.), keep it — don't migrate. Migrating an integration mid-port doubles the risk.
 
@@ -181,7 +181,7 @@ Tell the user:
 - `process.env.REPLIT_*` won't exist outside Replit. Look for code that depends on it and rewire to standard env vars or remove.
 - Replit DB (key-value) won't translate cleanly. Likely need to migrate to Postgres.
 - `replit.nix` and `.replit` files are useless outside Replit; delete them.
-- "Always-on" / Replit Deploy → replace with Render/Railway/Vercel; this is a deploy-skill problem after the port.
+- "Always-on" / Replit Deploy → replace with Vercel; this is a deploy-skill problem after the port.
 
 ### V0 (Vercel)
 

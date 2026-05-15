@@ -29,7 +29,7 @@ You generate an operational runbook for the current project — the first-respon
 
 Run in parallel:
 - `stack-detector` — full stack, deploy target, monitoring tools
-- Read `render.yaml`, `railway.json`, `Dockerfile`, or `.github/workflows/*.yml` if they exist
+- Read `vercel.json`, `Dockerfile`, or `.github/workflows/*.yml` if they exist
 - Read the health check endpoint code (typically `app/api/health/route.ts` or `routes/health.ts`)
 - Read `.env.example` for the full list of required env vars
 
@@ -62,7 +62,7 @@ Last reviewed: <YYYY-MM-DD>
 | | |
 |---|---|
 | **Production URL** | https://... |
-| **Deploy platform** | Render / Railway / Vercel |
+| **Deploy platform** | Vercel (or detected platform) |
 | **Primary on-call** | Name — slack @handle or email |
 | **Backup on-call** | Name — slack @handle or email |
 | **Monitoring** | [Sentry](https://sentry.io) · [PostHog](https://app.posthog.com) |
@@ -84,28 +84,24 @@ If this fails: the service is down. Go to Common Failure Modes.
 
 ## Starting, stopping, restarting
 
-### Render
-- **Deploy**: push to `main` (auto-deploys) or Render dashboard → Manual Deploy
-- **Restart**: Render dashboard → your service → "..." → Restart
-- **Stop** (emergency): Render dashboard → your service → Suspend service
-
-### Railway
-```bash
-railway up            # deploy from local
-railway rollback <id> # rollback to a previous deployment
-```
+### Vercel (default)
+- **Deploy**: push to `main` (auto-deploys via GitHub integration) or `vercel --prod` from local
+- **Rollback**: Vercel dashboard → project → Deployments → find stable deploy → "..." → "Promote to Production"
+- **Stop** (emergency): Vercel dashboard → project → Settings → scroll to Danger Zone → "Pause Project"
 
 ---
 
 ## Required environment variables
 
-All of the following must be set for the service to start. Missing any will cause startup failure.
+All of the following must be set for the service to start. Missing any will cause t3-env to throw at startup.
 
 | Variable | Purpose |
 |---|---|
 | `DATABASE_URL` | Neon Postgres connection string |
-| `FIREBASE_SERVICE_ACCOUNT` | Firebase admin credentials (full JSON, server-only) |
-| `NEXT_PUBLIC_FIREBASE_*` | Firebase client config (6 values) |
+| `BETTER_AUTH_SECRET` | Long random string for signing sessions |
+| `BETTER_AUTH_URL` | Production URL (e.g. https://yourapp.com) |
+| `AUTH_GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `AUTH_GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `STRIPE_SECRET_KEY` | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
 | `ANTHROPIC_API_KEY` | Anthropic Claude API key (if AI features present) |
@@ -125,10 +121,10 @@ All of the following must be set for the service to start. Missing any will caus
 - **Check**: [Neon console](https://console.neon.tech) — is the DB paused? (free tier auto-pauses after 5 min idle)
 - **Fix**: Wake the DB from the Neon console. For recurring pauses: upgrade to a paid Neon tier or configure a keep-alive ping.
 
-### Firebase Auth failure
-- **Symptoms**: All sign-ins return 401; Sentry shows `Firebase: auth/...` errors
-- **Check**: [Firebase console](https://console.firebase.google.com) → Authentication — is the project enabled?
-- **Fix**: Verify `FIREBASE_SERVICE_ACCOUNT` env var is valid JSON. Re-generate service account key if it was rotated.
+### Auth failure (Better Auth / Neon Auth)
+- **Symptoms**: All sign-ins return 401; users can't access protected routes
+- **Check**: Neon DB → `session` table — are sessions being created? Check Sentry for Better Auth errors.
+- **Fix**: Verify `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` env vars are set correctly. Confirm Google OAuth redirect URI in Google Cloud Console includes the production domain.
 
 ### Stripe webhook failure
 - **Symptoms**: Subscriptions not activating after checkout; Stripe dashboard shows webhook delivery failures
@@ -145,9 +141,9 @@ All of the following must be set for the service to start. Missing any will caus
 - **Check**: [Resend dashboard](https://resend.com/emails) → Logs
 - **Fix**: Verify DNS records (DKIM/SPF) are correct in Resend → Domains. Check `RESEND_API_KEY` is current.
 
-### Memory / CPU spike (Render/Railway)
-- **Symptoms**: Service restarts without error; Render Metrics tab shows memory spike before crash
-- **Fix**: Identify the culprit (Render logs → look for large data loads). Scale up instance temporarily. File a fix-and-redeploy.
+### Serverless function timeout (Vercel)
+- **Symptoms**: Requests return 504 Gateway Timeout; Vercel logs show "Function exceeded maximum duration"
+- **Fix**: Identify the slow operation (DB query, external API call). Add `export const maxDuration = 60;` to the route for longer limits on Pro plans. Optimize the query or add a DB index.
 
 ---
 
@@ -156,7 +152,7 @@ All of the following must be set for the service to start. Missing any will caus
 | Alert | Threshold | First response |
 |---|---|---|
 | Sentry: new error spike | >10 new events/min | Check Sentry — identify error type; if deploy-related → `/rollback` |
-| p95 API latency > 3s | Monitor in PostHog or Render Metrics | Check Neon slow query log; check for missing DB indexes |
+| p95 API latency > 3s | Monitor in PostHog or Sentry Performance | Check Neon slow query log; check for missing DB indexes |
 | Health check failing | Uptime monitor alerts | Check service logs; restart if unresponsive |
 | Stripe webhook failures | >3 consecutive in Stripe | Check `STRIPE_WEBHOOK_SECRET`; verify endpoint URL is correct |
 
@@ -177,8 +173,7 @@ See full procedure in [`/rollback` skill] or run `/rollback`.
 
 **Quick summary** (code-only rollback):
 ```
-Render: Dashboard → Deploys → "..." → Rollback to previous deploy
-Railway: railway rollback <deployment-id>
+Vercel: Dashboard → project → Deployments → stable deploy → "..." → Promote to Production
 Git: git revert <sha> --no-edit && git push origin main
 ```
 
@@ -191,7 +186,7 @@ For DB migration rollback, read the rollback skill first — ordering matters.
 | Service | Dashboard | What to check |
 |---|---|---|
 | Neon (DB) | https://console.neon.tech | Connection count, query latency, pause status |
-| Firebase | https://console.firebase.google.com | Auth error rate |
+| Vercel | https://vercel.com | Deployment status, function logs |
 | Stripe | https://dashboard.stripe.com | Webhook delivery, payment success rate |
 | Sentry | https://sentry.io | New error groups, error rate trend |
 | PostHog | https://app.posthog.com | Active users, funnel completion |

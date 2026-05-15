@@ -5,7 +5,7 @@ description: MUST BE USED when the user wants to deploy a project to production 
 
 # /deploy
 
-You walk the user — assumed to be a developer with limited deployment experience — through a full production deploy end-to-end. Every external step (account creation, dashboard navigation, DNS records) gets explicit numbered instructions like "1. Open https://railway.app/new. 2. Click 'Deploy from GitHub repo'." The user should be able to follow this skill without prior deploy experience.
+You walk the user — assumed to be a developer with limited deployment experience — through a full production deploy end-to-end. Every external step (account creation, dashboard navigation, DNS records) gets explicit numbered instructions like "1. Open https://vercel.com. 2. Click 'Add New Project'." The user should be able to follow this skill without prior deploy experience.
 
 ## Pre-flight
 
@@ -65,13 +65,13 @@ Determine the platform:
 
 | Detected | Action |
 |---|---|
-| Nothing | Default to **Railway** (preference) |
-| Railway/Vercel/Render/Fly | Use the existing platform |
+| Nothing | Default to **Vercel** (required default) |
+| Vercel/Railway/Render/Fly detected | Use the existing platform |
 | Multiple deploy configs (e.g., `vercel.json` + `railway.json`) | Stop, ask which is real, archive the other |
 
 Then walk the user through account setup. Use the relevant section below.
 
-→ See [platform-setup-steps.md](references/platform-setup-steps.md) for verbatim browser instructions for Railway, Vercel, and Render account setup.
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) for verbatim browser instructions for Vercel account setup and env var wiring.
 
 Use the relevant section from the reference file and deliver it verbatim to the user. Wait for confirmation before proceeding.
 
@@ -79,13 +79,13 @@ Use the relevant section from the reference file and deliver it verbatim to the 
 
 Claude-side: open `.env.example` and list every required env var the user needs to provide.
 
-→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Env Vars — Railway" section for the verbatim variable table and where to find each value. Deliver it to the user and wait for "done".
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Env Vars — Vercel" section for the verbatim variable table and where to find each value. Deliver it to the user and wait for "done".
 
-Claude-side: if `/api/health` doesn't exist, add it now (use the project's framework idiom — Next.js `app/api/health/route.ts` or Express `app.get('/api/health', ...)`). Commit and push. Railway auto-deploys.
+Claude-side: if `/api/health` doesn't exist, add it now (use the project's framework idiom — Next.js `app/api/health/route.ts`). Commit and push. Vercel auto-deploys on every push to main.
 
 ### Phase 3: First deploy + verify it's running
 
-Claude-side: confirm the build succeeded (ask the user to check Railway's "Deployments" tab and report any errors).
+Claude-side: confirm the build succeeded (ask the user to check Vercel's "Deployments" tab and report any errors).
 - Build error → look at the log, fix locally, push again
 - Runtime error → check env vars are correct, check Sentry for stack trace
 
@@ -93,25 +93,24 @@ Then:
 
 > **Verify the deploy is live:**
 >
-> 1. In your Railway project → click your service → **"Settings"** tab → look for **"Public Networking"**
-> 2. Click **"Generate Domain"** to get a `*.up.railway.app` URL
-> 3. Visit `https://<that-url>/api/health` — you should see `{"status":"ok",...}`
-> 4. Visit `https://<that-url>` — you should see your homepage
-> 5. Reply with the URL and "live" if it's working
+> 1. In your Vercel project → click the latest deployment → you'll see a `*.vercel.app` preview URL
+> 2. Visit `https://<that-url>/api/health` — you should see `{"status":"ok",...}`
+> 3. Visit `https://<that-url>` — you should see your homepage
+> 4. Reply with the URL and "live" if it's working
 
 ### Phase 4: Wire third-party services for production
 
 This is the most-forgotten phase. The user has services configured for `localhost`; production needs them updated. Walk through each service the project uses (skip ones not detected).
 
-→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Third-Party Service Wiring for Production" section for verbatim steps covering Firebase Auth authorized domains, Stripe webhook endpoint, Resend domain verification, and Sentry alert setup. PostHog requires no extra setup — it auto-detects environment from the host.
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Third-Party Service Wiring for Production" section for verbatim steps covering Better Auth (Google OAuth) authorized domains, Stripe webhook endpoint, Resend domain verification, and Sentry alert setup. PostHog requires no extra setup — it auto-detects environment from the host.
 
 ### Phase 5: Custom domain (optional but recommended for launch)
 
-If the user wants a custom domain (e.g., `myapp.com` instead of `myapp.up.railway.app`):
+If the user wants a custom domain (e.g., `myapp.com` instead of `myapp.vercel.app`):
 
-→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Custom Domain Setup" section for verbatim Railway CNAME and DNS steps.
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Custom Domain Setup" section for verbatim Vercel CNAME and DNS steps.
 
-Then **redo the Phase 4 third-party updates with the new domain** — Firebase authorized domains, Stripe webhook URL, Resend sender address all need the custom domain added.
+Then **redo the Phase 4 third-party updates with the new domain** — Google OAuth redirect URIs, Stripe webhook URL, Resend sender address all need the custom domain added.
 
 ### Phase 6: Final verification — the launch checklist
 
@@ -127,12 +126,13 @@ This is the gate before announcing. Walk through every box. Any FAIL must be fix
 - [ ] All vars from `.env.example` are set in production
 - [ ] No `STRIPE_SECRET_KEY` starting with `sk_test_` (must be `sk_live_*`)
 - [ ] `STRIPE_WEBHOOK_SECRET` is the **production** secret (different from your local `stripe listen` secret)
-- [ ] Firebase project ID is the production project (not dev)
+- [ ] `BETTER_AUTH_URL` is set to the production URL (not localhost)
+- [ ] Google OAuth redirect URI includes the production domain
 - [ ] Resend domain status is green
 
 #### C. End-to-end smoke test
-- [ ] **Sign up** with a brand-new account on production → check Firebase console for new user
-- [ ] **Sign in** with same credentials
+- [ ] **Sign up** with a brand-new account on production → check your Neon DB `user` table for the new record
+- [ ] **Sign in** with same credentials (Google Sign-In on production)
 - [ ] Visit a protected page → confirm access
 - [ ] Sign out → protected page redirects
 - [ ] **Real Stripe charge**: use a real card for the smallest amount your product allows ($0.50 if possible). Confirm:
@@ -151,9 +151,9 @@ This is the gate before announcing. Walk through every box. Any FAIL must be fix
 
 #### E. Operations
 - [ ] CI runs on every PR (typecheck + tests). If not, add `.github/workflows/test.yml` — see [platform-setup-steps.md](references/platform-setup-steps.md) "CI Workflow" for the exact YAML.
-- [ ] Production logs accessible (Railway → service → Logs tab)
+- [ ] Production logs accessible (Vercel → project → Functions tab or Runtime Logs)
 - [ ] **Uptime monitor** configured. Walk the user through BetterStack — see [platform-setup-steps.md](references/platform-setup-steps.md) "Uptime Monitor Setup" for verbatim steps.
-- [ ] **Rollback procedure tested**: in Railway → Deployments → previous successful deploy → "Redeploy" → confirm rollback works on a non-critical change
+- [ ] **Rollback procedure tested**: in Vercel → Deployments → previous successful deploy → "..." menu → "Promote to Production" → confirm rollback works on a non-critical change
 
 #### F. Legal & content
 - [ ] Privacy Policy page exists and is linked from footer
@@ -179,7 +179,7 @@ If all PASS:
 
 ## Rules
 
-- **Step-by-step external instructions, always.** Every action outside the codebase gets numbered steps with exact button labels and URLs. Don't say "configure your DNS" — say "open your DNS provider, find DNS settings for yourdomain.com, add a CNAME record with name '@' and value 'cname.up.railway.app', save."
+- **Step-by-step external instructions, always.** Every action outside the codebase gets numbered steps with exact button labels and URLs. Don't say "configure your DNS" — say "open your DNS provider, find DNS settings for yourdomain.com, add a CNAME record with name 'www' and value 'cname.vercel-dns.com', save."
 - **Pause for confirmation between phases.** Don't dump 50 instructions and walk away. After each user-facing phase, wait for "done" before proceeding.
 - **Never hand-wave third-party setup.** Account creation, dashboard navigation, DNS records, env var lookup — all explicit.
 - **Pre-flight is non-negotiable.** Don't deploy a build that fails locally.

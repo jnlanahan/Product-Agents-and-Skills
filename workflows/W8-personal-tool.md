@@ -6,7 +6,7 @@
 
 You're building something for **yourself** — or a tiny private group (your team, your family). No paying users. No multi-tenant requirements. No SLA. You want it to work, look reasonable, run somewhere, and stop demanding your attention. **You're paying with your own time, not your company's runway** — so most of the SaaS-grade rigor in [W2](W2-production-saas.md) is overkill.
 
-This workflow strips out anything you don't need: no Stripe, no full Firebase Auth (often just a single shared password or none), no Sentry/PostHog overhead, often SQLite over Postgres, free-tier deploy.
+This workflow strips out anything you don't need: no Stripe, no full auth setup (often just a single shared password or none), no Sentry/PostHog overhead, often SQLite over Postgres, free-tier Vercel deploy.
 
 ## PDLC mapping
 
@@ -26,7 +26,7 @@ This workflow strips out anything you don't need: no Stripe, no full Firebase Au
 |---|---|
 | `/add-payment` | No paying users |
 | `/add-monitoring` | Sentry + PostHog free tiers exist, but for a personal tool, errors visible in `console.log` are fine |
-| `/add-files` (Firebase) | Often local disk or simple object storage is enough |
+| `/add-files` | Often local disk or simple object storage is enough for personal tools |
 | `/add-auth` (full) | Often a shared env-var password or none at all |
 | `/glossary` | Vocabulary lives in your head |
 | `/grill-me` | You're already aligned with yourself |
@@ -82,7 +82,7 @@ flowchart TD
 You build "MealLog" — a private tool for tracking what you eat with photo + 3-tag entries.
 
 1. **30-second scope chat with Claude** — no `/prd`. You know what you want.
-2. **`/setup-project`** — when prompted for waves, you say: "skip Stripe, skip Firebase Auth (use a single env-var password), use SQLite via `better-sqlite3`, skip Sentry." Five waves total instead of nine.
+2. **`/setup-project --personal`** — when prompted for waves, you say: "skip Stripe, skip auth (use a single env-var password), use SQLite via `better-sqlite3`, skip Sentry." Five waves total instead of twelve.
 3. **`/setup-database`** — `meals` table with `id`, `created_at`, `photo_path`, `tags`, `note`.
 4. **`/build-feature`** — schema → storage → routes → React form. One commit per layer.
 5. **`/deploy`** — to Cloudflare Pages + Fly. Single env-var password gates the app. Disk volume for photo uploads.

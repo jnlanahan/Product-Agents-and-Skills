@@ -7,104 +7,95 @@ skill: "6-Deploy"
 
 Verbatim browser instructions for each supported deploy platform and third-party service.
 
-## Railway (default)
+## Vercel (default)
 
 ```
-Railway account setup — do these in your browser:
-
-1. Open https://railway.com (or railway.app — they redirect to the same place)
-2. Click "Login" in the top right
-3. Sign in with GitHub (recommended) — Railway needs GitHub access to deploy your repo
-4. Once logged in, click "New Project"
-5. Select "Deploy from GitHub repo"
-6. If this is your first time: click "Configure GitHub App" and grant Railway access to the repo you want to deploy
-7. Select your repo from the list
-8. Railway will start an initial build — let it run, it will probably fail because env vars aren't set yet (that's fine, we'll fix it next)
-9. Reply "done" when you're at the project page (you'll see "Build", "Deploy", "Variables" tabs)
-```
-
-If the user is using Railway Postgres (not Neon):
-
-```
-Add a Postgres database (skip if you're using Neon):
-
-1. In your Railway project, click "+ New" in the top right
-2. Click "Database" → "PostgreSQL"
-3. Railway provisions a Postgres instance and adds DATABASE_URL to your service automatically
-4. Reply "done" when the database shows up in your project view
-```
-
-## Vercel
-
-```
-Vercel account setup:
+Vercel account setup — do these in your browser:
 
 1. Open https://vercel.com/signup
-2. Sign up with GitHub
+2. Sign up with GitHub (required — Vercel deploys directly from your GitHub repo)
 3. Click "Add New..." → "Project"
-4. Import your GitHub repo (you may need to install the Vercel GitHub app first)
-5. On the configuration screen, leave defaults — Vercel auto-detects Next.js
-6. Don't deploy yet — click "Environment Variables" to add vars first (next phase)
-7. Reply "done" when you're at the env vars screen
-```
-
-## Render
-
-```
-Render account setup:
-
-1. Open https://render.com/register
-2. Sign up with GitHub
-3. Click "New +" → "Web Service"
-4. Connect your GitHub repo
-5. On the configuration screen, set Build Command and Start Command (Claude will give you the right values)
-6. Don't deploy yet — scroll down to env vars first (next phase)
-7. Reply "done"
+4. Click "Import" next to your GitHub repo (you may need to install the Vercel GitHub app and grant access first)
+5. On the Configure Project screen: Vercel auto-detects Next.js — leave all settings as defaults
+6. Do NOT click "Deploy" yet — first go to "Environment Variables" (still on this screen) to add your vars
+7. Reply "done" when you're at the env vars section
 ```
 
 ---
 
-## Env Vars — Railway
+## Railway (if already in use)
 
 ```
-Set these env vars in Railway:
+Railway account setup — do these in your browser:
 
-1. In your Railway project, click your service (the one named after your repo)
-2. Click the "Variables" tab
-3. Click "+ New Variable" for each of the following. Get the values from these locations:
+1. Open https://railway.com
+2. Click "Login" in the top right
+3. Sign in with GitHub
+4. Once logged in, click "New Project"
+5. Select "Deploy from GitHub repo"
+6. If this is your first time: click "Configure GitHub App" and grant Railway access to the repo
+7. Select your repo from the list
+8. Railway will start an initial build — it may fail because env vars aren't set yet (that's fine)
+9. Reply "done" when you're at the project page (you'll see "Build", "Deploy", "Variables" tabs)
+```
+
+---
+
+## Env Vars — Vercel
+
+```
+Set these env vars in Vercel:
+
+1. In your Vercel project configuration screen (or later: Project → Settings → Environment Variables)
+2. Add each variable below. Set the Environment to "Production", "Preview", and "Development" as appropriate.
+   Use "Production only" for secrets like live Stripe keys.
+3. Get the values from these locations:
 
 | Variable | Where to get it |
 |---|---|
-| DATABASE_URL | Auto-set if you used Railway Postgres. If using Neon: copy from Neon dashboard → your project → Connection Details → Connection string |
-| STRIPE_SECRET_KEY | Stripe dashboard → Developers → API keys → "Reveal live key" (use sk_live_* for production, NOT sk_test_*) |
-| STRIPE_WEBHOOK_SECRET | We'll set this in Phase 4 after you create the production webhook endpoint. Leave blank for now |
+| DATABASE_URL | Neon dashboard → your project → Connection Details → Connection string (use the pooled connection string for production) |
+| BETTER_AUTH_SECRET | Generate with: openssl rand -base64 32 (a long random string — keep it secret) |
+| BETTER_AUTH_URL | Your production domain, e.g. https://yourapp.com (or https://yourapp.vercel.app for now) |
+| AUTH_GOOGLE_CLIENT_ID | Google Cloud Console → APIs & Services → Credentials → your OAuth 2.0 Client |
+| AUTH_GOOGLE_CLIENT_SECRET | Same location as above |
+| STRIPE_SECRET_KEY | Stripe dashboard → Developers → API keys → "Reveal live key" (sk_live_* for production) |
+| STRIPE_WEBHOOK_SECRET | We'll set this in Phase 4 after you create the production webhook. Leave blank for now |
 | NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY | Stripe dashboard → Developers → API keys → publishable key (pk_live_*) |
-| FIREBASE_SERVICE_ACCOUNT | Firebase console → Project Settings → Service Accounts → "Generate new private key" → paste the FULL JSON (with quotes) |
-| NEXT_PUBLIC_FIREBASE_API_KEY (and other NEXT_PUBLIC_FIREBASE_*) | Firebase console → Project Settings → General → Your apps → SDK setup and configuration |
-| RESEND_API_KEY | Resend dashboard → API Keys → "Create API Key" |
+| AWS_ACCESS_KEY_ID | AWS Console → IAM → Users → your app user → Security credentials → Access keys |
+| AWS_SECRET_ACCESS_KEY | Same location — copy the secret when you create the key (only shown once) |
+| AWS_REGION | The region you created your S3 bucket in (e.g. us-east-1) |
+| AWS_S3_BUCKET | The name of your S3 bucket |
+| CLOUDFRONT_DOMAIN | AWS Console → CloudFront → your distribution → Distribution domain name (e.g. d1234abcd.cloudfront.net) |
+| CLOUDFRONT_KEY_PAIR_ID | Only if using signed CloudFront URLs: AWS → CloudFront → Key Management → Public Keys |
+| CLOUDFRONT_PRIVATE_KEY | Only if using signed CloudFront URLs: the PEM private key content |
+| RESEND_API_KEY | Resend dashboard → API Keys → "Create API Key" (if using Resend for email) |
 | NEXT_PUBLIC_POSTHOG_KEY | PostHog dashboard → Project Settings → Project API Key |
-| NEXT_PUBLIC_POSTHOG_HOST | Usually https://us.i.posthog.com (or https://eu.i.posthog.com if EU) |
+| NEXT_PUBLIC_POSTHOG_HOST | Usually https://us.i.posthog.com (or https://eu.i.posthog.com for EU) |
 | SENTRY_DSN | Sentry dashboard → Settings → Projects → [your project] → Client Keys (DSN) |
-| NEXT_PUBLIC_SENTRY_DSN | Same as above (it's safe to expose) |
+| NEXT_PUBLIC_SENTRY_DSN | Same as SENTRY_DSN (safe to expose) |
 | SENTRY_AUTH_TOKEN | Sentry → Settings → Account → Auth Tokens → Create token with project:releases scope |
 
-4. After all variables are set, Railway will redeploy automatically
-5. Reply "done" when all variables are in
+4. After all variables are set, click "Deploy" — Vercel will build and deploy automatically
+5. Reply "done" when the deployment finishes
 ```
 
 ---
 
 ## Third-Party Service Wiring for Production
 
-### Firebase Auth — add production domain
+### Better Auth / Google Sign-In — add production redirect URI
 
 ```
-Add your production domain to Firebase Auth:
+Update your Google OAuth app to accept production sign-ins:
 
-1. Open https://console.firebase.google.com → your project
-2. Authentication (left sidebar) → Settings tab → Authorized domains
-3. Click "Add domain" → enter your Railway domain (e.g., your-app.up.railway.app) and your custom domain if you have one
-4. Reply "done"
+1. Open https://console.cloud.google.com
+2. Navigate to APIs & Services → Credentials → your OAuth 2.0 Client ID
+3. Under "Authorized redirect URIs", click "+ Add URI"
+4. Add: https://yourdomain.com/api/auth/callback/google
+   (also add https://yourapp.vercel.app/api/auth/callback/google if you're using the Vercel domain)
+5. Click "Save"
+6. Also update BETTER_AUTH_URL in your Vercel env vars to: https://yourdomain.com
+7. Reply "done"
 ```
 
 ### Stripe webhook endpoint
@@ -124,8 +115,9 @@ Register the production webhook in Stripe:
    - invoice.payment_failed
 6. Click "Add endpoint"
 7. On the endpoint page, find "Signing secret" → click "Reveal" → copy the value (starts with whsec_)
-8. Go back to Railway → Variables → set STRIPE_WEBHOOK_SECRET to that value
-9. Reply "done"
+8. Go back to Vercel → your project → Settings → Environment Variables → update STRIPE_WEBHOOK_SECRET to that value
+9. Vercel will redeploy automatically
+10. Reply "done"
 ```
 
 ### Resend domain verification
@@ -135,7 +127,7 @@ Verify your sending domain in Resend:
 
 1. Open https://resend.com/domains
 2. Click "Add Domain"
-3. Enter the domain you'll send emails from (e.g., yourdomain.com — your custom domain, not *.up.railway.app)
+3. Enter the domain you'll send emails from (e.g., yourdomain.com — your custom domain, not *.vercel.app)
 4. Resend shows you DNS records to add (SPF, DKIM, DMARC)
 5. Add those records in your DNS provider (Phase 5 covers DNS access)
 6. Wait for verification (usually < 10 min) — Resend will turn the status green
@@ -158,18 +150,19 @@ Set up Sentry alerts:
 ## Custom Domain Setup
 
 ```
-Add your custom domain to Railway:
+Add your custom domain to Vercel:
 
-1. In Railway → your service → Settings → Public Networking
-2. Click "+ Custom Domain" → enter your domain (e.g., myapp.com)
-3. Railway shows you a CNAME record (something like cname.up.railway.app)
+1. In Vercel → your project → Settings → Domains
+2. Type your domain name (e.g., myapp.com) → click "Add"
+3. Vercel shows you a CNAME record (value: cname.vercel-dns.com) or an A record
 4. At your DNS provider (where you bought the domain — Namecheap, Cloudflare, GoDaddy, etc.):
    - Log in to your DNS provider
    - Find DNS settings for the domain
-   - Add a CNAME record: name = @ (or your subdomain) → value = the cname.up.railway.app value Railway gave you
+   - Add a CNAME record: name = www → value = cname.vercel-dns.com
+   - For the apex domain (@), add an A record → value = 76.76.21.21
    - Save
 5. Wait 5-30 minutes for DNS to propagate
-6. Railway auto-provisions an SSL certificate
+6. Vercel auto-provisions an SSL certificate (Let's Encrypt)
 7. Visit https://yourdomain.com to verify — should show your app with valid HTTPS
 8. Reply "done" when working
 ```
@@ -187,11 +180,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '24', cache: 'npm' }
+        with: { node-version: '20', cache: 'npm' }
       - run: npm ci
-      - run: npm run check
+      - run: npm run typecheck
       - run: npm test
 ```
+
+Note: Vercel auto-deploys on every push to main — no separate CI deploy step needed.
 
 ---
 

@@ -85,10 +85,10 @@ A founder has built "InvoiceParse" on Replit using ChatGPT. Two real customers a
 1. **`/code-map`** — the app is one big `index.ts` with everything in it: file upload to a Replit volume, OCR via Tesseract, hard-coded Stripe checkout, passwords stored in plaintext.
 2. **`/migrate-from-vibe`** — detects Replit. Walks the founder through extracting the code, scaffolding a real Vite + Hono + Neon repo, porting in waves: Wave 1 backend routes. Wave 2 file upload. Wave 3 OCR. Wave 4 payment. Wave 5 frontend. One commit per wave. Inconsistencies (e.g. mixed JSON-vs-form-encoded request handling) are flagged in `MIGRATION-NOTES.md` rather than fixed mid-port.
 3. **`/setup-database`** — proper Drizzle schema, migration history starts here.
-4. **`/add-auth`** — Firebase Auth. Existing two users invited via email; passwords reset.
+4. **`/add-auth`** — Neon Auth via Better Auth. Existing two users invited via email; passwords reset.
 5. **`/add-payment`** — proper Stripe Checkout sessions, webhook with signature verification, replaces hard-coded link.
 6. **`/add-monitoring`** — Sentry catches an immediate stack trace from a malformed PDF. PostHog tracks usage.
 7. **`/check-production`** — returns 1 Critical (`.env` was committed in Wave 1; needs scrub from git history), 4 Highs (no rate limit, no input size limit on uploads, no idempotency on webhook, no email validation on signup), 6 Mediums.
 8. **`/triage`** — fixes Critical (`git filter-repo`, rotate keys via secret-scanner's rotation actions). Fixes 4 Highs. Parks Mediums in a backlog.
-9. **`/deploy`** — Render + custom domain. First time the app has a real URL.
+9. **`/deploy`** — Vercel + custom domain. First time the app has a real URL.
 10. The two existing users are migrated. App now survives container restarts. The founder breathes.

@@ -88,3 +88,42 @@ throw new Error('Sentry test error');
 3. The error should appear within 1 minute
 4. Click it — stack trace should show your `.tsx` file (NOT minified `.js`). If minified, source maps aren't uploading; check `SENTRY_AUTH_TOKEN`.
 5. Remove the test throw
+
+---
+
+## Drizzle Studio (DB browser for local development)
+
+Drizzle Studio gives you a visual UI for browsing and editing your Neon database rows during development. It is not a monitoring tool but is frequently used alongside Sentry/PostHog to investigate data issues.
+
+### Launch
+
+```bash
+npm run db:studio
+# or directly:
+npx drizzle-kit studio
+```
+
+This opens a browser UI at `https://local.drizzle.studio`. It connects to the database specified in your `DATABASE_URL` env var.
+
+### When to use
+
+- After running a migration, to verify the schema looks correct
+- When debugging a production bug, to inspect the actual data in your Neon DB
+- When seeding test data for development
+- To verify that auth, payments, or file upload routes are writing the expected rows
+
+### npm script to add
+
+Add to `package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "db:studio": "drizzle-kit studio"
+  }
+}
+```
+
+### Caution
+
+Drizzle Studio connects directly to whatever `DATABASE_URL` is set in your environment. Be careful not to accidentally run `db:studio` pointed at a production database and edit live data. Always use a dev/test database URL for local development.

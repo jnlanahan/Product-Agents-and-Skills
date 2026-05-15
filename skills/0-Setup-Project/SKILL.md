@@ -1,11 +1,11 @@
-﻿---
+---
 name: setup-project
 description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. Use `--personal` flag for lighter personal tools (no Stripe, optional auth, SQLite). NOT for existing projects — for those, run `/next-steps` first.
 ---
 
 # /setup-project
 
-You set up a new project from near-empty state using the user's preferred stack from `_stack-preferences.md`. Discipline matters here: each layer goes in as a separate commit, in the right order, with verification.
+You set up a new project from near-empty state using the user's definitive stack from `_stack-preferences.md`. Discipline matters here: each layer goes in as a separate commit, in the right order, with verification before moving on.
 
 ## Pre-flight
 
@@ -26,7 +26,7 @@ You set up a new project from near-empty state using the user's preferred stack 
 ## When to Use
 
 - Empty directory or `npm init -y` output
-- Fresh `create-next-app` / `create-vite` / `create-t3-app` scaffold with no real features
+- Fresh `create-next-app` scaffold with no real features
 - User explicitly says "start a new SaaS project" or "start a personal tool"
 
 ## When NOT to Use
@@ -42,11 +42,11 @@ When invoked as `/setup-project --personal`, use a reduced scope:
 | Layer | SaaS default | Personal (`--personal`) |
 |---|---|---|
 | DB | Neon Postgres + Drizzle | SQLite + Drizzle (local-first, no cloud account needed) |
-| Auth | Firebase Auth (required) | Optional — ask if needed |
+| Auth | Neon Auth via Better Auth | Optional — ask if needed |
 | Payments | Stripe | Skip |
-| File storage | Firebase Storage | Skip |
-| Monitoring | PostHog + Sentry | Sentry only (optional) |
-| Deploy | Render / Railway | Fly.io or Render (single container) |
+| File storage | AWS S3 + CloudFront | Skip |
+| Monitoring | Sentry + PostHog | Sentry only (optional) |
+| Deploy | Vercel | Vercel (same; free hobby tier works) |
 
 Everything else (test infra, CI, CLAUDE.md, security middleware) still applies. Use `--personal` for: internal dashboards, scripts with a UI, personal productivity tools, side projects without a business model.
 
@@ -62,41 +62,42 @@ Run `stack-detector` and `codebase-classifier` in parallel. If classification is
 
 ### Step 2: Confirm framework
 
-Read `_stack-preferences.md`. Ask:
+Read `_stack-preferences.md`. Confirm with the user:
 
-> Two architecture options:
-> 1. **Next.js App Router** (single codebase; recommended for new SaaS)
-> 2. **React + Vite + Express** (split client/server; matches the reference template)
+> We'll use Next.js App Router (TypeScript, Tailwind CSS, shadcn/ui) — the definitive stack for new SaaS projects. This gives you a frontend and a secure backend in one codebase.
 >
-> Which?
+> Is this correct, or do you have a different framework in mind?
 
 ### Step 3: Confirm scope
 
 Ask which integrations to wire now (defaults all on):
 
 - [x] Drizzle + Neon (almost always needed)
-- [x] Firebase Auth (almost always needed)
+- [x] Neon Auth via Better Auth (almost always needed)
+- [x] t3-env (always — validates env vars at startup)
 - [x] Stripe (defer if pre-revenue)
-- [x] Firebase Storage (defer if no file uploads)
-- [x] PostHog + Sentry (wire from day one)
+- [x] AWS S3 + CloudFront (defer if no file uploads needed)
+- [x] Sentry + PostHog (wire from day one)
 - [ ] AI SDK (only if AI features planned)
 
-User can opt out of any.
+User can opt out of any. Explain trade-offs if they opt out of t3-env or Sentry.
 
 ### Step 4: External account setup (USER does these in browser FIRST)
 
 Before installing any code, the user needs accounts and credentials. Tell them, verbatim:
 
-> **You need these accounts before I install anything. Open each, sign up, and grab the values listed:**
+> **You need these accounts before I install anything. Open each, sign up, and grab the values listed. Take your time — I'll wait.**
 >
-> 1. **Neon** (https://neon.tech) — sign up free → create project → copy `DATABASE_URL` from Connection Details
-> 2. **Firebase** (https://console.firebase.google.com) — create project → enable Authentication (Email + Google providers) → Project Settings → General → SDK config (copy 6 `NEXT_PUBLIC_FIREBASE_*` values) → Service Accounts tab → "Generate new private key" (saves a JSON file — you'll paste the FULL content)
-> 3. **Stripe** (https://dashboard.stripe.com/register) — sign up → leave in TEST mode for now → Developers → API keys → copy `pk_test_*` and `sk_test_*`
-> 4. **PostHog** (https://posthog.com) — sign up → copy Project API Key (`phc_*`) and Host URL
-> 5. **Sentry** (https://sentry.io) — sign up → create project (pick your framework) → copy DSN → Settings → Auth Tokens → create with `project:releases` scope
-> 6. **GitHub** (https://github.com) — sign up if needed; you'll create a repo for this project at the end of setup
+> 1. **Neon** (neon.tech) — sign up free → create project → copy `DATABASE_URL` from Connection Details
+> 2. **Google Cloud Console** (console.cloud.google.com) — create a project → APIs & Services → Credentials → Create OAuth 2.0 Client ID (Web application) → add redirect URI `http://localhost:3000/api/auth/callback/google` → copy Client ID and Client Secret
+> 3. **Stripe** (dashboard.stripe.com/register) — sign up → leave in TEST mode → Developers → API keys → copy `pk_test_*` and `sk_test_*`
+> 4. **AWS** (aws.amazon.com) — sign up (free tier) → create S3 bucket (block all public access) → create IAM user with S3 access → copy Access Key ID and Secret Access Key → create CloudFront distribution pointing at your bucket → copy the distribution domain name
+> 5. **Sentry** (sentry.io) — sign up → create project (Next.js) → copy DSN → Settings → Auth Tokens → create with `project:releases` scope
+> 6. **PostHog** (posthog.com) — sign up → copy Project API Key and Host URL (optional but recommended)
+> 7. **GitHub** (github.com) — sign up if needed; you'll link a repo at the end of setup
+> 8. **Vercel** (vercel.com) — sign up with GitHub → you'll link the repo after git init
 >
-> Reply with all the values OR "I have them in a password manager — let's go."
+> Reply with all the values, or "I have them ready — let's go."
 
 Wait for the user.
 
@@ -106,63 +107,80 @@ Show the full list of dependencies, files to create, files to modify, env vars n
 
 ### Step 6: Execute in waves (one commit per wave)
 
-Each wave is a single commit — easier to roll back, easier to debug.
+Each wave is a single commit — easier to roll back, easier to debug. After each wave: `npm run build`. Fix before moving on.
 
-**Wave 1: Framework + TypeScript**
-- `create-next-app` if not done; ensure tsconfig strict
-- Commit: "scaffold framework"
+**Wave 1: Framework + TypeScript + UI**
+- `npx create-next-app@latest` with TypeScript, Tailwind, App Router
+- Initialize shadcn/ui: `npx shadcn@latest init`
+- Ensure tsconfig strict mode
+- Commit: "scaffold framework + tailwind + shadcn"
 
 **Wave 2: DB + ORM**
-- Drizzle config, schema with `users` table, first migration
+- Install Drizzle + Neon serverless driver
+- Drizzle config, `db/schema.ts` with `users` table, first migration
 - Commit: "wire drizzle + neon"
 
-**Wave 3: Auth**
-- Firebase client + admin SDK, route protection middleware
-- Commit: "wire firebase auth"
+**Wave 3: Auth (Neon Auth via Better Auth)**
+- Install `better-auth`
+- Create `lib/auth.ts`, `app/api/auth/[...all]/route.ts`, `lib/auth-client.ts`
+- Session middleware in `middleware.ts`, sign-in page
+- Google Sign-In configured
+- Commit: "wire neon auth via better-auth"
 
-**Wave 4: Payments**
-- Stripe client, Checkout endpoint, webhook handler with signature verification, Customer Portal endpoint
+**Wave 4: Env validation (t3-env)**
+- Install `@t3-oss/env-nextjs`
+- Create `src/env.ts` validating all env vars added so far
+- Generate complete `.env.example`
+- Commit: "add t3-env validation"
+
+**Wave 5: Payments**
+- Stripe client, Checkout Session endpoint, webhook handler with signature verification, Customer Portal endpoint
 - Commit: "wire stripe checkout + webhook"
 
-**Wave 5: Storage**
-- Firebase Storage client, upload route, security rules
-- Commit: "wire firebase storage"
+**Wave 6: File storage (AWS S3 + CloudFront)**
+- Install `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`, `@aws-sdk/cloudfront-signer`
+- Pre-signed upload route, CloudFront delivery helper, file metadata table in DB
+- Commit: "wire aws s3 + cloudfront"
 
-**Wave 6: Monitoring** (delegate to `/add-monitoring` if you want)
-- PostHog (client + server), Sentry (client + server), wired into layout + error boundaries
-- Commit: "wire posthog + sentry"
+**Wave 7: Monitoring**
+- Sentry: install, wire into `instrumentation.ts`, Next.js config, error boundaries
+- PostHog: install, wire into layout (client-side)
+- Commit: "wire sentry + posthog"
 
-**Wave 7: AI** (only if requested) — delegate to project owner; skip auto-scaffolding
-- Commit: "wire ai sdk"
+**Wave 8: AI SDK** (only if requested)
+- Install `ai` + `@ai-sdk/<provider>`
+- Commit: "wire vercel ai sdk"
 
-**Wave 8: Security middleware**
-- Rate limiting, CORS, headers
+**Wave 9: Security middleware**
+- Rate limiting, CORS, security headers in `next.config.ts` or `middleware.ts`
 - Commit: "add security middleware"
 
-**Wave 9: Test infrastructure**
-- Install test framework (Vitest for Next.js, Jest for Vite/Express)
-- Add `npm test`, `npm run test:watch` scripts
-- Add a single passing smoke test so the suite isn't empty
+**Wave 10: Test infrastructure**
+- Install Vitest, add `npm test` and `npm run test:watch` scripts
+- Add one passing smoke test (e.g., `lib/utils.test.ts`)
 - Commit: "add test infrastructure"
 
-**Wave 10: CI**
-- `.github/workflows/test.yml` with typecheck + tests on PR
-- Commit: "add CI workflow"
+**Wave 11: CI**
+- `.github/workflows/test.yml` — typecheck + tests on every PR
+- Commit: "add ci workflow"
 
-**Wave 11: Health check + docs**
-- `/api/health` endpoint, complete `.env.example`
-- README with quick-start
-- **Generate `CLAUDE.md` with the skills index** (see Step 7 below)
-- Commit: "add health check, env example, and CLAUDE.md skills index"
+**Wave 12: Health check + docs**
+- `/api/health` endpoint returning `{ status: 'ok' }` and app version
+- Complete `.env.example` (all vars listed, no real values)
+- README with quick-start instructions
+- **Generate `CLAUDE.md` with the skills index** (see Step 7)
+- Commit: "add health check, env example, readme, and claude.md"
 
-**Wave 12: Initialize git + GitHub repo**
-- Confirm `.gitignore` covers `.env`, `node_modules`, build outputs, `.claude/` (except committed planning docs)
-- `git init` if not already done
-- Make the initial commit if waves 1-11 weren't already committed
-- Ask user if they want a GitHub repo created now; if yes, walk through `gh repo create` (or browser flow)
-- Commit: (no new code; just push to remote if applicable)
+**Wave 13: Deploy to Vercel**
+- Confirm `.gitignore` covers `.env*`, `node_modules`, build outputs, `.claude/` (except committed planning docs)
+- `git init` if not already done; push to GitHub
+- Link GitHub repo to Vercel: `vercel link` (or walk through Vercel dashboard)
+- Add all env vars to Vercel: Project Settings → Environment Variables
+- Deploy: `vercel --prod` (or let Vercel auto-deploy from the GitHub push)
+- Confirm the live URL works and `/api/health` returns 200
+- Commit: (no new code; just push to remote)
 
-After each wave: `npm run build && npm run check`. If broken, fix before next wave.
+After each wave: `npm run build && npm run typecheck`. If broken, fix before next wave.
 
 ### Step 7: Generate CLAUDE.md with skills index
 
@@ -172,17 +190,20 @@ After each wave: `npm run build && npm run check`. If broken, fix before next wa
 
 - [ ] `npm run dev` boots without errors
 - [ ] `/api/health` returns 200
-- [ ] Sign up + sign in flow works (visit a protected page)
+- [ ] Sign up + sign in flow works (Google Sign-In)
+- [ ] Protected page redirects unauthenticated users to sign-in
 - [ ] Stripe Checkout test card succeeds (4242 4242 4242 4242)
 - [ ] `stripe listen --forward-to localhost:3000/api/webhooks/stripe` shows webhook events delivered
-- [ ] PostHog event appears in dashboard
-- [ ] Sentry test exception appears in dashboard
-- [ ] CI passes on first PR
+- [ ] File upload works; file appears in S3 bucket; CloudFront URL serves the file
+- [ ] Sentry test exception appears in Sentry dashboard
+- [ ] PostHog event appears in PostHog dashboard (if wired)
+- [ ] CI passes on first PR (typecheck + tests green)
+- [ ] Vercel preview URL works on a test PR
 - [ ] `CLAUDE.md` exists at repo root and includes the Available Skills section
 
 ### Step 9: Hand off
 
-> Project is ready for development. Next:
+> Project is ready for development. Next steps:
 > - Run `/prd` to produce a PRD for your first feature
 > - Then `/plan` to turn it into vertical slices
 > - Then `/build-feature` to implement
@@ -195,13 +216,15 @@ After each wave: `npm run build && npm run check`. If broken, fix before next wa
 - **One wave per commit.** Easier review, easier rollback.
 - **Verify after each wave.** Don't proceed if `npm run build` is broken.
 - **Don't write app features.** This skill wires infrastructure. The first user-facing feature is `/build-feature`.
-- **Don't deploy.** That's `/deploy`.
 - **Don't run `db:push` against a production database.** Local dev only. Production uses `db:migrate`.
 - **Always generate `CLAUDE.md` with the skills index.** Without it, the agent can't suggest commands the user has forgotten.
 
 ## If Something Goes Wrong
 
-- **Package install fails** — check Node/pnpm version matches the scaffold requirements; delete `node_modules` and lockfile, then retry.
-- **First migration fails** — confirm the database connection string is correct and the database server is running before re-running the migration.
-- **Account setup step blocked** (Vercel, Supabase, etc.) — skip the step, continue with local setup, and revisit the account setup separately; do not abort the whole scaffold.
-- **Git push rejected** — confirm the remote is set correctly (`git remote -v`) and you have push permission to the repo.
+- **Package install fails** — check Node version (18+); delete `node_modules` and lockfile, then retry.
+- **First migration fails** — confirm the DATABASE_URL is correct and t3-env passes startup validation.
+- **Better Auth session not persisting** — confirm `BETTER_AUTH_SECRET` is set and `BETTER_AUTH_URL` matches the running URL exactly.
+- **Google OAuth redirect mismatch** — the redirect URI in Google Cloud Console must exactly match `BETTER_AUTH_URL + /api/auth/callback/google`.
+- **Vercel deploy fails** — check that all env vars are set in Vercel Project Settings; missing env vars cause t3-env to throw at startup.
+- **S3 upload fails with CORS error** — add a CORS configuration to the S3 bucket allowing PUT from your app domain.
+- **CloudFront returns 403** — make sure the bucket policy was updated to grant CloudFront OAC access (AWS shows this policy during distribution setup).

@@ -26,12 +26,13 @@ The only exception is when something is *missing entirely* — then preferences 
 | Detected | Preference | What to do |
 |---|---|---|
 | Prisma | Drizzle | Use Prisma |
-| Clerk | Firebase Auth | Use Clerk |
+| Clerk | Neon Auth / Better Auth | Use Clerk |
+| Firebase Auth | Neon Auth / Better Auth | Extend Firebase Auth; do not migrate |
 | Paddle | Stripe | Use Paddle (warn if you're less confident) |
 | SendGrid | Resend | Use SendGrid |
-| Vercel | Render/Railway | Use Vercel |
+| Railway/Render | Vercel | Use Railway/Render if already configured |
 | Nothing | Drizzle | Install Drizzle |
-| Nothing | Firebase Auth | Install Firebase Auth |
+| Nothing | Neon Auth / Better Auth | Install Neon Auth via Better Auth |
 
 ### 3. Mirror local conventions
 
@@ -90,7 +91,7 @@ Vibe-coded only. Greenfield/wired don't need this skill.
 
 | Class | Strategy |
 |---|---|
-| Greenfield | Walk through Render/Railway phase by phase, with extensive browser-step instructions. |
+| Greenfield | Walk through Vercel phase by phase, with extensive browser-step instructions. |
 | Wired/vibe-coded | Detect existing platform and adapt. If multiple deploy configs exist, ask which is real. |
 
 ### `triage`

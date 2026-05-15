@@ -304,7 +304,7 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 #### `/add-auth` — `4-Build-Auth`
 
 - **Use when** — adding or extending authentication (sign-up, sign-in, social login, MFA, organizations, RBAC)
-- **Output** — wired auth — Firebase Auth preferred for greenfield; adapts to Clerk / NextAuth / Supabase Auth / custom JWT if detected (never migrates)
+- **Output** — wired auth — Neon Auth (via Better Auth) for greenfield; adapts to Firebase Auth / Clerk / NextAuth / Supabase Auth / custom JWT if detected (never migrates)
 - **Calls agents** — `stack-detector`, `pattern-finder`
 - **File** — [skills/4-Build-Auth/SKILL.md](skills/4-Build-Auth/SKILL.md)
 
@@ -318,7 +318,7 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 #### `/add-files` — `4-Build-File-Storage`
 
 - **Use when** — adding or extending file uploads, file sharing, folders, tags, image transforms, per-user quotas
-- **Output** — Firebase Storage wired (or extends existing S3 / R2 / UploadThing); enforces server-side validation, ownership checks, magic-byte MIME verification
+- **Output** — AWS S3 + CloudFront wired for greenfield (or extends existing Firebase Storage / R2 / UploadThing if detected); enforces server-side validation, ownership checks, magic-byte MIME verification
 - **Calls agents** — `stack-detector`, `pattern-finder`
 - **File** — [skills/4-Build-File-Storage/SKILL.md](skills/4-Build-File-Storage/SKILL.md)
 
@@ -466,7 +466,7 @@ These aren't skills themselves; they're shared knowledge that skills reference.
 | File | Purpose |
 | --- | --- |
 | [PDLC_Phases.md](PDLC_Phases.md) | Defines all 7 PDLC phases (Discover, Define, Design, Build, Validate, Deploy, Learn) — activities, outputs, exit criteria |
-| [skills/_stack-preferences.md](skills/_stack-preferences.md) | The user's locked greenfield stack: Firebase Auth, Stripe, Neon + Drizzle, Firebase Storage, PostHog + Sentry, Resend, etc. Read by `/setup-project` and `/add-*` skills when nothing is detected. |
+| [skills/_stack-preferences.md](skills/_stack-preferences.md) | The user's locked greenfield stack: Neon Auth (Better Auth), Stripe, Neon + Drizzle, AWS S3 + CloudFront, Vercel, Sentry + PostHog, t3-env, etc. Read by `/setup-project` and `/add-*` skills when nothing is detected. |
 | [skills/_adaptation-playbook.md](skills/_adaptation-playbook.md) | Five core rules every skill follows when deciding whether to install fresh, extend existing, or stay out of the way. Critical for handling vibe-coded apps without breaking them. |
 | [settings.snippet.json](settings.snippet.json) | Optional Claude Code hook config to merge into `~/.claude/settings.json`. Provides a session-start reminder about `stack-detector` and runs `npm run check` after edits. |
 

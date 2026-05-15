@@ -20,12 +20,13 @@ This file is read by Claude Code on every conversation. Keep it short.
 
 - Framework: <Next.js App Router | React + Vite + Express>
 - DB: Neon Postgres + Drizzle ORM
-- Auth: Firebase Auth
+- Auth: Neon Auth (via Better Auth) + Google Sign-In
 - Payments: Stripe
-- File storage: Firebase Storage
+- File storage: AWS S3 + CloudFront CDN
+- Env validation: t3-env
 - Monitoring: Sentry (errors) + PostHog (product analytics)
 - Tests: <Vitest | Jest>
-- Deploy: Railway
+- Deploy: Vercel
 
 ## Conventions
 
@@ -38,8 +39,8 @@ This file is read by Claude Code on every conversation. Keep it short.
 
 ## What Not to Touch
 
-- `server/migrations/` — never edit applied migrations; create new ones instead
-- `firebase-storage.rules` — review carefully, deploy separately
+- `server/migrations/` or `db/migrations/` — never edit applied migrations; create new ones instead
+- `.env.local` — never commit this file; keep `.env.example` in sync with all required vars
 - `.env.example` — keep in sync with actual env vars used; do NOT add real values
 
 ## Available Skills

@@ -1,11 +1,11 @@
 ﻿---
 name: setup-ci
-description: MUST BE USED when adding continuous integration to a project that lacks it. Generates GitHub Actions workflows for typecheck, tests, lint, and (optionally) auto-deploy to Render or Railway on merge to main. Adapts to detected test framework and package manager. Trigger on `/setup-ci`, "add CI", "add GitHub Actions", "automate tests on PR", "wire CI/CD", "deploy on push".
+description: MUST BE USED when adding continuous integration to a project that lacks it. Generates GitHub Actions workflows for typecheck, tests, and lint. Vercel auto-deploys from GitHub — no separate deploy CI step needed. Adapts to detected test framework and package manager. Trigger on `/setup-ci`, "add CI", "add GitHub Actions", "automate tests on PR", "wire CI/CD", "deploy on push".
 ---
 
 # /setup-ci
 
-You add CI to a project that doesn't have it. Preference is GitHub Actions. Adapts to Render or Railway deploy targets per stack preferences.
+You add CI to a project that doesn't have it. Preference is GitHub Actions for typecheck + tests. Vercel handles deploys automatically from GitHub — no separate deploy workflow is needed for the default stack.
 
 ## Pre-flight
 
@@ -19,7 +19,7 @@ You add CI to a project that doesn't have it. Preference is GitHub Actions. Adap
 
 ## Important
 
-- Confirm the deploy target (Render, Railway, or none) with the user before generating the workflow — deploy steps are platform-specific and non-interchangeable.
+- Vercel deploys automatically on every push to main — you don't need a deploy step in GitHub Actions.
 - Show the generated CI config to the user before pushing it; a broken pipeline blocks all PRs.
 - Ensure tests pass locally before wiring CI — a red pipeline on day one destroys confidence in the system.
 
@@ -28,7 +28,7 @@ You add CI to a project that doesn't have it. Preference is GitHub Actions. Adap
 ### Step 1: Detect
 
 In parallel:
-- `stack-detector` — test framework (Vitest, Jest, Playwright), deploy target (Render, Railway, Vercel, Fly), package manager (npm/pnpm/yarn)
+- `stack-detector` — test framework (Vitest, Jest, Playwright), deploy target (Vercel, Railway, Render, Fly), package manager (npm/pnpm/yarn)
 - `pattern-finder` — "Find existing CI files: .github/workflows/, existing npm test/typecheck scripts in package.json"
 
 ### Step 2: Determine mode
@@ -44,9 +44,10 @@ In parallel:
 > What CI jobs do you want?
 > 1. **Typecheck + tests on PR** (recommended minimum — always include this)
 > 2. **Lint on PR** (ESLint/Biome)
-> 3. **Auto-deploy to Render on merge to main** (requires deploy hook setup)
-> 4. **Auto-deploy to Railway on merge to main** (requires Railway token)
-> 5. **E2E tests (Playwright)** on PR
+> 3. **E2E tests (Playwright)** on PR
+> 4. **Auto-deploy to Render on merge to main** (only if NOT using Vercel — Vercel auto-deploys from GitHub)
+>
+> Note: If you're using Vercel, deploys happen automatically on every push — you don't need a deploy job in CI.
 
 ### Step 4: Collect secrets
 
@@ -121,7 +122,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
 ```
 
-### Auto-deploy to Render on push to main
+### Auto-deploy to Vercel (no CI step needed)
+
+If you're using Vercel, **you do not need a deploy job in GitHub Actions**. Vercel's GitHub integration auto-deploys on every push to main. Just connect your repo in the Vercel dashboard and it handles the rest.
+
+### Auto-deploy to Render on push to main (if not using Vercel)
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -198,9 +203,10 @@ Tell the user:
 > | Secret | Value |
 > |---|---|
 > | `DATABASE_URL_TEST` | A separate test database URL — never point CI at prod or staging |
-> | `RENDER_DEPLOY_HOOK_URL` | From Render service settings (if using auto-deploy to Render) |
-> | `RAILWAY_TOKEN` | From Railway account settings (if using Railway) |
+> | `RENDER_DEPLOY_HOOK_URL` | From Render service settings (only if using Render, not Vercel) |
 > | Any env vars your tests need | Match whatever your app reads from `process.env` during tests |
+>
+> Note: Vercel users don't need any deploy secrets in GitHub — Vercel's GitHub integration handles deploys automatically.
 
 ---
 

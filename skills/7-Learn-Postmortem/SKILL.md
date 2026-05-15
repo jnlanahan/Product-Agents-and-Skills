@@ -46,7 +46,7 @@ Ask:
 
 Work with the user to build a minute-by-minute timeline from first symptom to resolution. Pull timestamps from:
 - Sentry event timestamps
-- Render/Railway deploy logs
+- Vercel deployment logs (or Railway/Render if that's the platform)
 - Git commit timestamps
 - Slack/team communication timestamps
 

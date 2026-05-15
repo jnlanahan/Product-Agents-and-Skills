@@ -57,8 +57,8 @@ Read the project's `CLAUDE.md` for any database-related conventions.
 Three cases:
 
 **Case A: No DB yet**
-- Confirm DB choice (Neon Postgres is the preferred default)
-- Confirm ORM (Drizzle is the preferred default)
+- Confirm DB is Neon Postgres (this is the required default — no alternatives for new projects)
+- Confirm ORM is Drizzle (required default)
 - Run first-time setup (Step 3)
 
 **Case B: DB and ORM present, user wants to change schema**
@@ -76,7 +76,8 @@ Walk through:
 
 1. **Get the connection string** from the user (Neon dashboard → Connection Details → copy `DATABASE_URL`).
 2. **Add `DATABASE_URL` to `.env.local` and `.env.example`** (the example without the actual value).
-3. **Install Drizzle**: `npm install drizzle-orm @neondatabase/serverless` and `npm install -D drizzle-kit`.
+3. **Wire t3-env** to validate `DATABASE_URL` at startup — the app should crash loudly at boot if the DB string is missing, not silently at query time.
+4. **Install Drizzle**: `npm install drizzle-orm @neondatabase/serverless` and `npm install -D drizzle-kit`.
 4. **Create `drizzle.config.ts`** at the repo root.
 5. **Create `shared/schema.ts`** (or `db/schema.ts` for Next.js projects) with one starter table — `users` typically.
 6. **Add npm scripts**: `db:generate`, `db:migrate`, `db:push`, `db:studio`, `db:check`.
@@ -164,7 +165,7 @@ If the user is doing this in production via `/deploy`, the deploy skill takes ov
 - **Never `db:push` against production.** Local dev only.
 - **Always stop and ask before destructive operations.** Drops, type changes, renames, NOT NULL on existing columns.
 - **Always run `npm run db:check` after a migration** — it catches ORM/DB drift early.
-- **For first-time setup, use Neon + Drizzle by default** unless the user has stated otherwise.
+- **For first-time setup, use Neon + Drizzle — always.** No alternatives for new projects.
 
 ## If Something Goes Wrong
 
