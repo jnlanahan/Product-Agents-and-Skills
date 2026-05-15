@@ -2,7 +2,7 @@
 
 This repository is a curated library of **Claude Code agents and skills** that drive a full Product Development Lifecycle (PDLC). Agents are read-only diagnostic helpers; skills are conversational workflows that orchestrate the work. Both are designed to be installed under `~/.claude/agents/` and `~/.claude/skills/` and used globally across projects.
 
-> **Index counts:** 12 agents · 28 skills · 8 workflows.
+> **Index counts:** 12 agents · 29 skills · 8 workflows.
 
 For the lifecycle this library is built around, see [PDLC_Phases.md](PDLC_Phases.md). For composed end-to-end paths through these tools, see [WORKFLOWS.md](WORKFLOWS.md). For a list of known coverage gaps, see [GAPS.md](GAPS.md).
 
@@ -218,6 +218,15 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **Calls agents** — `stack-detector`, `codebase-classifier`, `project-state-detector`, `vibe-artifact-detector`, `duplication-detector`, `dead-code-detector`, `architecture-drift-detector`, `secret-scanner`, `dependency-currency-checker`, `pattern-finder`
 - **File** — [skills/0-Setup-Unvibe/SKILL.md](skills/0-Setup-Unvibe/SKILL.md)
 - **Notes** — read-only until Step 4; nothing changes without explicit user approval per wave; safe stopping point between every wave; expects multiple sessions on non-trivial codebases. Run AFTER `/migrate-from-vibe` if the project is still platform-locked.
+
+#### `/align-stack` — `0-Setup-Align-Stack`
+
+- **Use when** — migrating an existing project's integrations to the user's preferred stack (Neon Postgres + Drizzle, Neon Auth via Better Auth, Stripe, S3 + CloudFront, Sentry, PostHog, Vercel AI SDK, Zod, Vercel). The explicit counterpart to `_adaptation-playbook.md`'s "existing patterns win" rule — invoked specifically when the user wants to *change* existing patterns, not work around them.
+- **Output** — `.claude/align-stack-plan.md` (gap table + approved wave sequence), then one committed wave per integration layer
+- **Flags** — any layer can be deferred; auth and payments have hard stops when live users / active subscriptions are present
+- **Calls agents** — `stack-detector`, `codebase-classifier`, `project-state-detector`
+- **File** — [skills/0-Setup-Align-Stack/SKILL.md](skills/0-Setup-Align-Stack/SKILL.md)
+- **Notes** — read-only until Step 4; one commit per wave; hard stops before auth migration (real users) and payment migration (active subscriptions); references [database-migration.md](skills/0-Setup-Align-Stack/references/database-migration.md) and [auth-migration.md](skills/0-Setup-Align-Stack/references/auth-migration.md) for detailed per-provider procedures
 
 ---
 
