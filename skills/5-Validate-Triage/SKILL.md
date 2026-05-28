@@ -1,5 +1,6 @@
 ﻿---
 name: triage
+when_to_use: "User says 'this is broken', 'X doesn't work', 'investigate this bug', or types /triage."
 description: MUST BE USED when the user reports a bug or wants to investigate a problem. Listens conversationally, explores the codebase to find root cause, forms a hypothesis with file:line evidence, proposes 2+ fixes (root cause + workaround), and writes a complete bug report to `.claude/bugs/<short-name>.md`. Replaces standalone bug-investigation, bug-report, and QA-session skills. Trigger on `/triage`, "this is broken", "X doesn't work", "investigate this bug".
 ---
 

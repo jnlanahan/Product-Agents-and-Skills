@@ -1,5 +1,7 @@
 ﻿---
 name: rollback
+when_to_use: "User says 'rollback plan', 'how do I revert production', 'undo deploy', 'production is broken', 'need to rollback', or types /rollback."
+disable-model-invocation: true
 description: MUST BE USED when a production deploy has introduced a regression and the team needs a rollback plan, or proactively before a risky deploy to document the rollback path. Assesses what changed, classifies rollback complexity, and generates a numbered step-by-step rollback runbook covering code, DB migrations, env vars, and traffic. Trigger on `/rollback`, "rollback plan", "how do I revert production", "undo deploy", "production is broken", "need to rollback".
 ---
 

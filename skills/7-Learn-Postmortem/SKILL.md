@@ -1,5 +1,7 @@
 ﻿---
 name: postmortem
+when_to_use: "User says 'write postmortem', 'incident review', 'post-incident', 'root cause analysis', 'RCA', 'what happened in prod', or types /postmortem."
+disable-model-invocation: true
 description: MUST BE USED after a production outage, severe bug, data incident, or security exposure. Generates a structured blameless postmortem with an incident timeline, root cause analysis (5 Whys), contributing factors, and a concrete action item list. Trigger on `/postmortem`, "write postmortem", "incident review", "post-incident", "what happened", "root cause analysis", "RCA".
 ---
 

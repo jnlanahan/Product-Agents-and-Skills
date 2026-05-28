@@ -1,6 +1,8 @@
 ﻿---
 name: migrate-from-vibe
-description: MUST BE USED when the user wants to move a project off a vibe-coding platform (Replit, V0, Lovable, Bolt, Cursor-only, ChatGPT-generated) onto a real local stack. Detects the source platform from file markers, maps env vars and integrations, extracts the working app, and rewires it onto the user's preferred stack. Preserves working features; flags inconsistencies as out-of-scope rather than fixing them. Trigger on `/migrate-from-vibe`, "move from Replit", "off V0", "off Lovable", "off Bolt".
+description: MUST BE USED when the user wants to move a project off a vibe-coding platform (Replit, V0, Lovable, Bolt, Cursor-only, ChatGPT-generated) onto a real local stack. Detects the source platform from file markers, maps env vars and integrations, extracts the working app, and rewires it onto the user's preferred stack. Preserves working features; flags inconsistencies as out-of-scope rather than fixing them.
+when_to_use: "User says 'move off Replit', 'migrate from Lovable', 'extract from v0', 'get this off Bolt', 'move to a real local codebase'."
+disable-model-invocation: true
 ---
 
 # /migrate-from-vibe

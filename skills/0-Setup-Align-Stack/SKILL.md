@@ -1,6 +1,7 @@
 ---
 name: align-stack
-description: MUST BE USED when the user wants to migrate an existing project's integrations to their preferred stack — Neon Postgres + Drizzle, Neon Auth via Better Auth, Stripe, AWS S3 + CloudFront, Sentry, PostHog, Vercel AI SDK, Zod, and Vercel. Detects what's currently wired, shows a gap table (current vs. target), sequences migrations by risk, gets explicit approval per layer, then executes one wave per layer with one commit each. Never migrates live auth or active subscriptions without a documented migration plan. Trigger on `/align-stack`, "migrate to my stack", "convert to Neon", "switch from Supabase", "replace Clerk", "off Firebase Auth", "switch to Better Auth", "replace Prisma with Drizzle".
+description: MUST BE USED when the user wants to migrate an existing project's integrations to their preferred stack — Neon Postgres + Drizzle, Neon Auth via Better Auth, Stripe, AWS S3 + CloudFront, Sentry, PostHog, Vercel AI SDK, Zod, and Vercel. Detects what's currently wired, shows a gap table (current vs. target), sequences migrations by risk, gets explicit approval per layer, then executes one wave per layer with one commit each. Never migrates live auth or active subscriptions without a documented migration plan.
+when_to_use: "User says 'migrate to my preferred stack', 'convert to Neon', 'switch from Supabase', 'replace Clerk', 'off Firebase Auth', 'switch to Better Auth', 'replace Prisma with Drizzle'."
 ---
 
 # /align-stack

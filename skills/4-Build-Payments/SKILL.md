@@ -1,6 +1,7 @@
 ﻿---
 name: add-payment
-description: MUST BE USED when the user wants to add or extend payments. Stripe-first; detects existing Stripe setup and extends, or detects a different processor (Paddle, Lemon Squeezy) and adapts. Always handles webhook signature verification, idempotency, and Customer Portal. Trigger on `/add-payment`, "add subscription", "add billing", "add Stripe".
+description: MUST BE USED when the user wants to add or extend payments. Stripe-first; detects existing Stripe setup and extends, or detects a different processor (Paddle, Lemon Squeezy) and adapts. Always handles webhook signature verification, idempotency, and Customer Portal.
+when_to_use: "User says 'add Stripe', 'add payments', 'add subscription', 'add billing', 'add a paywall', 'wire up payments'."
 ---
 
 # /add-payment

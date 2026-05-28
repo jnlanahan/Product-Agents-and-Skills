@@ -1,6 +1,7 @@
 ﻿---
 name: setup-ci
-description: MUST BE USED when adding continuous integration to a project that lacks it. Generates GitHub Actions workflows for typecheck, tests, and lint. Vercel auto-deploys from GitHub — no separate deploy CI step needed. Adapts to detected test framework and package manager. Trigger on `/setup-ci`, "add CI", "add GitHub Actions", "automate tests on PR", "wire CI/CD", "deploy on push".
+description: MUST BE USED when adding continuous integration to a project that lacks it. Generates GitHub Actions workflows for typecheck, tests, and lint. Vercel auto-deploys from GitHub — no separate deploy CI step needed. Adapts to detected test framework and package manager.
+when_to_use: "User says 'add CI', 'add GitHub Actions', 'automate tests on PR', 'wire CI/CD', 'deploy on push', 'set up the pipeline'."
 ---
 
 # /setup-ci

@@ -1,6 +1,7 @@
 ---
 name: discover
-description: Use when the user has a vague or unvalidated idea and needs to surface the real problem before writing a PRD. Walks through 5 steps (frame → customer → problem → stakes → bridge) across sessions, tracking state in .claude/discovery-notes.md. Output feeds directly into /prd. Optional — PMs with confirmed problems skip it. Trigger on /discover, "I have an idea", "not sure what to build", "help me think through this", or when /prd routing suggests it.
+description: Use when the user has a vague or unvalidated idea and needs to surface the real problem before writing a PRD. Walks through 5 steps (frame → customer → problem → stakes → bridge) across sessions, tracking state in .claude/discovery-notes.md. Output feeds directly into /prd. Optional — PMs with confirmed problems skip it.
+when_to_use: "User has a vague idea and says 'I want to build something but not sure what', 'help me think through this', 'I have an idea I want to explore', 'not sure what to build'."
 ---
 
 # /discover

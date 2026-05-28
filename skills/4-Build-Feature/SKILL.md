@@ -1,6 +1,7 @@
 ﻿---
 name: build-feature
-description: MUST BE USED to implement a new feature in coherent TDD layers (schema → storage → routes → hooks → components). Reads `.claude/plan.md` if it exists; otherwise interviews the user. Adapts to the project's actual layering, mirrors existing patterns, and ships one commit per layer with tests at each layer. Trigger on `/build-feature`, "build this feature", "implement this", "let's start coding".
+description: MUST BE USED to implement a new feature in coherent TDD layers (schema → storage → routes → hooks → components). Reads `.claude/plan.md` if it exists; otherwise interviews the user. Adapts to the project's actual layering, mirrors existing patterns, and ships one commit per layer with tests at each layer.
+when_to_use: "User says 'build this feature', 'implement this', 'let's start coding', 'execute the plan', 'start building'."
 ---
 
 # /build-feature

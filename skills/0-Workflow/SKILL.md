@@ -1,6 +1,7 @@
 ---
 name: workflow
-description: Run to pilot one of the eight named workflows (W1–W8) end-to-end. Asks which workflow you're on (or reads `.claude/workflow-state.md`), reads the matching `workflows/Wn-*.md` for the canonical skill sequence, walks you through it step-by-step with explicit run / skip / done / pause / switch / off-script options at every transition. Survives context resets — re-derives position from the state file and `.claude/` artifacts. Read-only on the pilot side; invokes other skills only with your confirmation. Trigger on `/workflow`, `/workflow Wn`, "pilot me through", "walk me through W2".
+description: Run to pilot one of the eight named workflows (W1–W8) end-to-end. Asks which workflow you're on (or reads `.claude/workflow-state.md`), reads the matching `workflows/Wn-*.md` for the canonical skill sequence, walks you through it step-by-step with explicit run / skip / done / pause / switch / off-script options at every transition. Survives context resets — re-derives position from the state file and `.claude/` artifacts. Read-only on the pilot side; invokes other skills only with your confirmation.
+when_to_use: "User says 'walk me through this', 'follow a workflow', 'which workflow should I use', 'pilot me through W1/W2/W3', 'guide me step by step'."
 ---
 
 # /workflow

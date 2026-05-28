@@ -1,5 +1,6 @@
 ﻿---
 name: accessibility
+when_to_use: "User says 'a11y audit', 'accessibility check', 'screen reader support', 'keyboard navigation', 'WCAG', or types /accessibility."
 description: MUST BE USED when auditing a project for accessibility (a11y) compliance. Calls accessibility-auditor to scan all component files for WCAG 2.1 AA violations, presents a prioritized fix list, and optionally fixes findings one at a time with user approval. Also provides a manual testing checklist for issues static analysis cannot catch. Trigger on `/accessibility`, "a11y audit", "accessibility check", "screen reader support", "keyboard navigation", "WCAG".
 ---
 

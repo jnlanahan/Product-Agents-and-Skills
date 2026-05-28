@@ -1,5 +1,7 @@
 ﻿---
 name: deploy
+when_to_use: "User says 'ship to prod', 'go live', 'deploy this', 'deploy to production', or types /deploy."
+disable-model-invocation: true
 description: MUST BE USED when the user wants to deploy a project to production for the first time, or onboard an existing app's deploy story. Covers pre-flight checks, account setup, env vars, custom domain + SSL, third-party reconfigurations (webhooks, allowed origins, email DNS), post-deploy smoke tests, and runbook generation. Heavy on step-by-step browser guidance. Trigger on `/deploy`, "ship to prod", "go live", "deploy this".
 ---
 

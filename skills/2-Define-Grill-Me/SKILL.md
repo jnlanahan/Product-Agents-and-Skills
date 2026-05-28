@@ -1,6 +1,7 @@
 ﻿---
 name: grill-me
-description: Use when the user wants their plan or design stress-tested with relentless questions. Walks the decision tree one question at a time until shared understanding is reached. Trigger on /grill-me, "grill me", "stress-test this plan", or "challenge my design".
+description: Use when the user wants their plan or design stress-tested with relentless questions. Walks the decision tree one question at a time until shared understanding is reached.
+when_to_use: "User says 'grill me', 'stress-test this plan', 'challenge my design', 'poke holes in this', 'ask me hard questions'."
 ---
 
 # /grill-me

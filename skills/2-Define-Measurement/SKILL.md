@@ -1,6 +1,7 @@
 ---
 name: measure
-description: Use to produce a telemetry and measurement plan before building. Defines success metrics, event schema, telemetry destinations, and failure signals. Output is .claude/measurement.md. Pairs with /add-monitoring for implementation. Trigger on /measure, "define metrics", "measurement plan", "what should we track", "telemetry strategy", "how do we know this worked".
+description: Use to produce a telemetry and measurement plan before building. Defines success metrics, event schema, telemetry destinations, and failure signals. Output is .claude/measurement.md. Pairs with /add-monitoring for implementation.
+when_to_use: "User says 'define metrics', 'measurement plan', 'what should we track', 'telemetry strategy', 'how do we know this worked', 'define KPIs'."
 ---
 
 # /measure

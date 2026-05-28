@@ -1,5 +1,6 @@
 ﻿---
 name: runbook
+when_to_use: "User says 'generate runbook', 'ops runbook', 'on-call handoff', 'operational documentation', 'incident response guide', or types /runbook."
 description: MUST BE USED after a successful production deploy to generate an operational runbook for on-call handoff. Reads codebase, deploy config, and monitoring setup to produce a reference doc covering health checks, env vars, startup/shutdown, common failure modes and their fixes, alert response, and rollback steps. Trigger on `/runbook`, "generate runbook", "ops runbook", "on-call handoff", "operational documentation", "incident response guide".
 ---
 

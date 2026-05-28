@@ -1,6 +1,8 @@
 ---
 name: unvibe
-description: MUST BE USED when the user wants to rehabilitate a vibe-coded project — strip platform artifacts, remove dead code, consolidate duplicates, converge competing patterns, and harden into a maintainable codebase. Orchestrates a full assess → plan → approve → execute → verify loop using the four detector agents plus the existing stack/classifier/pattern/secret/dependency agents. Read-only first; nothing is changed without explicit user approval per wave. Trigger on `/unvibe`, "unvibe this", "clean up this vibe-coded project", "refactor the Replit/Lovable/v0/Bolt mess".
+description: MUST BE USED when the user wants to rehabilitate a vibe-coded project — strip platform artifacts, remove dead code, consolidate duplicates, converge competing patterns, and harden into a maintainable codebase. Orchestrates a full assess → plan → approve → execute → verify loop using the four detector agents plus the existing stack/classifier/pattern/secret/dependency agents. Read-only first; nothing is changed without explicit user approval per wave.
+when_to_use: "User says 'unvibe this', 'clean up this vibe-coded project', 'refactor the Replit/Lovable/v0/Bolt mess', 'clean up generated code'."
+disable-model-invocation: true
 ---
 
 # /unvibe

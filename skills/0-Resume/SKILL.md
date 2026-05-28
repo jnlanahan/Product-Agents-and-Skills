@@ -1,6 +1,7 @@
 ---
 name: resume
 description: Run at the start of any new chat on a project with prior history. Reads .claude/progress.md and calls project-state-detector to give a 5–10 line orientation: current mode, last activity, open threads, recommended next step. Read-only.
+when_to_use: "Start of a new chat on an existing project. User says 'where were we', 'catch me up', 'what's the status', 'resume'."
 ---
 
 # /resume

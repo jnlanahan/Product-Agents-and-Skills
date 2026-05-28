@@ -1,6 +1,7 @@
 ---
 name: skills
-description: Use to discover what skills are available and which ones make sense right now. Lists all skills grouped by PDLC phase, calls project-state-detector to highlight on-mode skills, and shows one-line descriptions. Read-only. Trigger on /skills, "what skills are available", "what can I run", "show me all commands", "what slash commands exist".
+description: Use to discover what skills are available and which ones make sense right now. Lists all skills grouped by PDLC phase, calls project-state-detector to highlight on-mode skills, and shows one-line descriptions. Read-only.
+when_to_use: "User says 'what skills are available', 'what can I run', 'show me all commands', 'what slash commands exist', 'what can I do'."
 ---
 
 # /skills

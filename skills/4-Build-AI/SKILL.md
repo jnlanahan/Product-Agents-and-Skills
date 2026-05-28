@@ -1,6 +1,7 @@
 ﻿---
 name: add-ai
-description: MUST BE USED when adding AI / LLM capabilities to a project. Runs model-selector to pick the right Claude model tier based on the use case (Haiku for real-time/image-gen orchestration, Sonnet for most features, Opus for deep reasoning), wires Anthropic SDK with prompt caching, and sets up LangSmith tracing + evals. Handles chat, RAG, tool use, document analysis, and image analysis. Trigger on `/add-ai`, "add AI", "add Claude", "wire LLM", "add chatbot", "add AI feature", "add evals", "wire LangSmith".
+description: MUST BE USED when adding AI / LLM capabilities to a project. Runs model-selector to pick the right Claude model tier based on the use case (Haiku for real-time/image-gen orchestration, Sonnet for most features, Opus for deep reasoning), wires Anthropic SDK with prompt caching, and sets up LangSmith tracing + evals. Handles chat, RAG, tool use, document analysis, and image analysis.
+when_to_use: "User says 'add AI', 'add Claude', 'wire LLM', 'add a chatbot', 'add AI features', 'integrate the Anthropic SDK', 'add evals', 'wire LangSmith'."
 ---
 
 # /add-ai

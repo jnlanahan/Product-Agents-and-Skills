@@ -1,6 +1,7 @@
 ﻿---
 name: prototype
-description: MUST BE USED when the user wants to design or visualize a feature's UI before building it. Generates 3 radically different clickable HTML prototypes (TailwindCSS via CDN, mock data, fake auth, fake API). Saves to `prototypes/variant-A.html`, `variant-B.html`, `variant-C.html`. The user opens each in a browser, picks one, and that variant becomes the design reference for `/build-feature`. Trigger on `/prototype`, "design this feature", "what should this look like", "show me UI options". Do NOT use to implement features — prototype output is throwaway HTML only; use `/build-feature` once a variant is chosen.
+description: MUST BE USED when the user wants to design or visualize a feature's UI before building it. Generates 3 radically different clickable HTML prototypes (TailwindCSS via CDN, mock data, fake auth, fake API). Saves to `prototypes/variant-A.html`, `variant-B.html`, `variant-C.html`. The user opens each in a browser, picks one, and that variant becomes the design reference for `/build-feature`. Do NOT use to implement features — prototype output is throwaway HTML only; use `/build-feature` once a variant is chosen.
+when_to_use: "User says 'design this feature', 'what should this look like', 'show me UI options', 'make a mockup', 'prototype the UI', 'I want to see options before building'."
 ---
 
 # /prototype

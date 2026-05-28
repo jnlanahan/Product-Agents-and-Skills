@@ -1,6 +1,7 @@
 ﻿---
 name: glossary
-description: Use when the user wants to extract project domain terms into a consistent glossary — flagging ambiguous terms, proposing canonical names, and writing the result to `.claude/glossary.md`. Trigger on phrases like "build a glossary", "harden terminology", "sharpen language", or "define domain terms".
+description: Use when the user wants to extract project domain terms into a consistent glossary — flagging ambiguous terms, proposing canonical names, and writing the result to `.claude/glossary.md`.
+when_to_use: "User says 'build a glossary', 'define domain terms', 'harden terminology', 'sharpen language', 'what does this word mean in our codebase'."
 ---
 
 # /glossary

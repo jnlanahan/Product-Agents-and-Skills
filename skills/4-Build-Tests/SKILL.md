@@ -1,6 +1,7 @@
 ﻿---
 name: setup-tests
-description: MUST BE USED when a project has no test framework or when adding a first meaningful test suite. Scaffolds Vitest (Next.js/Vite) or Jest (Express/Node), adds test utilities and setup, and writes the first passing unit + integration tests following the project's existing patterns. Trigger on `/setup-tests`, "add tests", "write tests", "set up testing", "add Vitest", "add Jest", "add testing infrastructure".
+description: MUST BE USED when a project has no test framework or when adding a first meaningful test suite. Scaffolds Vitest (Next.js/Vite) or Jest (Express/Node), adds test utilities and setup, and writes the first passing unit + integration tests following the project's existing patterns.
+when_to_use: "User says 'add tests', 'write tests', 'set up testing', 'add Vitest', 'add Jest', 'scaffold the test suite', 'I have no tests'."
 ---
 
 # /setup-tests

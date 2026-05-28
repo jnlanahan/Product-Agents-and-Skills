@@ -1,6 +1,7 @@
 ---
 name: add-files
-description: MUST BE USED when the user wants to add or extend file uploads, file sharing, folders, tags, image transforms, or per-user quotas. Detects existing storage (AWS S3, Firebase Storage, R2, UploadThing) and extends it; if none, scaffolds AWS S3 + CloudFront CDN. Always enforces server-side validation, ownership checks, and magic-byte MIME verification. Trigger on `/add-files`, "add file uploads", "add file storage", "add image uploads".
+description: MUST BE USED when the user wants to add or extend file uploads, file sharing, folders, tags, image transforms, or per-user quotas. Detects existing storage (AWS S3, Firebase Storage, R2, UploadThing) and extends it; if none, scaffolds AWS S3 + CloudFront CDN. Always enforces server-side validation, ownership checks, and magic-byte MIME verification.
+when_to_use: "User says 'add file uploads', 'let users upload files', 'add image uploads', 'set up S3', 'add file storage'."
 ---
 
 # /add-files

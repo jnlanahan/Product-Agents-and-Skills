@@ -1,6 +1,7 @@
 ﻿---
 name: prd
 description: MUST BE USED when the user wants to create a PRD or product requirements doc. Synthesizes the current conversation and codebase understanding into a comprehensive PRD with functional and non-functional requirements, success metrics, risks, and rollout plan. Writes to `.claude/prd.md`. Does NOT interview the user — just synthesizes what's already known. Do NOT use when a PRD already exists — open `.claude/prd.md` directly and edit it, or run `/refactor` to restructure it.
+when_to_use: "User says 'write a PRD', 'create requirements', 'document what we're building', 'I need a product requirements doc', 'define the feature'."
 ---
 
 # /prd

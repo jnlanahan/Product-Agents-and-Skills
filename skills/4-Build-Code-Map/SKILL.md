@@ -1,6 +1,7 @@
 ﻿---
 name: code-map
-description: Use when the user is unfamiliar with a section of code, asks the agent to "zoom out", or wants a higher-level map of how an area fits into the bigger picture. Trigger on /code-map, "what's going on here", "explain this area", or "give me a code map".
+description: Use when the user is unfamiliar with a section of code, asks the agent to "zoom out", or wants a higher-level map of how an area fits into the bigger picture.
+when_to_use: "User says 'what's going on here', 'explain this area', 'give me a code map', 'zoom out', 'how does this fit into the bigger picture'."
 ---
 
 # /code-map

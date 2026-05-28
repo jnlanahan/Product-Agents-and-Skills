@@ -1,5 +1,6 @@
 ﻿---
 name: post-launch-review
+when_to_use: "User says 'post-launch', 'launch retro', 'how did the launch go', 'review after launch', 'metrics review', or types /post-launch-review. Best used 2–4 weeks after shipping."
 description: MUST BE USED 2–4 weeks after a production launch or major feature ship to close the learn loop. Reviews actual metrics against the PRD's success criteria, surfaces surprises, runs a Start/Stop/Continue retro, and produces a ranked action item list and next-iteration ideas. Trigger on `/post-launch-review`, "post-launch", "launch retro", "how did it go", "review after launch", "metrics review", "check the launch".
 ---
 

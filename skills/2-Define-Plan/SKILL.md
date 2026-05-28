@@ -1,6 +1,7 @@
 ﻿---
 name: plan
 description: MUST BE USED to turn a PRD (or current conversation context) into an executable implementation plan. Breaks work into vertical slices (tracer bullets), assigns a TDD strategy per slice, sequences commits by layer (schema → storage → routes → hooks → components), and writes the plan to `.claude/plan.md` so `/build-feature` can pick it up. Replaces GitHub-Issues-style breakdown. Do NOT use without a PRD or clear requirements — run `/prd` first so the plan has a solid requirements baseline to slice against.
+when_to_use: "User says 'create a plan', 'plan this feature', 'how should we implement this', 'break this down', 'make an implementation plan'."
 ---
 
 # /plan
@@ -42,131 +43,47 @@ Run in parallel:
 
 Read `_stack-preferences.md` and `_adaptation-playbook.md`.
 
-### Step 3: Sketch vertical slices
+### Step 3: Enter plan mode — fast slice sketch
 
-A **vertical slice** is a tracer-bullet path through every layer for one piece of behavior. It's demoable end-to-end. It is NOT "schema first, then API, then UI" — that's a horizontal slice and produces tests/code that don't match observed behavior.
+Call `EnterPlanMode` now.
 
-For each candidate slice, write:
+In plan mode, produce a **fast sketch only** — do not write the full plan yet. For each candidate slice, show:
 
-- **Behavior**: a one-sentence description in user-facing language
-- **Why this is a slice (not bigger or smaller)**: what makes it a coherent unit
-- **Layers touched**: schema, storage, route/action, hook, component
-- **Migration**: needed yes/no, sketch the shape
-- **Side effects**: emails, webhooks, third-party calls, AI calls
-- **TDD strategy**: which behaviors get a test, what the test exercises, what gets mocked (only at system boundaries — see `mocking.md`)
+- **Slice title** — short name (e.g., "Tracer bullet — empty list view")
+- **One-sentence behavior** — user-facing
+- **Layers touched** — schema / storage / route / hook / component (one line)
+- **Depends on** — slice number(s) or "none"
+
+Present the sketch as a numbered table. Keep it to one screen. The goal is to get a redirect opportunity before writing 200 lines.
 
 ### Step 4: Quiz the user on granularity
 
-Ask the user one batch of questions:
+While still in plan mode, ask one batch of questions:
 
 - Are these slices the right size, or do any need to be bigger or smaller?
 - Are there dependencies I missed (e.g., slice 3 actually needs something from slice 1)?
 - What's the priority order if we ship one at a time?
 
-Wait for answers before writing the plan.
+Wait for answers before proceeding.
 
-### Step 5: Write the plan to `.claude/plan.md`
+### Step 5: Elaborate into the full plan
 
-Use the template below. Each slice section is independently executable.
+Using the approved slice structure, write the complete plan to `.claude/plan.md` using the WBS template. → See [plan-template.md](references/plan-template.md)
 
-### Step 6: Hand off
+Fill in every section: objectives, success criteria, scope, architecture decisions, and all slice subsections (schema through verification checklist).
 
-Tell the user the plan is at `.claude/plan.md` and recommend `/build-feature` to start executing the first slice.
+### Step 6: Exit plan mode — approval gate
+
+Call `ExitPlanMode`. The user will review the written `.claude/plan.md` and explicitly approve before `/build-feature` picks it up. Do not proceed to post-flight until approved.
+
+### Step 7: Hand off
+
+Tell the user the approved plan is at `.claude/plan.md` and recommend `/build-feature` to start executing the first slice.
 
 ## Plan Template
 
-```markdown
-# Implementation Plan: <Feature or Product Name>
+→ See [references/plan-template.md](references/plan-template.md) for the full WBS template Claude writes to `.claude/plan.md`.
 
-*Status: Ready for build · Source: `.claude/prd.md` (or "current conversation") · Last updated: <YYYY-MM-DD>*
-
-## Strategy
-
-- **Approach**: vertical slices, one slice per PR (or per coherent commit chain)
-- **TDD**: red → green → refactor, per layer; tests verify behavior through public interfaces, not internals (see TDD Workflow below)
-- **Layering** (as detected in this project): <schema → storage → routes → hooks → components | server actions → server components → client components | other>
-- **Test mocking boundary**: <DB, third-party APIs, time, randomness> — see `mocking.md`
-
-## Validation Contract
-
-*Written before implementation begins. These assertions are independent of how the feature is built — they describe observable outcomes verifiable by a fresh reviewer who has not seen the implementation.*
-
-| # | Assertion | Verification method | Acceptance threshold |
-|---|---|---|---|
-| 1 | <observable behavior, e.g. "User can create a note and see it in the list"> | Manual: create → reload → confirm visible | Must work in Chrome + Safari |
-| 2 | <permission boundary, e.g. "User B cannot read User A's notes"> | API test: GET with User B token → 403/404 | Zero leakage |
-| 3 | <data integrity, e.g. "Deleting a note removes it from the DB"> | DB query after delete → row count decrements | Row must not exist |
-| 4 | <error handling, e.g. "Submitting empty title shows validation error"> | UI: submit blank form → inline error shown | Error before server call |
-
-**How to use**: After all slices are implemented, a fresh agent or the user runs through each row without looking at the implementation path. A contract violation is not a test failure to explain away — it means the feature is not done.
-
-## Slice Order
-
-| # | Slice | Depends on | Demoable outcome |
-|---|---|---|---|
-| 1 | <Tracer bullet — minimal happy path> | None | <e.g., user can see an empty list> |
-| 2 | <Add primary write path> | 1 | <e.g., user can create one item> |
-| 3 | <Add update / delete> | 2 | <e.g., user can update or remove items> |
-| 4 | <Edge cases / permissions> | 3 | <e.g., other users can't see your items> |
-| 5 | <Polish / non-happy path> | 4 | <e.g., empty states, errors, validation> |
-
-## Slice 1: <Slice Name>
-
-**User-facing behavior**: <one sentence>
-
-**Layers**:
-
-- Schema: <new table/columns or "no change">
-- Storage: <new functions or "no change">
-- Routes/Actions: <new endpoints or "no change">
-- Client: <new hook + component or "no change">
-
-**TDD cycles** (one test → one impl, NOT all tests first):
-
-1. **RED**: test that <observable behavior 1> — should fail because <reason>
-   **GREEN**: minimal impl — <one-line description>
-2. **RED**: test that <observable behavior 2> — should fail
-   **GREEN**: minimal impl — <one-line description>
-3. **RED**: test that <ownership/permission boundary> — should fail
-   **GREEN**: minimal impl — <one-line description>
-
-**Refactor pass after green**: <e.g., "extract helper if duplication appears"; or "none expected">
-
-**Migration**: <yes/no>; if yes — <sketch>
-
-**Commits**: one per layer (schema, storage, routes, client) — <count> total
-
-**Verification**:
-
-- [ ] All tests green
-- [ ] `npm run build` clean
-- [ ] Manual: <observable demo step>
-
-**Out of scope for this slice**: <things explicitly deferred to later slices>
-
-## Slice 2: ...
-
-(repeat structure)
-
-## Cross-Cutting Decisions
-
-- **Validation**: <e.g., Zod at every API boundary, `drizzle-zod` for DB shape>
-- **Auth/ownership**: <e.g., every protected route checks `userId === resource.userId` server-side>
-- **Error handling**: <match existing pattern from `pattern-finder` — e.g., `throw new AppError(...)`>
-- **Naming conventions**: <follow existing — e.g., `useNotes`, `noteRoutes.ts`>
-
-## Open Questions
-
-Anything that needs an answer before the relevant slice is buildable:
-
-- <question>
-
-## Out of Scope
-
-Explicit list of things NOT in this plan (mirrored from PRD, plus anything pruned during planning):
-
-- <item>
-```
 
 ## TDD Workflow (apply per slice)
 

@@ -1,6 +1,7 @@
 ﻿---
 name: setup-database
-description: MUST BE USED when the user wants to set up a database, add a table, add a column, add an index, or run a migration. Detects ORM (Drizzle / Prisma / Kysely / raw SQL) and adapts. Walks through migration generation → review → apply → verification, with explicit warnings around destructive migrations. Aimed at amateur users — never silently runs destructive operations. Trigger on `/setup-database`, "add a table", "add a column", "run a migration".
+description: MUST BE USED when the user wants to set up a database, add a table, add a column, add an index, or run a migration. Detects ORM (Drizzle / Prisma / Kysely / raw SQL) and adapts. Walks through migration generation → review → apply → verification, with explicit warnings around destructive migrations. Aimed at amateur users — never silently runs destructive operations.
+when_to_use: "User says 'add a table', 'add a column', 'run a migration', 'set up the database', 'add an index', 'create a schema'."
 ---
 
 # /setup-database

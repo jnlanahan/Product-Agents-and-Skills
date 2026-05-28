@@ -1,6 +1,7 @@
 ﻿---
 name: add-monitoring
-description: MUST BE USED before any production launch. Wires both Sentry (errors) and PostHog (product analytics) — not one or the other. Walks the user through account setup, env vars, and verification with real test events. Identifies authenticated users in both tools so analytics is attributable. Trigger on `/add-monitoring`, "wire Sentry", "wire PostHog", "add observability".
+description: MUST BE USED before any production launch. Wires both Sentry (errors) and PostHog (product analytics) — not one or the other. Walks the user through account setup, env vars, and verification with real test events. Identifies authenticated users in both tools so analytics is attributable.
+when_to_use: "User says 'wire Sentry', 'wire PostHog', 'add observability', 'add error tracking', 'add analytics', 'set up monitoring'."
 ---
 
 # /add-monitoring

@@ -1,6 +1,7 @@
 ---
 name: next
 description: Run anytime to see where the project is, what's stale, and which skill to run next. State-aware dashboard powered by project-state-detector. Your default "what should I do?" command. Read-only.
+when_to_use: "User says 'what should I do next', 'what's the status', 'I don't know what to work on', 'what's left', 'where are we'."
 ---
 
 # /next

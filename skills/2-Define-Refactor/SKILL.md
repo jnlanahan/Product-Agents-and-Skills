@@ -1,6 +1,7 @@
 ﻿---
 name: refactor
 description: MUST BE USED when the user wants to refactor code — either to find opportunities ("where's our shallow code?") or to plan a known refactor with safe, tiny commits. Combines opportunity-scanning and plan-and-execute modes. Includes Claude-Code-specific refactoring best practices. Writes the plan to `.claude/refactor-plan.md`.
+when_to_use: "User says 'refactor this', 'clean up the code', 'find shallow code', 'improve code quality', 'restructure this'."
 ---
 
 # /refactor

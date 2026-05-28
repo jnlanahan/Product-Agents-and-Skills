@@ -1,5 +1,6 @@
 ﻿---
 name: uat
+when_to_use: "User says 'user acceptance test', 'UAT', 'acceptance testing', 'test before launch', 'test with real users', or types /uat."
 description: MUST BE USED before migrating users to a new version or shipping a feature that changes existing behavior. Generates a structured user acceptance testing (UAT) checklist from the codebase and recent changes, walks through each scenario with the user, and records pass/fail/blocked results with a final ship/no-ship decision. Trigger on `/uat`, "user acceptance test", "UAT", "acceptance testing", "test before launch", "test with real users".
 ---
 

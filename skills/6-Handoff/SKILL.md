@@ -1,5 +1,6 @@
 ---
 name: handoff
+when_to_use: "User says 'write a handoff doc', 'brief a contractor', 'package this for the team', 'external handoff', or types /handoff."
 description: Use to package PRD, plan, and architecture into a single standalone document for stakeholders without codebase access — contractors, outsourced developers, executives, or design partners. Output is .claude/handoff-<feature-name>.md. Trigger on /handoff, "write a handoff doc", "brief a contractor", "package this for the team", "external handoff".
 ---
 

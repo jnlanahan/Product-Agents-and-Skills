@@ -1,6 +1,7 @@
 ---
 name: start
 description: Run once at project initialization to capture context, create .claude/ scaffolding, and get oriented. Re-runnable — updates specific sections if .claude/context.md already exists. Never asks which workflow to use; captures context and suggests a starting point.
+when_to_use: "User opens a project for the first time, says 'let's get started', 'set up context', 'initialize this project', 'what is this codebase'."
 ---
 
 # /start

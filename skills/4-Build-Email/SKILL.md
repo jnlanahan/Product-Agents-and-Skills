@@ -1,6 +1,7 @@
 ﻿---
 name: add-email
-description: MUST BE USED when adding transactional email to a project. Detects existing email setup; if none, wires Resend per stack preferences. Handles welcome emails, password resets, notification emails, and rich HTML templates with React Email. Always covers DKIM/SPF DNS setup, send-on-event wiring, and delivery verification. Trigger on `/add-email`, "add email", "send email", "transactional email", "welcome email", "password reset email", "email notifications".
+description: MUST BE USED when adding transactional email to a project. Detects existing email setup; if none, wires Resend per stack preferences. Handles welcome emails, password resets, notification emails, and rich HTML templates with React Email. Always covers DKIM/SPF DNS setup, send-on-event wiring, and delivery verification.
+when_to_use: "User says 'add email', 'send welcome emails', 'add password reset email', 'set up Resend', 'add transactional email', 'email notifications'."
 ---
 
 # /add-email

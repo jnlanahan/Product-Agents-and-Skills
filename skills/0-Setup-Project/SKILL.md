@@ -1,6 +1,8 @@
 ---
 name: setup-project
 description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. Use `--personal` flag for lighter personal tools (no Stripe, optional auth, SQLite). NOT for existing projects — for those, run `/next-steps` first.
+when_to_use: "User says 'start a new project', 'new SaaS app', 'scaffold this from scratch', 'I'm building a new app'."
+disable-model-invocation: true
 ---
 
 # /setup-project

@@ -1,6 +1,7 @@
 ---
 name: add-auth
-description: MUST BE USED when the user wants to add or extend authentication. Detects existing auth provider (Neon Auth / Better Auth, Firebase Auth, Clerk, NextAuth, Supabase Auth, custom JWT) and adapts to it. If none, scaffolds Neon Auth via Better Auth per stack preferences. Handles sign-up, sign-in, Google Sign-In, MFA, organizations, and role-based access. Trigger on `/add-auth`, "add login", "add sign-up", "wire auth".
+description: MUST BE USED when the user wants to add or extend authentication. Detects existing auth provider (Neon Auth / Better Auth, Firebase Auth, Clerk, NextAuth, Supabase Auth, custom JWT) and adapts to it. If none, scaffolds Neon Auth via Better Auth per stack preferences. Handles sign-up, sign-in, Google Sign-In, MFA, organizations, and role-based access.
+when_to_use: "User says 'add login', 'add sign-up', 'wire auth', 'add authentication', 'I need users to sign in', 'add Google Sign-In', 'set up auth'."
 ---
 
 # /add-auth

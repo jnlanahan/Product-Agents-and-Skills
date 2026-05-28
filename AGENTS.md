@@ -253,6 +253,7 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 
 - **Use when** — turning a PRD (or current conversation context) into an executable implementation plan
 - **Output** — `.claude/plan.md`: vertical slices (tracer bullets), TDD strategy per slice, commit sequencing by layer (schema → storage → routes → hooks → components). `/build-feature` reads this.
+- **Flow** — two-pass: (1) enters Claude Code plan mode and presents a fast slice sketch for user redirect before writing anything; (2) elaborates the approved sketch into the full plan, then calls `ExitPlanMode` for an explicit approval gate before handing off to `/build-feature`
 - **File** — [skills/2-Define-Plan/SKILL.md](skills/2-Define-Plan/SKILL.md)
 - **Supporting docs** — `deep-modules.md`, `interface-design.md`, `mocking.md`, `tests.md`, `refactoring.md`
 

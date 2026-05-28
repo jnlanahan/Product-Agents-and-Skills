@@ -1,6 +1,7 @@
 ---
 name: architect
-description: Use when a feature or product involves novel architecture decisions that warrant explicit review before building. Walks through 5 steps (detect stack → data model → integrations → tradeoffs → output) to produce .claude/architecture.md. Step-decomposed — each step ends at a reviewable checkpoint. Optional for trivial features; required for greenfield products and significant infrastructure changes. Trigger on /architect, "what's the architecture", "design the system", "help me think through the data model".
+description: Use when a feature or product involves novel architecture decisions that warrant explicit review before building. Walks through 5 steps (detect stack → data model → integrations → tradeoffs → output) to produce .claude/architecture.md. Step-decomposed — each step ends at a reviewable checkpoint. Optional for trivial features; required for greenfield products and significant infrastructure changes.
+when_to_use: "User says 'what's the architecture', 'design the system', 'help me think through the data model', 'how should we architect this', 'technical design'."
 ---
 
 # /architect

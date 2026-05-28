@@ -1,5 +1,6 @@
 ﻿---
 name: check-production
+when_to_use: "User says 'is this ready for production', 'audit before launch', 'pre-deploy check', 'production checklist', or types /check-production."
 description: MUST BE USED before a production launch or after a big change to the critical path. Runs a deep production-readiness audit and returns a severity-graded report (Critical/High/Medium/Low) with file:line citations and a recommended fix order. Add `--lite` for a fast 30-second sanity check that skips the full auditor. Trigger on `/check-production`, "is this ready for production", "audit before launch", or any pre-deploy review request.
 ---
 
