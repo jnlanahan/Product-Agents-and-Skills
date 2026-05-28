@@ -72,68 +72,180 @@
 
 ## 4.0  Work Breakdown
 
-### 4.1  <Slice 1 Name — Tracer Bullet>
-
-**User-facing behavior:** <one sentence>
-**Demoable outcome:** <what the user can see/do when this slice is complete>
-**Depends on:** None
-
-#### 4.1.1  Schema
-<New tables / columns / indexes, or "no change.">
-
-#### 4.1.2  Storage
-<New data-access functions, or "no change.">
-
-#### 4.1.3  Routes / Actions
-<New endpoints or server actions, or "no change.">
-
-#### 4.1.4  Client
-<New hooks + components, or "no change.">
-
-#### 4.1.5  Tests
-- RED → GREEN: <observable behavior 1 — should fail because X>
-- RED → GREEN: <observable behavior 2>
-- RED → GREEN: <permission / ownership boundary>
-
-*One test → one impl per cycle. Mock only at system boundaries (DB, third-party APIs, time, randomness).*
-
-#### 4.1.6  Migration
-<None / or sketch: add column X to table Y, nullable first then backfill>
-
-#### 4.1.7  Verification
-- [ ] All tests green
-- [ ] `npm run build` clean
-- [ ] Manual: <demo step>
-- [ ] Out of scope for this slice: <items deferred to later slices>
+> **Phase key** — slices are organized in build order:
+> - **Phase A — Working Prototype:** Core thing working end-to-end. Mocked data is fine. Something demoable. Build this first.
+> - **Phase B — Minimum Functionality:** Real persistence, basic validation, minimum happy path. Something a user can actually test.
+> - **Phase C — Production Hardening:** Auth, security, payments, monitoring. Build this last. Omit if `WORKFLOW_SCOPE` is `PROTOTYPE`, `PERSONAL`, or `ADD_FEATURE` (unless capability already exists).
 
 ---
 
-### 4.2  <Slice 2 Name>
+### Phase A — Working Prototype
+
+*Goal: get the core behavior running end-to-end with mocked or minimal data. Something demoable at the end of this phase.*
+
+#### 4.A.1  <Slice A1 Name — Tracer Bullet>
+
+**User-facing behavior:** <one sentence — what can the user do?>
+**Demoable outcome:** <what they see when this slice is complete; mocked data acceptable>
+**Depends on:** None
+
+##### 4.A.1.1  Schema
+<Tables / columns / indexes needed for the tracer bullet, or "no change.">
+
+##### 4.A.1.2  Storage
+<Minimal data-access functions — stub or real, whichever is faster to demo.>
+
+##### 4.A.1.3  Routes / Actions
+<Endpoint(s) or server action(s) that make the core behavior work.>
+
+##### 4.A.1.4  Client
+<Hook(s) + component(s) that connect UI to the route.>
+
+##### 4.A.1.5  Tests
+- RED → GREEN: <core behavior 1>
+- RED → GREEN: <core behavior 2>
+
+*One test → one impl per cycle. Mock at system boundaries only.*
+
+##### 4.A.1.6  Migration
+<None / or sketch>
+
+##### 4.A.1.7  Verification
+- [ ] All Phase A.1 tests green
+- [ ] `npm run build` clean
+- [ ] Manual: <demo step — show the thing working end-to-end>
+- [ ] Deferred to Phase B: <persistence / validation items>
+
+---
+
+#### 4.A.2  <Slice A2 Name>
 
 **User-facing behavior:** <one sentence>
-**Demoable outcome:** <what the user can see/do>
-**Depends on:** 4.1
+**Demoable outcome:** <what they see>
+**Depends on:** 4.A.1
 
-#### 4.2.1  Schema
-#### 4.2.2  Storage
-#### 4.2.3  Routes / Actions
-#### 4.2.4  Client
-#### 4.2.5  Tests
-#### 4.2.6  Migration
-#### 4.2.7  Verification
+##### 4.A.2.1–4.A.2.7  *(same subsections as 4.A.1)*
 
-*(Repeat 4.x.1 – 4.x.7 for each additional slice)*
+*(Repeat 4.A.x for each Phase A slice)*
+
+---
+
+### Phase B — Minimum Functionality
+
+*Goal: replace mocks with real data, add basic validation, complete the minimum happy path. Something a tester can use.*
+
+#### 4.B.1  <Slice B1 Name — Real Persistence>
+
+**User-facing behavior:** <one sentence>
+**Demoable outcome:** <data survives a page reload; error shows on bad input>
+**Depends on:** 4.A.1 (or last Phase A slice)
+
+##### 4.B.1.1  Schema
+<Finalize schema — add columns deferred from Phase A.>
+
+##### 4.B.1.2  Storage
+<Replace stub storage with real DB calls. Add error handling.>
+
+##### 4.B.1.3  Routes / Actions
+<Add validation at API boundary (e.g. Zod). Return proper error shapes.>
+
+##### 4.B.1.4  Client
+<Wire up error states. Handle loading / empty states.>
+
+##### 4.B.1.5  Tests
+- RED → GREEN: <persistence — data survives round-trip>
+- RED → GREEN: <validation — bad input rejected with correct error>
+- RED → GREEN: <error handling — server error shows graceful UI>
+
+##### 4.B.1.6  Migration
+<Production-safe migrations deferred from Phase A.>
+
+##### 4.B.1.7  Verification
+- [ ] All Phase B.1 tests green
+- [ ] `npm run build` clean
+- [ ] Manual: <happy path from blank state through success state>
+- [ ] Deferred to Phase C: <auth / security / payments>
+
+---
+
+#### 4.B.2  <Slice B2 Name>
+
+**User-facing behavior:** <one sentence>
+**Depends on:** 4.B.1
+
+##### 4.B.2.1–4.B.2.7  *(same subsections)*
+
+*(Repeat 4.B.x for each Phase B slice)*
+
+---
+
+### Phase C — Production Hardening
+
+*Goal: auth, security boundaries, payments, monitoring. Build after Phase A + B are fully working. Remove this entire phase block if `WORKFLOW_SCOPE` excludes it.*
+
+#### 4.C.1  <Slice C1 Name — Auth / Security>
+
+**User-facing behavior:** <e.g. "Users log in and see only their own data">
+**Demoable outcome:** <two users cannot see each other's data; session persists>
+**Depends on:** last Phase B slice
+
+##### 4.C.1.1  Schema
+<User / session tables; ownership columns on feature tables.>
+
+##### 4.C.1.2  Storage
+<All queries scoped to `userId`. Row-level filtering.>
+
+##### 4.C.1.3  Routes / Actions
+<All protected routes check session. Auth middleware.>
+
+##### 4.C.1.4  Client
+<Auth-gated pages. Redirect unauthenticated users.>
+
+##### 4.C.1.5  Tests
+- RED → GREEN: <unauthenticated request → 401/redirect>
+- RED → GREEN: <User B cannot read User A's resource → 403/404>
+- RED → GREEN: <session persists across reload>
+
+##### 4.C.1.6  Migration
+<Add `userId` foreign keys; backfill or seed if needed.>
+
+##### 4.C.1.7  Verification
+- [ ] All Phase C.1 tests green
+- [ ] `npm run build` clean
+- [ ] Manual: two-browser test — User A's data not visible to User B
+
+---
+
+#### 4.C.2  <Slice C2 Name — Payments / Billing>  *(omit if not applicable)*
+
+**Depends on:** 4.C.1
+
+##### 4.C.2.1–4.C.2.7  *(same subsections)*
+
+---
+
+#### 4.C.3  <Slice C3 Name — Monitoring / Observability>  *(omit if not applicable)*
+
+**User-facing behavior:** Error tracking and usage analytics active in production.
+**Depends on:** 4.C.1
+
+##### 4.C.3.1–4.C.3.7  *(same subsections)*
+
+---
+
+*(Repeat 4.C.x for each Phase C slice. Remove the entire Phase C block if `WORKFLOW_SCOPE` excludes it.)*
 
 ---
 
 ## 5.0  Delivery Schedule
 
-| #   | Milestone | Slice(s) | Status |
-|-----|-----------|----------|--------|
-| 5.1 | Tracer bullet live | 4.1 | Not started |
-| 5.2 | Write path complete | 4.2 | Not started |
-| 5.3 | Full happy path | 4.3 | Not started |
-| 5.4 | Edge cases & permissions | 4.4 | Not started |
+| #   | Milestone | Phase / Slice(s) | Status |
+|-----|-----------|------------------|--------|
+| 5.1 | Core behavior demoable | Phase A (4.A.1–4.A.n) | Not started |
+| 5.2 | Minimum functionality testable | Phase B (4.B.1–4.B.n) | Not started |
+| 5.3 | Production-hardened | Phase C (4.C.1–4.C.n) | Not started |
+
+*Remove rows for phases excluded by `WORKFLOW_SCOPE`.*
 
 ---
 

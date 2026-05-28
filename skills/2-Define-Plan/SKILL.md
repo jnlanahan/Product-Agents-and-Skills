@@ -11,6 +11,7 @@ You turn a PRD (or current conversation context) into an executable plan that `/
 ## Pre-flight
 
 - Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
+- Read `.claude/workflow-state.md` if present — extract the `workflow_id` value from YAML frontmatter (e.g. `workflow_id: W2`). Store as `WORKFLOW_SCOPE` for resolution in Step 0.
 - Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
 
 ## Post-flight
@@ -30,6 +31,43 @@ You turn a PRD (or current conversation context) into an executable plan that `/
 - The codebase (explored on demand to ground decisions)
 
 ## Procedure
+
+### Step 0: Resolve workflow scope
+
+Determine which scope profile applies before any planning begins. This drives which phases appear in the plan.
+
+**A — State file found:** If pre-flight found a `workflow_id` in `.claude/workflow-state.md`, map it:
+
+| `workflow_id` | `WORKFLOW_SCOPE` | Phases to plan |
+|---|---|---|
+| W1 | `PROTOTYPE` | Phase A + lite Phase B only. Skip Phase C. |
+| W2 | `PRODUCTION` | All three phases: A + B + C. |
+| W3 | `ADD_FEATURE` | Phase A + B. Phase C only where capability already exists in the codebase. |
+| W4 | `PRODUCTION` | All three phases (migrating to production requires full hardening). |
+| W5 | `ADD_FEATURE` | Phase A + B. Phase C only where already present. |
+| W6 | `ADD_FEATURE` | Phase A + B scoped to the fix. Phase C not applicable. |
+| W7 | `PRODUCTION` | All three phases (this workflow exists to harden). |
+| W8 | `PERSONAL` | Phase A + B. Skip auth, payments, and monitoring slices in Phase C. |
+
+**B — No state file (or `workflow_id` absent):** Ask this one question before proceeding:
+
+> **Quick scope check** (one question before we plan):
+> Which best describes this work?
+> - **[1] Prototype / throwaway** — get it working to demo or validate; fine to throw away the code
+> - **[2] MVP / feature for testing** — needs to work, but not launching to real users yet
+> - **[3] Production-ready** — real users, needs auth, security, and full hardening
+> - **[4] Personal tool** — just for me; no payments, minimal or no auth, no monitoring
+>
+> *(Type a number, or describe and I'll map it.)*
+
+Map to `WORKFLOW_SCOPE`: 1 → `PROTOTYPE`, 2 → `ADD_FEATURE`, 3 → `PRODUCTION`, 4 → `PERSONAL`.
+
+Do not ask this question if `workflow_id` was already found from the state file.
+
+Surface the resolved scope in one line before moving to Step 1:
+> **Scope:** `PRODUCTION` — plan will include Phase A (working prototype), Phase B (minimum functionality), and Phase C (production hardening).
+
+*(Adjust the description to match the resolved profile.)*
 
 ### Step 1: Detect existing PRD or context
 
@@ -54,6 +92,12 @@ In plan mode, produce a **fast sketch only** — do not write the full plan yet.
 - **Layers touched** — schema / storage / route / hook / component (one line)
 - **Depends on** — slice number(s) or "none"
 
+**Apply scope filter based on `WORKFLOW_SCOPE`:** Label each candidate slice with its phase (`Phase A`, `Phase B`, or `Phase C`). Then:
+- `PROTOTYPE`: include Phase A slices and lite Phase B (persistence only); suppress Phase C entirely.
+- `PERSONAL`: include Phase A + B; suppress auth, payments, and monitoring from Phase C.
+- `ADD_FEATURE`: include Phase A + B; include a Phase C slice only if that capability (auth, payments, monitoring) already exists in the codebase as detected in Step 2.
+- `PRODUCTION`: include all three phases.
+
 Present the sketch as a numbered table. Keep it to one screen. The goal is to get a redirect opportunity before writing 200 lines.
 
 ### Step 4: Quiz the user on granularity
@@ -70,7 +114,7 @@ Wait for answers before proceeding.
 
 Using the approved slice structure, write the complete plan to `.claude/plan.md` using the WBS template. → See [plan-template.md](references/plan-template.md)
 
-Fill in every section: objectives, success criteria, scope, architecture decisions, and all slice subsections (schema through verification checklist).
+Fill in every section: objectives, success criteria, scope, architecture decisions, and all slice subsections (schema through verification checklist). In section 4.0 (Work Breakdown), organize slices under the Phase A / Phase B / Phase C headers from the plan template. Omit entire phase blocks excluded by `WORKFLOW_SCOPE` — do not leave empty headers. If a phase is excluded, add one line to section 2.2 (Out of Scope) explaining why (e.g., "Phase C skipped — PROTOTYPE scope; harden after concept validation.").
 
 ### Step 6: Exit plan mode — approval gate
 
@@ -130,9 +174,11 @@ Only **after** all tests in a slice are green. See `refactoring.md` for what to 
 - **Tests describe behavior**, not implementation. If renaming an internal function would break a test, the test is wrong.
 - **Write the plan to `.claude/plan.md`.** No GitHub Issues required. Recommend the user commit it.
 - **Hand off to `/build-feature`** at the end. Don't start writing code in this skill.
+- **Scope before slicing.** Resolve `WORKFLOW_SCOPE` in Step 0 before generating any slices. A `PROTOTYPE` plan that includes auth and payments slices is a planning error — those items will be built too early or ignored.
 
 ## If Something Goes Wrong
 
 - **PRD is missing or too vague** — stop and run `/prd` first; a plan built on insufficient requirements produces incorrect slice ordering.
 - **Plan produces too many slices** — ask the user to narrow scope; flag which slices are optional vs. required for a first working version.
 - **Slice dependencies are circular** — surface the cycle explicitly and ask the user which dependency to break before proceeding.
+- **User's Step 0 answer conflicts with the state file** (e.g., state says W2 but user says "just testing") — ask which is authoritative. Default to the more conservative scope and note the discrepancy in section 2.3 (Assumptions).
