@@ -52,6 +52,16 @@ Every skill in this project follows this discipline:
    `.claude/architecture.md`, `.claude/context.md`, etc.) before generating output.
 3. On completion, append a 3–5 line entry to `.claude/progress.md`:
    timestamp, skill name, output path, key decisions, suggested next step.
+4. Read `memory.md` in this skill's folder (if it exists) **before generating output**.
+   Apply the lessons as working constraints — they override default behavior.
+5. After delivering output, if `evals.md` exists in this skill's folder:
+   Spawn a fresh grading agent (clean context). Give it the evals list and the output just produced.
+   Grading agent instruction: "Return PASS or FAIL for each criterion. For FAILs, one-line reason only. Do not add criteria."
+   Present the pass/fail table to the user. FAILs are suggestions — the user decides whether to correct.
+   Do NOT auto-apply corrections or re-run the skill.
+6. After the grading pass (or if no evals.md exists), always surface 1–3 specific enhancement
+   suggestions for this skill based on what was ambiguous, hard, or surprising during the run.
+   These are observations — the user decides whether to update evals.md, memory.md, or SKILL.md.
 
 Assume the context window resets at any moment. Anything not written to
 `.claude/` is lost. Skills must not rely on conversational memory to carry
@@ -59,6 +69,25 @@ state forward.
 
 If `.claude/progress.md` does not exist, create it with a header before
 appending the first entry.
+
+## Skill Memory Rules
+
+`memory.md` is a staging area for things not yet codified in the skill. It is not a run log.
+
+Write an entry ONLY when something is:
+- **Surprising** — you would have done it differently without this lesson
+- **Cross-run** — applies every time this skill runs, not just in this context
+- **Not already in SKILL.md or evals.md**
+
+Format: one line, shorthand. Example: `"User wants personas as job titles, not archetypes."`
+
+Hard limits:
+- Max 7 entries per skill
+- If a pattern appears in memory **twice** → promote it to SKILL.md or evals.md, then delete it from memory
+- If something is already in SKILL.md → do not put it in memory
+- Not every skill needs a memory file. Only create one when there is something worth staging.
+
+Do NOT write skill-level lessons to the global MEMORY.md.
 
 ## Project context
 
