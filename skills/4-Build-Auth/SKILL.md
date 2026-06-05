@@ -87,8 +87,28 @@ Write the code, mirroring existing patterns from `pattern-finder`.
 
 → See [firebase-auth-patterns.md](references/firebase-auth-patterns.md) for Firebase Auth, Clerk, and NextAuth adaptation patterns (for existing projects that use those providers).
 
+**Windows / tsx env setup (do this during setup, not after debugging):**
+`--env-file` is unreliable on Windows with `tsx`. Instead:
+1. `npm install dotenv`
+2. Add `import "dotenv/config"` as the very first line of the server entry point.
+
+**After adding `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.env`:** `tsx watch` does not auto-restart on `.env` changes. Tell the user to stop and restart the server.
+
+**Google Auth Platform setup (console UI as of 2025):**
+The old "OAuth consent screen" is now **Google Auth Platform** with a sidebar:
+- **Branding** — app name, logo, support email
+- **Audience** — internal vs. external; add test users here
+- **Clients** — create the OAuth client and get your credentials
+
+When creating the OAuth client, two URI fields trip people up:
+- **Authorized JavaScript origins** — domain only, no path: `http://localhost:3001`
+- **Authorized redirect URIs** — full callback path: `http://localhost:3001/api/auth/callback/google`
+
+The JavaScript origins field rejects paths — it will silently error or fail if you include one. State this explicitly before the user fills it in.
+
 ### Step 6: Verify end-to-end
 
+- **Health check first:** Before testing the OAuth flow, hit `/api/health` (or equivalent) and confirm `google_oauth: true` and `database: true` are both present. This catches a misconfigured env before a confusing OAuth round-trip.
 - Sign up with a new account → check DB (`users` table in your Neon DB) for the new user record
 - Sign in with same credentials
 - Visit a protected page → confirm access
