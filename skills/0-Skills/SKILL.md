@@ -1,10 +1,10 @@
 ---
-name: skills
+name: 0-Skills
 description: Use to discover what skills are available and which ones make sense right now. Lists all skills grouped by PDLC phase, calls project-state-detector to highlight on-mode skills, and shows one-line descriptions. Read-only.
 when_to_use: "User says 'what skills are available', 'what can I run', 'show me all commands', 'what slash commands exist', 'what can I do'."
 ---
 
-# /skills
+# /0-Skills
 
 Discover what's available without memorizing slash commands.
 
@@ -35,57 +35,57 @@ Format:
 CURRENT MODE: <mode> — recommended next: /<skill>
 
 ── SETUP & ORIENTATION ────────────────────────────────
-  /start      Initialize a new project and capture context
-  /resume     Recover session state at the start of a new chat ★ ON-MODE
-  /next       State-aware dashboard: where am I, what's next?
-  /skills     This command — discover available skills
+  /0-Start      Initialize a new project and capture context
+  /0-Resume     Recover session state at the start of a new chat ★ ON-MODE
+  /0-Next       State-aware dashboard: where am I, what's next?
+  /0-Skills     This command — discover available skills
 
 ── DISCOVER (Phase 1) ─────────────────────────────────
-  /discover   Surface a real problem before writing a PRD
+  /1-Discover   Surface a real problem before writing a PRD
 
 ── DEFINE (Phase 2) ───────────────────────────────────
-  /prd        Synthesize a PRD from current context
-  /plan       Turn a PRD into vertical implementation slices
-  /measure    Define success metrics and telemetry plan
-  /refactor   Find or plan a refactor with safe tiny commits
-  /glossary   Extract domain terminology into .claude/glossary.md
+  /2-Define-PRD        Synthesize a PRD from current context
+  /2-Define-Plan       Turn a PRD into vertical implementation slices
+  /2-Define-Measurement    Define success metrics and telemetry plan
+  /2-Define-Refactor   Find or plan a refactor with safe tiny commits
+  /2-Define-Glossary   Extract domain terminology into .claude/2-Define-Glossary.md
   /grill-me   Stress-test a plan with relentless questions
 
 ── DESIGN (Phase 3) ───────────────────────────────────
-  /architect  Make architecture decisions explicit before building ★ ON-MODE
-  /prototype  Generate 3 clickable HTML UI variants to compare
+  /3-Architect  Make architecture decisions explicit before building ★ ON-MODE
+  /3-Design-Prototype  Generate 3 clickable HTML UI variants to compare
 
 ── BUILD (Phase 4) ────────────────────────────────────
-  /build-feature    Implement a feature in TDD layers
-  /code-map         Map an unfamiliar area of the codebase
-  /setup-project    Scaffold a new project from scratch
-  /setup-database   Wire a DB, add tables, run migrations
-  /add-auth         Add or extend authentication
-  /add-payment      Add or extend payments (Stripe)
-  /add-files        Add file uploads and storage
-  /add-monitoring   Wire Sentry and PostHog
-  /add-ai           Add Claude / LLM capabilities
-  /add-email        Add transactional email
-  /setup-ci         Wire GitHub Actions CI
-  /setup-tests      Add a test framework and first tests
-  /migrate-from-vibe  Move a vibe-coded app to a real stack
+  /4-Build-Feature    Implement a feature in TDD layers
+  /4-Build-Code-Map         Map an unfamiliar area of the codebase
+  /0-Setup-Project    Scaffold a new project from scratch
+  /4-Build-Database   Wire a DB, add tables, run migrations
+  /4-Build-Auth         Add or extend authentication
+  /4-Build-Payments      Add or extend payments (Stripe)
+  /4-Build-File-Storage        Add file uploads and storage
+  /4-Build-Monitoring   Wire Sentry and PostHog
+  /4-Build-AI           Add Claude / LLM capabilities
+  /4-Build-Email        Add transactional email
+  /4-Build-CI         Wire GitHub Actions CI
+  /4-Build-Tests      Add a test framework and first tests
+  /4-Build-Migrate-From-Vibe  Move a vibe-coded app to a real stack
 
 ── VALIDATE (Phase 5) ─────────────────────────────────
-  /check-production   Pre-launch production-readiness audit
-  /triage             Investigate and document a bug
-  /uat                Run a structured user acceptance test
-  /accessibility      WCAG 2.1 AA audit
+  /5-Validate-Production-Readiness   Pre-launch production-readiness audit
+  /5-Validate-Triage             Investigate and document a bug
+  /5-Validate-UAT                Run a structured user acceptance test
+  /5-Validate-Accessibility      WCAG 2.1 AA audit
 
 ── DEPLOY (Phase 6) ───────────────────────────────────
-  /deploy         Deploy to production end-to-end
-  /feature-flag   Wire feature flags for staged rollout
-  /rollback       Generate a rollback plan
-  /runbook        Generate an operational runbook
-  /handoff        Package PRD + plan for external stakeholders
+  /6-Deploy         Deploy to production end-to-end
+  /6-Deploy-Feature-Flag   Wire feature flags for staged rollout
+  /6-Deploy-Rollback       Generate a rollback plan
+  /6-Deploy-Runbook        Generate an operational runbook
+  /6-Handoff        Package PRD + plan for external stakeholders
 
 ── LEARN (Phase 7) ────────────────────────────────────
-  /post-launch-review  Close the learn loop 2–4 weeks after launch
-  /postmortem          Blameless postmortem after an incident
+  /7-Learn-Post-Launch-Review  Close the learn loop 2–4 weeks after launch
+  /7-Learn-Postmortem          Blameless postmortem after an incident
 
 ★ = highlighted as on-mode for current project state
 ```

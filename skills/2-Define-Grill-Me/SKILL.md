@@ -1,10 +1,10 @@
 ﻿---
-name: grill-me
+name: 2-Define-Grill-Me
 description: Use when the user wants their plan or design stress-tested with relentless questions. Walks the decision tree one question at a time until shared understanding is reached.
 when_to_use: "User says 'grill me', 'stress-test this plan', 'challenge my design', 'poke holes in this', 'ask me hard questions'."
 ---
 
-# /grill-me
+# /2-Define-Grill-Me
 
 Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 

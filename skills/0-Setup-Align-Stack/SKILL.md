@@ -1,10 +1,10 @@
 ---
-name: align-stack
+name: 0-Setup-Align-Stack
 description: MUST BE USED when the user wants to migrate an existing project's integrations to their preferred stack — Neon Postgres + Drizzle, Neon Auth via Better Auth, Stripe, AWS S3 + CloudFront, Sentry, PostHog, Vercel AI SDK, Zod, and Vercel. Detects what's currently wired, shows a gap table (current vs. target), sequences migrations by risk, gets explicit approval per layer, then executes one wave per layer with one commit each. Never migrates live auth or active subscriptions without a documented migration plan.
 when_to_use: "User says 'migrate to my preferred stack', 'convert to Neon', 'switch from Supabase', 'replace Clerk', 'off Firebase Auth', 'switch to Better Auth', 'replace Prisma with Drizzle'."
 ---
 
-# /align-stack
+# /0-Setup-Align-Stack
 
 You migrate an existing project's integrations to the user's preferred stack — deliberately and layer-by-layer. You detect what's currently wired, build a gap table, get the user's approval on each wave, then execute with one commit per wave. You never silently swap integrations that affect live data (user accounts, active subscriptions) — those always require an explicit migration plan.
 
@@ -32,14 +32,14 @@ This skill is the intentional counterpart to `_adaptation-playbook.md`'s "existi
 
 - Project uses a different stack (Supabase, Firebase, Prisma, Clerk, PlanetScale, etc.) and the user explicitly wants to standardize on their preferred stack
 - User is adopting a client project or fork and wants to bring it to their stack
-- Project came off `/migrate-from-vibe` with old integrations still wired; user now wants to convert them
+- Project came off `/4-Build-Migrate-From-Vibe` with old integrations still wired; user now wants to convert them
 - User is doing a deliberate tech stack modernization pass
 
 ## When NOT to Use
 
-- Just adding a missing integration → use `/add-auth`, `/add-database`, `/add-payment`, etc.
-- Rehabilitating vibe-coded mess without a specific stack migration goal → use `/unvibe` first
-- Brand-new project with no integrations → use `/setup-project`
+- Just adding a missing integration → use `/4-Build-Auth`, `/add-database`, `/4-Build-Payments`, etc.
+- Rehabilitating vibe-coded mess without a specific stack migration goal → use `/0-Setup-Unvibe` first
+- Brand-new project with no integrations → use `/0-Setup-Project`
 - User explicitly says "keep the existing stack" — this skill is opt-in migration only
 
 ## Preferred Stack (migration target)
@@ -70,7 +70,7 @@ Run in parallel:
 
 If `codebase-classifier` returns `vibe-coded`, surface a warning:
 
-> This codebase is vibe-coded. Consider running `/unvibe` first — migrating integrations on top of messy code doubles the risk. Want to run `/unvibe` first, or proceed with `/align-stack` anyway?
+> This codebase is vibe-coded. Consider running `/0-Setup-Unvibe` first — migrating integrations on top of messy code doubles the risk. Want to run `/0-Setup-Unvibe` first, or proceed with `/0-Setup-Align-Stack` anyway?
 
 Otherwise continue.
 
@@ -112,7 +112,7 @@ Present approved layers in this risk-ascending order:
 8. **Auth** — high risk if real users exist (hard stop)
 9. **Payments** — highest risk if active subscriptions exist (hard stop)
 
-Write `.claude/align-stack-plan.md`:
+Write `.claude/0-Setup-Align-Stack-plan.md`:
 
 ```markdown
 # Align Stack Plan — <project-name> — <date>
@@ -132,7 +132,7 @@ Write `.claude/align-stack-plan.md`:
 ```
 
 Say to the user:
-> Plan written to `.claude/align-stack-plan.md`. I'll walk through it wave-by-wave; you approve each before I touch anything. Ready for Wave 1 (<layer>)?
+> Plan written to `.claude/0-Setup-Align-Stack-plan.md`. I'll walk through it wave-by-wave; you approve each before I touch anything. Ready for Wave 1 (<layer>)?
 
 ### Step 4 onwards: Execute each wave
 
@@ -145,7 +145,7 @@ For every approved wave:
 5. Update `.env.example` with new vars; comment out old ones
 6. Run `npm run build && npm test` (or project equivalent)
 7. Commit: `"align-stack: <layer> → <target>"`
-8. Update `.claude/align-stack-plan.md` checkboxes
+8. Update `.claude/0-Setup-Align-Stack-plan.md` checkboxes
 
 ---
 
@@ -168,7 +168,7 @@ For every approved wave:
 4. Wire model: `import { anthropic } from '@ai-sdk/anthropic'` (keep the same API key env var)
 5. Commit: `"align-stack: [old AI SDK] → Vercel AI SDK"`
 
-→ For complex AI integrations run `/add-ai` for the full guided setup.
+→ For complex AI integrations run `/4-Build-AI` for the full guided setup.
 
 ### Monitoring: Any → Sentry + PostHog
 
@@ -306,15 +306,15 @@ After all approved waves complete:
 > - Commits: <count>
 >
 > Recommended next:
-> - `/check-production` — full audit now that the stack is new
-> - `/next` — see current project state
-> - For deferred layers, rerun `/align-stack` when ready
+> - `/5-Validate-Production-Readiness` — full audit now that the stack is new
+> - `/0-Next` — see current project state
+> - For deferred layers, rerun `/0-Setup-Align-Stack` when ready
 
 ---
 
 ## Rules
 
-- **Read-only until Step 4.** Steps 1–3 write only to `.claude/align-stack-plan.md`.
+- **Read-only until Step 4.** Steps 1–3 write only to `.claude/0-Setup-Align-Stack-plan.md`.
 - **One wave per layer, one commit per wave.** Never bundle two layers in one commit.
 - **Verify after every wave.** `npm run build` must pass; blocked build = blocked wave.
 - **Auth hard stop if real users exist.** No exceptions.

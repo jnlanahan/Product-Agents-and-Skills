@@ -1,10 +1,10 @@
 ﻿---
-name: check-production
-when_to_use: "User says 'is this ready for production', 'audit before launch', 'pre-deploy check', 'production checklist', or types /check-production."
-description: MUST BE USED before a production launch or after a big change to the critical path. Runs a deep production-readiness audit and returns a severity-graded report (Critical/High/Medium/Low) with file:line citations and a recommended fix order. Add `--lite` for a fast 30-second sanity check that skips the full auditor. Trigger on `/check-production`, "is this ready for production", "audit before launch", or any pre-deploy review request.
+name: 5-Validate-Production-Readiness
+when_to_use: "User says 'is this ready for production', 'audit before launch', 'pre-deploy check', 'production checklist', or types /5-Validate-Production-Readiness."
+description: MUST BE USED before a production launch or after a big change to the critical path. Runs a deep production-readiness audit and returns a severity-graded report (Critical/High/Medium/Low) with file:line citations and a recommended fix order. Add `--lite` for a fast 30-second sanity check that skips the full auditor. Trigger on `/5-Validate-Production-Readiness`, "is this ready for production", "audit before launch", or any pre-deploy review request.
 ---
 
-# /check-production
+# /5-Validate-Production-Readiness
 
 You orchestrate a deep production-readiness audit. The actual audit work is delegated to the `prod-readiness-auditor` agent; this skill assembles the inputs, runs supporting scans in parallel, and presents the result with a clear "what to fix in what order" recommendation.
 
@@ -29,12 +29,12 @@ You orchestrate a deep production-readiness audit. The actual audit work is dele
 - Before going live with a new app
 - After a major refactor or new integration
 - Periodic check (quarterly) on a production app
-- After running `/next-steps` and the user wants to drill down on Stage-4 hardening
+- After running `/0-Next-steps` and the user wants to drill down on Stage-4 hardening
 - `--lite` flag: quick pre-deploy sanity check for hotfixes (W6) or personal tools (W8)
 
 ## `--lite` Mode (fast sanity check)
 
-When invoked as `/check-production --lite`, skip the full auditor and run a quick pass instead:
+When invoked as `/5-Validate-Production-Readiness --lite`, skip the full auditor and run a quick pass instead:
 
 1. Run `secret-scanner` only (fastest, highest-signal scan)
 2. Run `stack-detector` to confirm the expected stack is in place
@@ -108,5 +108,5 @@ If no: save the report to `PRODUCTION_AUDIT_<date>.md` in the project root and e
 ## If Something Goes Wrong
 
 - **prod-readiness-auditor times out** — run `--lite` mode for a quick scan and follow up with a full audit on a targeted area; do not skip the audit entirely.
-- **Critical finding is disputed** — document the disagreement in `.claude/next-steps.md` with the justification for overriding; do not silently mark it resolved without evidence.
+- **Critical finding is disputed** — document the disagreement in `.claude/0-Next-steps.md` with the justification for overriding; do not silently mark it resolved without evidence.
 - **Audit finds no Critical items but the app feels fragile** — run `secret-scanner` and `dependency-currency-checker` separately; the auditor may have incomplete coverage for the specific stack.

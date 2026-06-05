@@ -1,10 +1,10 @@
 ﻿---
-name: feature-flag
-when_to_use: "User says 'add feature flag', 'gate this feature', 'staged rollout', 'kill switch', 'progressive rollout', 'dark launch', or types /feature-flag."
-description: MUST BE USED when wiring feature flags to gate a new feature for staged rollout, A/B testing, or kill-switch control. Uses PostHog feature flags (stack preference) or extends detected flag tooling. Generates flag-guarded code and a staged rollout plan. Trigger on `/feature-flag`, "add feature flag", "gate this feature", "staged rollout", "kill switch", "progressive rollout", "dark launch".
+name: 6-Deploy-Feature-Flag
+when_to_use: "User says 'add feature flag', 'gate this feature', 'staged rollout', 'kill switch', 'progressive rollout', 'dark launch', or types /6-Deploy-Feature-Flag."
+description: MUST BE USED when wiring feature flags to gate a new feature for staged rollout, A/B testing, or kill-switch control. Uses PostHog feature flags (stack preference) or extends detected flag tooling. Generates flag-guarded code and a staged rollout plan. Trigger on `/6-Deploy-Feature-Flag`, "add feature flag", "gate this feature", "staged rollout", "kill switch", "progressive rollout", "dark launch".
 ---
 
-# /feature-flag
+# /6-Deploy-Feature-Flag
 
 You wire feature flags to control feature visibility — for staged rollouts, A/B tests, or kill switches.
 

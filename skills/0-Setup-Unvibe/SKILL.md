@@ -1,15 +1,15 @@
 ---
-name: unvibe
+name: 0-Setup-Unvibe
 description: MUST BE USED when the user wants to rehabilitate a vibe-coded project — strip platform artifacts, remove dead code, consolidate duplicates, converge competing patterns, and harden into a maintainable codebase. Orchestrates a full assess → plan → approve → execute → verify loop using the four detector agents plus the existing stack/classifier/pattern/secret/dependency agents. Read-only first; nothing is changed without explicit user approval per wave.
 when_to_use: "User says 'unvibe this', 'clean up this vibe-coded project', 'refactor the Replit/Lovable/v0/Bolt mess', 'clean up generated code'."
 disable-model-invocation: true
 ---
 
-# /unvibe
+# /0-Setup-Unvibe
 
 You take a vibe-coded project — output from Replit, Lovable, v0, Bolt, Cursor, Windsurf, or pasted ChatGPT/Claude code — and convert it into a maintainable codebase. You assess everything first, produce a plan the user approves, then execute the plan in disciplined waves with one commit per wave. You never modify files without explicit approval.
 
-This skill is the rehabilitation counterpart to `/migrate-from-vibe`. That skill *moves* a project off a vibe platform onto a real stack and explicitly leaves inconsistencies as out-of-scope. `/unvibe` *fixes those inconsistencies*. Run `/migrate-from-vibe` first if the project is still platform-locked.
+This skill is the rehabilitation counterpart to `/4-Build-Migrate-From-Vibe`. That skill *moves* a project off a vibe platform onto a real stack and explicitly leaves inconsistencies as out-of-scope. `/0-Setup-Unvibe` *fixes those inconsistencies*. Run `/4-Build-Migrate-From-Vibe` first if the project is still platform-locked.
 
 ## Pre-flight
 
@@ -34,15 +34,15 @@ This skill is the rehabilitation counterpart to `/migrate-from-vibe`. That skill
 - Project came off Replit / Lovable / v0 / Bolt and has the leftovers (or was pasted from ChatGPT/Claude and never harmonized)
 - `codebase-classifier` returns `vibe-coded`
 - User says "this project is a mess," "clean this up," "refactor the AI-generated code," or similar
-- Just after `/migrate-from-vibe` succeeded and the user wants to address the `OUT_OF_SCOPE.md` items
+- Just after `/4-Build-Migrate-From-Vibe` succeeded and the user wants to address the `OUT_OF_SCOPE.md` items
 
 ## When NOT to Use
 
-- Project is `greenfield` → run `/setup-project`
-- Project is `wired` → use `/refactor` for specific cleanup, `/check-production` for audit
-- Project is still platform-locked (running on Replit's hosting, referencing `process.env.REPLIT_*`) → run `/migrate-from-vibe` first
-- One specific bug → use `/triage`
-- Just adding a feature → use `/build-feature`
+- Project is `greenfield` → run `/0-Setup-Project`
+- Project is `wired` → use `/2-Define-Refactor` for specific cleanup, `/5-Validate-Production-Readiness` for audit
+- Project is still platform-locked (running on Replit's hosting, referencing `process.env.REPLIT_*`) → run `/4-Build-Migrate-From-Vibe` first
+- One specific bug → use `/5-Validate-Triage`
+- Just adding a feature → use `/4-Build-Feature`
 
 ## Procedure
 
@@ -56,9 +56,9 @@ Run in parallel:
 
 If `codebase-classifier` returns `greenfield` or `wired`, stop and reroute:
 
-> This codebase classifies as `<wired|greenfield>`. `/unvibe` is for vibe-coded codebases. Recommended:
-> - `wired` → use `/refactor` for targeted cleanup, or `/check-production` for an audit
-> - `greenfield` → use `/setup-project`
+> This codebase classifies as `<wired|greenfield>`. `/0-Setup-Unvibe` is for vibe-coded codebases. Recommended:
+> - `wired` → use `/2-Define-Refactor` for targeted cleanup, or `/5-Validate-Production-Readiness` for an audit
+> - `greenfield` → use `/0-Setup-Project`
 
 Otherwise continue.
 
@@ -77,7 +77,7 @@ Collect all six reports. Do not summarize to the user yet — go straight to Ste
 
 ### Step 3: Synthesize the plan
 
-Write `.claude/unvibe-plan.md` with this structure:
+Write `.claude/0-Setup-Unvibe-plan.md` with this structure:
 
 ```markdown
 # Unvibe Plan — <project-name> — <date>
@@ -120,10 +120,10 @@ Write `.claude/unvibe-plan.md` with this structure:
 - [ ] Move hardcoded URLs/emails to env vars
 - [ ] Rotate any committed secrets and remove from git history
 - [ ] Add `.env.example` if missing
-- [ ] Run `/setup-tests` if no test framework
-- [ ] Run `/setup-ci` if no CI
+- [ ] Run `/4-Build-Tests` if no test framework
+- [ ] Run `/4-Build-CI` if no CI
 - Estimated effort: medium
-- Verification: `/check-production --lite` passes
+- Verification: `/5-Validate-Production-Readiness --lite` passes
 
 ## Out of scope for this run
 - <items the user explicitly defers>
@@ -135,7 +135,7 @@ Write `.claude/unvibe-plan.md` with this structure:
 
 Show the user a one-screen summary of the plan, then say:
 
-> Plan written to `.claude/unvibe-plan.md`. I'll walk through it wave-by-wave. You approve each list before I touch anything. Ready for Wave 1?
+> Plan written to `.claude/0-Setup-Unvibe-plan.md`. I'll walk through it wave-by-wave. You approve each list before I touch anything. Ready for Wave 1?
 
 ### Step 4: Wave 1 — Clean
 
@@ -146,7 +146,7 @@ Show the user the **exact list of files to delete and dependencies to uninstall*
 - **Scratch/backup files**: `*.bak`, `*.old`, `untitled.*`, `scratch.*`
 - **Orphaned dependencies**: `npm uninstall <list>`
 
-Ask the user to confirm or strike specific items. For each struck item, add a line to the `.claude/unvibe-plan.md` "Out of scope" section explaining why it was kept.
+Ask the user to confirm or strike specific items. For each struck item, add a line to the `.claude/0-Setup-Unvibe-plan.md` "Out of scope" section explaining why it was kept.
 
 After approval:
 
@@ -211,11 +211,11 @@ Production basics. Run these in order, each as its own commit:
    - Surface git-filter-repo / BFG instructions for purging from history (do NOT run these unattended — the user must run them)
    - Commit: "unvibe wave 4: remove committed .env (rotation required — see notes)"
 
-4. **Stale dependencies.** Use the `dependency-currency-checker` report. Update major versions one at a time only if user explicitly approves — otherwise note in the plan as out-of-scope (this is `/check-production` territory).
+4. **Stale dependencies.** Use the `dependency-currency-checker` report. Update major versions one at a time only if user explicitly approves — otherwise note in the plan as out-of-scope (this is `/5-Validate-Production-Readiness` territory).
 
 5. **Missing fundamentals:**
-   - If no test framework → recommend `/setup-tests` as a follow-up (do not auto-install)
-   - If no CI → recommend `/setup-ci` as a follow-up
+   - If no test framework → recommend `/4-Build-Tests` as a follow-up (do not auto-install)
+   - If no CI → recommend `/4-Build-CI` as a follow-up
    - If no `CLAUDE.md` → generate a minimal one referencing this library
 
 ### Step 8: Verify end-to-end
@@ -223,12 +223,12 @@ Production basics. Run these in order, each as its own commit:
 After all waves:
 
 - [ ] `npm run build` passes
-- [ ] `npm test` passes (or "no tests yet — recommend /setup-tests")
+- [ ] `npm test` passes (or "no tests yet — recommend /4-Build-Tests")
 - [ ] `npm run dev` boots and the app renders
 - [ ] Manual smoke test of 2-3 critical user flows (user signs in, key feature works)
-- [ ] Optionally: run `/check-production --lite` for a quick re-scan
+- [ ] Optionally: run `/5-Validate-Production-Readiness --lite` for a quick re-scan
 
-Update `.claude/unvibe-plan.md` "Decisions log" with what was actually done per wave.
+Update `.claude/0-Setup-Unvibe-plan.md` "Decisions log" with what was actually done per wave.
 
 ### Step 9: Hand off
 
@@ -237,13 +237,13 @@ Update `.claude/unvibe-plan.md` "Decisions log" with what was actually done per 
 > - Wave 2 consolidated <N> duplicate clusters
 > - Wave 3 resolved <N> architectural drifts
 > - Wave 4 hardened <N> production-readiness issues
-> - <N> items deferred to `.claude/unvibe-plan.md` "Out of scope"
+> - <N> items deferred to `.claude/0-Setup-Unvibe-plan.md` "Out of scope"
 >
 > Recommended next:
-> - `/next` to see the current project state
-> - `/check-production` for a full audit before deploy
-> - For each "out of scope" item, run the matching skill (`/refactor`, `/triage`, `/add-tests`, etc.)
-> - `/deploy` when ready
+> - `/0-Next` to see the current project state
+> - `/5-Validate-Production-Readiness` for a full audit before deploy
+> - For each "out of scope" item, run the matching skill (`/2-Define-Refactor`, `/5-Validate-Triage`, `/add-tests`, etc.)
+> - `/6-Deploy` when ready
 
 ## Rules
 
@@ -251,7 +251,7 @@ Update `.claude/unvibe-plan.md` "Decisions log" with what was actually done per 
 - **One commit per wave.** Always. Even if a wave is small.
 - **Verify after every wave.** Don't proceed if `npm run build` is broken.
 - **Surface ambiguity.** When the right answer requires user judgment (which `formatDate` is correct, which auth flow to keep), ask. Don't pick.
-- **Don't migrate integrations.** Same auth provider, same DB, same payments. Even if `_stack-preferences.md` lists different defaults. Migrations are out-of-scope; `/add-auth`, `/add-payment`, etc., handle those if the user wants them later.
+- **Don't migrate integrations.** Same auth provider, same DB, same payments. Even if `_stack-preferences.md` lists different defaults. Migrations are out-of-scope; `/4-Build-Auth`, `/4-Build-Payments`, etc., handle those if the user wants them later.
 - **Never run destructive git operations unattended.** `git filter-repo`, BFG, `git push --force` — provide the command, let the user run it.
 - **Truncate any value that looks like a secret in your output to the user.** First 8 chars + `***`.
 - **Don't auto-rewrite half-implemented features as "complete."** The original author may have meant to ship that feature; ask before deleting OR completing.
@@ -268,6 +268,6 @@ Update `.claude/unvibe-plan.md` "Decisions log" with what was actually done per 
 ## Notes for the calling agent
 
 - This skill expects to take multiple sessions for non-trivial codebases. Each wave is a natural stopping point.
-- Always write `.claude/unvibe-plan.md` even for small runs — it's the audit trail of what changed and why.
+- Always write `.claude/0-Setup-Unvibe-plan.md` even for small runs — it's the audit trail of what changed and why.
 - If a wave finds something out-of-scope (e.g., the codebase needs a full re-architecture), surface it clearly and recommend a different skill rather than forcing the rehabilitation.
-- Run `/next` if the user asks "what's the next skill to run" — don't try to be the next skill yourself.
+- Run `/0-Next` if the user asks "what's the next skill to run" — don't try to be the next skill yourself.

@@ -62,6 +62,12 @@ Every skill in this project follows this discipline:
 6. After the grading pass (or if no evals.md exists), always surface 1–3 specific enhancement
    suggestions for this skill based on what was ambiguous, hard, or surprising during the run.
    These are observations — the user decides whether to update evals.md, memory.md, or SKILL.md.
+7. Always end with a paste-ready skill update prompt the user can bring to this repo:
+
+   > **To improve this skill:** paste the following into Claude Code (Product-Agents-and-Skills repo):
+   > "Update /[skill-name]: [what was unexpected or unnecessary this run — be specific]. Suggested change: [one concrete fix]. Memory candidate: '[one-line lesson]'" (omit memory line if nothing new surfaced)
+
+   Generate from actual run context. 2–3 sentences max. Do not emit a generic template.
 
 Assume the context window resets at any moment. Anything not written to
 `.claude/` is lost. Skills must not rely on conversational memory to carry
@@ -72,20 +78,16 @@ appending the first entry.
 
 ## Skill Memory Rules
 
-`memory.md` is a staging area for things not yet codified in the skill. It is not a run log.
+`memory.md` is a staging area, not a run log.
 
-Write an entry ONLY when something is:
-- **Surprising** — you would have done it differently without this lesson
-- **Cross-run** — applies every time this skill runs, not just in this context
-- **Not already in SKILL.md or evals.md**
+Write an entry when the skill assumed something that wasn't true for this run — it prompted for something the user already had, over-explained something they didn't need, or missed a step that mattered.
 
-Format: one line, shorthand. Example: `"User wants personas as job titles, not archetypes."`
+Format: one line, shorthand. Example: `"User already had migrations configured — skip the setup walkthrough."`
 
 Hard limits:
 - Max 7 entries per skill
 - If a pattern appears in memory **twice** → promote it to SKILL.md or evals.md, then delete it from memory
 - If something is already in SKILL.md → do not put it in memory
-- Not every skill needs a memory file. Only create one when there is something worth staging.
 
 Do NOT write skill-level lessons to the global MEMORY.md.
 

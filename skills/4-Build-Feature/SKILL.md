@@ -1,12 +1,12 @@
 ﻿---
-name: build-feature
-description: MUST BE USED to implement a new feature in coherent TDD layers (schema → storage → routes → hooks → components). Reads `.claude/plan.md` if it exists; otherwise interviews the user. Adapts to the project's actual layering, mirrors existing patterns, and ships one commit per layer with tests at each layer.
+name: 4-Build-Feature
+description: MUST BE USED to implement a new feature in coherent TDD layers (schema → storage → routes → hooks → components). Reads `.claude/2-Define-Plan.md` if it exists; otherwise interviews the user. Adapts to the project's actual layering, mirrors existing patterns, and ships one commit per layer with tests at each layer.
 when_to_use: "User says 'build this feature', 'implement this', 'let's start coding', 'execute the plan', 'start building'."
 ---
 
-# /build-feature
+# /4-Build-Feature
 
-You plan and implement a feature in coherent layers, with tests at each layer. Adapts to whatever architecture the project has. If `.claude/plan.md` exists, execute against it. Otherwise interview the user briefly, then proceed.
+You plan and implement a feature in coherent layers, with tests at each layer. Adapts to whatever architecture the project has. If `.claude/2-Define-Plan.md` exists, execute against it. Otherwise interview the user briefly, then proceed.
 
 ## Pre-flight
 
@@ -21,7 +21,7 @@ You plan and implement a feature in coherent layers, with tests at each layer. A
 ## Important
 
 - Run `pattern-finder` before writing any new file — match the project's naming, import, and error-handling conventions exactly.
-- If `.claude/plan.md` exists, execute against it; do not re-plan unless the user explicitly asks for a scope change.
+- If `.claude/2-Define-Plan.md` exists, execute against it; do not re-plan unless the user explicitly asks for a scope change.
 - Ship one commit per layer; do not bundle schema + routes + components into a single commit.
 
 ## When to Use
@@ -33,8 +33,8 @@ You plan and implement a feature in coherent layers, with tests at each layer. A
 
 - One-line bug fixes → just fix them
 - Pure UI tweaks (color, copy, layout) → just edit
-- Refactors that don't change behavior → use `/refactor`
-- Bugs requiring investigation → use `/triage`
+- Refactors that don't change behavior → use `/2-Define-Refactor`
+- Bugs requiring investigation → use `/5-Validate-Triage`
 
 ## Procedure
 
@@ -45,11 +45,11 @@ In parallel:
 - `codebase-classifier` — wired vs vibe-coded affects how strictly you mirror patterns
 - `pattern-finder` — "Find a recent feature that's representative of this project's layering. Trace it through schema → storage/db → API route → client hook → component."
 
-Also: read `.claude/plan.md` if it exists. If yes, the slices and TDD strategy are pre-decided — skip Step 2 and execute slice-by-slice.
+Also: read `.claude/2-Define-Plan.md` if it exists. If yes, the slices and TDD strategy are pre-decided — skip Step 2 and execute slice-by-slice.
 
 ### Step 2: Understand the feature (only if no plan exists)
 
-If no `.claude/plan.md`, ask the user enough to plan. Don't guess. Required:
+If no `.claude/2-Define-Plan.md`, ask the user enough to plan. Don't guess. Required:
 
 - **What**: one-sentence description
 - **Who**: which users see it (all, paid, admin, owner-only)
@@ -58,7 +58,7 @@ If no `.claude/plan.md`, ask the user enough to plan. Don't guess. Required:
 - **Permissions**: who can read, who can write
 - **Side effects**: any emails, webhooks, third-party calls, AI calls
 
-If the feature is non-trivial, recommend the user run `/prd` then `/plan` first, and offer to do that instead.
+If the feature is non-trivial, recommend the user run `/2-Define-PRD` then `/2-Define-Plan` first, and offer to do that instead.
 
 ### Step 3: Write the layered plan
 
@@ -109,8 +109,8 @@ Manually exercise the full feature:
 
 After all slices are done and end-to-end verification passes:
 
-1. Ask the user to run `/check-production --lite` against the branch. This invokes `prod-readiness-auditor` (a separate agent with no memory of the build context) to flag anything the implementation missed.
-2. If a `.claude/plan.md` Validation Contract exists, walk through each contract assertion row-by-row with the user — do not read the implementation to justify failures; just check if each observable outcome is true.
+1. Ask the user to run `/5-Validate-Production-Readiness --lite` against the branch. This invokes `prod-readiness-auditor` (a separate agent with no memory of the build context) to flag anything the implementation missed.
+2. If a `.claude/2-Define-Plan.md` Validation Contract exists, walk through each contract assertion row-by-row with the user — do not read the implementation to justify failures; just check if each observable outcome is true.
 3. Only declare the feature complete when the contract passes and `--lite` shows no Critical or High findings related to the new feature.
 
 This step exists because the implementing agent has success bias — a fresh agent or the user running the validation contract catches errors the implementer explains away.
@@ -164,4 +164,4 @@ For vibe-coded projects, `pattern-finder` may report inconsistencies. Strategy:
 - **pattern-finder finds no matching pattern** — the feature type may be novel for this codebase; ask the user to point to the closest existing file to use as a reference.
 - **Tests fail after implementation** — run tests in isolation before running the full suite; a failing setup file or shared mock state causes false failures across tests.
 - **Build errors after adding new layer** — confirm all imports are correct and types match; do not proceed to the next layer until the current layer compiles cleanly.
-- **`.claude/plan.md` scope is incorrect** — stop and run `/plan` again with the corrected scope rather than adapting mid-implementation; diverging from the plan compounds errors.
+- **`.claude/2-Define-Plan.md` scope is incorrect** — stop and run `/2-Define-Plan` again with the corrected scope rather than adapting mid-implementation; diverging from the plan compounds errors.

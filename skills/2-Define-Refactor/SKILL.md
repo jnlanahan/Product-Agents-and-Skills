@@ -1,10 +1,10 @@
 ﻿---
-name: refactor
-description: MUST BE USED when the user wants to refactor code — either to find opportunities ("where's our shallow code?") or to plan a known refactor with safe, tiny commits. Combines opportunity-scanning and plan-and-execute modes. Includes Claude-Code-specific refactoring best practices. Writes the plan to `.claude/refactor-plan.md`.
+name: 2-Define-Refactor
+description: MUST BE USED when the user wants to refactor code — either to find opportunities ("where's our shallow code?") or to plan a known refactor with safe, tiny commits. Combines opportunity-scanning and plan-and-execute modes. Includes Claude-Code-specific refactoring best practices. Writes the plan to `.claude/2-Define-Refactor-plan.md`.
 when_to_use: "User says 'refactor this', 'clean up the code', 'find shallow code', 'improve code quality', 'restructure this'."
 ---
 
-# /refactor
+# /2-Define-Refactor
 
 Two entry modes — pick based on user intent:
 
@@ -26,7 +26,7 @@ Two entry modes — pick based on user intent:
 - For Plan mode: scope the refactor target before starting — open-ended refactors balloon quickly.
 - Run on a clean working tree; commit or stash existing changes first so the refactor diff is unambiguous.
 
-Output: `.claude/refactor-plan.md` (the chosen candidate's full plan). Recommend the user commit it.
+Output: `.claude/2-Define-Refactor-plan.md` (the chosen candidate's full plan). Recommend the user commit it.
 
 ## Glossary (use these terms exactly)
 
@@ -55,7 +55,7 @@ Key principles:
 
 Read existing documentation first:
 
-- `.claude/glossary.md` (or any `UBIQUITOUS_LANGUAGE.md` / `CONTEXT.md` in older repos) — domain terms
+- `.claude/2-Define-Glossary.md` (or any `UBIQUITOUS_LANGUAGE.md` / `CONTEXT.md` in older repos) — domain terms
 - Any `docs/adr/` directory — decisions you should not re-litigate
 
 If those don't exist, proceed silently. Don't flag absence.
@@ -109,7 +109,7 @@ Walk the design tree with them — constraints, dependencies, the shape of the d
 
 Side effects happen inline:
 
-- **Naming a deepened module after a concept not in the glossary?** Add the term (call `/glossary` or update inline).
+- **Naming a deepened module after a concept not in the glossary?** Add the term (call `/2-Define-Glossary` or update inline).
 - **User rejects a candidate with a load-bearing reason?** Offer an ADR — only when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing.
 
 ### 5. Hammer the scope
@@ -128,7 +128,7 @@ Martin Fowler: "make each refactoring step as small as possible, so that you can
 - Change only one thing
 - Be revertible without unwinding subsequent commits
 
-### 8. Write `.claude/refactor-plan.md`
+### 8. Write `.claude/2-Define-Refactor-plan.md`
 
 ## Refactor Plan Template
 
@@ -200,7 +200,7 @@ When executing a refactor plan with Claude Code, follow these practices to keep 
 7. **When in doubt, branch and squash-merge.** A messy branch with 30 tiny commits can squash-merge cleanly to `main` with one polished message.
 8. **Stop and ask before destructive operations** — file deletions, function removals, large reorganizations. Show the planned change first.
 9. **Don't bypass hooks** (`--no-verify`) to push refactors. If a hook fails, the refactor introduced a real problem.
-10. **After the refactor lands, run `/check-production`** if the changed area is on the critical path. Refactors are where regressions sneak in.
+10. **After the refactor lands, run `/5-Validate-Production-Readiness`** if the changed area is on the critical path. Refactors are where regressions sneak in.
 
 ---
 
@@ -210,8 +210,8 @@ When executing a refactor plan with Claude Code, follow these practices to keep 
 - **Apply the deletion test** to anything that looks shallow.
 - **Hammer scope explicitly** in the plan. Out-of-scope items are a feature, not a defect.
 - **Tiny commits, working state.** Always.
-- **Write the plan to `.claude/refactor-plan.md`** — recommend the user commit it.
-- **Don't execute the refactor in this skill.** That's `/build-feature` (for feature refactors) or direct work after the plan is approved. This skill produces the plan.
+- **Write the plan to `.claude/2-Define-Refactor-plan.md`** — recommend the user commit it.
+- **Don't execute the refactor in this skill.** That's `/4-Build-Feature` (for feature refactors) or direct work after the plan is approved. This skill produces the plan.
 
 ## If Something Goes Wrong
 

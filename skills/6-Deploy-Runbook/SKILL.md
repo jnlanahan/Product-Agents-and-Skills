@@ -1,10 +1,10 @@
 ﻿---
-name: runbook
-when_to_use: "User says 'generate runbook', 'ops runbook', 'on-call handoff', 'operational documentation', 'incident response guide', or types /runbook."
-description: MUST BE USED after a successful production deploy to generate an operational runbook for on-call handoff. Reads codebase, deploy config, and monitoring setup to produce a reference doc covering health checks, env vars, startup/shutdown, common failure modes and their fixes, alert response, and rollback steps. Trigger on `/runbook`, "generate runbook", "ops runbook", "on-call handoff", "operational documentation", "incident response guide".
+name: 6-Deploy-Runbook
+when_to_use: "User says 'generate runbook', 'ops runbook', 'on-call handoff', 'operational documentation', 'incident response guide', or types /6-Deploy-Runbook."
+description: MUST BE USED after a successful production deploy to generate an operational runbook for on-call handoff. Reads codebase, deploy config, and monitoring setup to produce a reference doc covering health checks, env vars, startup/shutdown, common failure modes and their fixes, alert response, and rollback steps. Trigger on `/6-Deploy-Runbook`, "generate runbook", "ops runbook", "on-call handoff", "operational documentation", "incident response guide".
 ---
 
-# /runbook
+# /6-Deploy-Runbook
 
 You generate an operational runbook for the current project — the first-responder reference for anyone keeping this service healthy.
 
@@ -152,7 +152,7 @@ All of the following must be set for the service to start. Missing any will caus
 
 | Alert | Threshold | First response |
 |---|---|---|
-| Sentry: new error spike | >10 new events/min | Check Sentry — identify error type; if deploy-related → `/rollback` |
+| Sentry: new error spike | >10 new events/min | Check Sentry — identify error type; if deploy-related → `/6-Deploy-Rollback` |
 | p95 API latency > 3s | Monitor in PostHog or Sentry Performance | Check Neon slow query log; check for missing DB indexes |
 | Health check failing | Uptime monitor alerts | Check service logs; restart if unresponsive |
 | Stripe webhook failures | >3 consecutive in Stripe | Check `STRIPE_WEBHOOK_SECRET`; verify endpoint URL is correct |
@@ -170,7 +170,7 @@ All of the following must be set for the service to start. Missing any will caus
 
 ## Rollback
 
-See full procedure in [`/rollback` skill] or run `/rollback`.
+See full procedure in [`/6-Deploy-Rollback` skill] or run `/6-Deploy-Rollback`.
 
 **Quick summary** (code-only rollback):
 ```

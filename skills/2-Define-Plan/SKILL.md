@@ -1,17 +1,17 @@
 ﻿---
-name: plan
-description: MUST BE USED to turn a PRD (or current conversation context) into an executable implementation plan. Breaks work into vertical slices (tracer bullets), assigns a TDD strategy per slice, sequences commits by layer (schema → storage → routes → hooks → components), and writes the plan to `.claude/plan.md` so `/build-feature` can pick it up. Replaces GitHub-Issues-style breakdown. Do NOT use without a PRD or clear requirements — run `/prd` first so the plan has a solid requirements baseline to slice against.
+name: 2-Define-Plan
+description: MUST BE USED to turn a PRD (or current conversation context) into an executable implementation plan. Breaks work into vertical slices (tracer bullets), assigns a TDD strategy per slice, sequences commits by layer (schema → storage → routes → hooks → components), and writes the plan to `.claude/2-Define-Plan.md` so `/4-Build-Feature` can pick it up. Replaces GitHub-Issues-style breakdown. Do NOT use without a PRD or clear requirements — run `/2-Define-PRD` first so the plan has a solid requirements baseline to slice against.
 when_to_use: "User says 'create a plan', 'plan this feature', 'how should we implement this', 'break this down', 'make an implementation plan'."
 ---
 
-# /plan
+# /2-Define-Plan
 
-You turn a PRD (or current conversation context) into an executable plan that `/build-feature` can pick up. The output is `.claude/plan.md` — vertical slices, each demoable end-to-end, each with a TDD strategy.
+You turn a PRD (or current conversation context) into an executable plan that `/4-Build-Feature` can pick up. The output is `.claude/2-Define-Plan.md` — vertical slices, each demoable end-to-end, each with a TDD strategy.
 
 ## Pre-flight
 
 - Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
-- Read `.claude/workflow-state.md` if present — extract the `workflow_id` value from YAML frontmatter (e.g. `workflow_id: W2`). Store as `WORKFLOW_SCOPE` for resolution in Step 0.
+- Read `.claude/0-Workflow-state.md` if present — extract the `workflow_id` value from YAML frontmatter (e.g. `workflow_id: W2`). Store as `WORKFLOW_SCOPE` for resolution in Step 0.
 - Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
 
 ## Post-flight
@@ -21,12 +21,12 @@ You turn a PRD (or current conversation context) into an executable plan that `/
 
 ## Before You Start
 
-- A `.claude/prd.md` should exist before planning — if not, run `/prd` first so the plan has a requirements baseline.
+- A `.claude/2-Define-PRD.md` should exist before planning — if not, run `/2-Define-PRD` first so the plan has a requirements baseline.
 - Clarify the desired scope with the user before generating; a plan for a full feature vs. a single route produces very different outputs.
 
 ## Inputs
 
-- A `.claude/prd.md` if it exists (preferred starting point)
+- A `.claude/2-Define-PRD.md` if it exists (preferred starting point)
 - Otherwise, the current conversation context
 - The codebase (explored on demand to ground decisions)
 
@@ -36,7 +36,7 @@ You turn a PRD (or current conversation context) into an executable plan that `/
 
 Determine which scope profile applies before any planning begins. This drives which phases appear in the plan.
 
-**A — State file found:** If pre-flight found a `workflow_id` in `.claude/workflow-state.md`, map it:
+**A — State file found:** If pre-flight found a `workflow_id` in `.claude/0-Workflow-state.md`, map it:
 
 | `workflow_id` | `WORKFLOW_SCOPE` | Phases to plan |
 |---|---|---|
@@ -71,7 +71,7 @@ Surface the resolved scope in one line before moving to Step 1:
 
 ### Step 1: Detect existing PRD or context
 
-Read `.claude/prd.md` if it exists. If not, synthesize from conversation. If the context is too thin to plan, stop and recommend `/prd` first.
+Read `.claude/2-Define-PRD.md` if it exists. If not, synthesize from conversation. If the context is too thin to plan, stop and recommend `/2-Define-PRD` first.
 
 ### Step 2: Detect the project
 
@@ -112,21 +112,21 @@ Wait for answers before proceeding.
 
 ### Step 5: Elaborate into the full plan
 
-Using the approved slice structure, write the complete plan to `.claude/plan.md` using the WBS template. → See [plan-template.md](references/plan-template.md)
+Using the approved slice structure, write the complete plan to `.claude/2-Define-Plan.md` using the WBS template. → See [plan-template.md](references/2-Define-Plan-template.md)
 
 Fill in every section: objectives, success criteria, scope, architecture decisions, and all slice subsections (schema through verification checklist). In section 4.0 (Work Breakdown), organize slices under the Phase A / Phase B / Phase C headers from the plan template. Omit entire phase blocks excluded by `WORKFLOW_SCOPE` — do not leave empty headers. If a phase is excluded, add one line to section 2.2 (Out of Scope) explaining why (e.g., "Phase C skipped — PROTOTYPE scope; harden after concept validation.").
 
 ### Step 6: Exit plan mode — approval gate
 
-Call `ExitPlanMode`. The user will review the written `.claude/plan.md` and explicitly approve before `/build-feature` picks it up. Do not proceed to post-flight until approved.
+Call `ExitPlanMode`. The user will review the written `.claude/2-Define-Plan.md` and explicitly approve before `/4-Build-Feature` picks it up. Do not proceed to post-flight until approved.
 
 ### Step 7: Hand off
 
-Tell the user the approved plan is at `.claude/plan.md` and recommend `/build-feature` to start executing the first slice.
+Tell the user the approved plan is at `.claude/2-Define-Plan.md` and recommend `/4-Build-Feature` to start executing the first slice.
 
 ## Plan Template
 
-→ See [references/plan-template.md](references/plan-template.md) for the full WBS template Claude writes to `.claude/plan.md`.
+→ See [references/2-Define-Plan-template.md](references/2-Define-Plan-template.md) for the full WBS template Claude writes to `.claude/2-Define-Plan.md`.
 
 
 ## TDD Workflow (apply per slice)
@@ -172,13 +172,13 @@ Only **after** all tests in a slice are green. See `refactoring.md` for what to 
 - **One test → one impl per cycle.** No batching.
 - **Mock only at system boundaries** (DB, third-party APIs, time, randomness). Never internal collaborators. See `mocking.md`.
 - **Tests describe behavior**, not implementation. If renaming an internal function would break a test, the test is wrong.
-- **Write the plan to `.claude/plan.md`.** No GitHub Issues required. Recommend the user commit it.
-- **Hand off to `/build-feature`** at the end. Don't start writing code in this skill.
+- **Write the plan to `.claude/2-Define-Plan.md`.** No GitHub Issues required. Recommend the user commit it.
+- **Hand off to `/4-Build-Feature`** at the end. Don't start writing code in this skill.
 - **Scope before slicing.** Resolve `WORKFLOW_SCOPE` in Step 0 before generating any slices. A `PROTOTYPE` plan that includes auth and payments slices is a planning error — those items will be built too early or ignored.
 
 ## If Something Goes Wrong
 
-- **PRD is missing or too vague** — stop and run `/prd` first; a plan built on insufficient requirements produces incorrect slice ordering.
+- **PRD is missing or too vague** — stop and run `/2-Define-PRD` first; a plan built on insufficient requirements produces incorrect slice ordering.
 - **Plan produces too many slices** — ask the user to narrow scope; flag which slices are optional vs. required for a first working version.
 - **Slice dependencies are circular** — surface the cycle explicitly and ask the user which dependency to break before proceeding.
 - **User's Step 0 answer conflicts with the state file** (e.g., state says W2 but user says "just testing") — ask which is authoritative. Default to the more conservative scope and note the discrepancy in section 2.3 (Assumptions).

@@ -1,10 +1,10 @@
 ﻿---
-name: accessibility
-when_to_use: "User says 'a11y audit', 'accessibility check', 'screen reader support', 'keyboard navigation', 'WCAG', or types /accessibility."
-description: MUST BE USED when auditing a project for accessibility (a11y) compliance. Calls accessibility-auditor to scan all component files for WCAG 2.1 AA violations, presents a prioritized fix list, and optionally fixes findings one at a time with user approval. Also provides a manual testing checklist for issues static analysis cannot catch. Trigger on `/accessibility`, "a11y audit", "accessibility check", "screen reader support", "keyboard navigation", "WCAG".
+name: 5-Validate-Accessibility
+when_to_use: "User says 'a11y audit', 'accessibility check', 'screen reader support', 'keyboard navigation', 'WCAG', or types /5-Validate-Accessibility."
+description: MUST BE USED when auditing a project for accessibility (a11y) compliance. Calls accessibility-auditor to scan all component files for WCAG 2.1 AA violations, presents a prioritized fix list, and optionally fixes findings one at a time with user approval. Also provides a manual testing checklist for issues static analysis cannot catch. Trigger on `/5-Validate-Accessibility`, "a11y audit", "accessibility check", "screen reader support", "keyboard navigation", "WCAG".
 ---
 
-# /accessibility
+# /5-Validate-Accessibility
 
 You run an accessibility audit using the `accessibility-auditor` agent, then present findings with a prioritized fix plan.
 

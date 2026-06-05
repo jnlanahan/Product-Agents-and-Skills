@@ -1,10 +1,10 @@
 ﻿---
-name: prd
-description: MUST BE USED when the user wants to create a PRD or product requirements doc. Synthesizes the current conversation and codebase understanding into a comprehensive PRD with functional and non-functional requirements, success metrics, risks, and rollout plan. Writes to `.claude/prd.md`. Does NOT interview the user — just synthesizes what's already known. Do NOT use when a PRD already exists — open `.claude/prd.md` directly and edit it, or run `/refactor` to restructure it.
+name: 2-Define-PRD
+description: MUST BE USED when the user wants to create a PRD or product requirements doc. Synthesizes the current conversation and codebase understanding into a comprehensive PRD with functional and non-functional requirements, success metrics, risks, and rollout plan. Writes to `.claude/2-Define-PRD.md`. Does NOT interview the user — just synthesizes what's already known. Do NOT use when a PRD already exists — open `.claude/2-Define-PRD.md` directly and edit it, or run `/2-Define-Refactor` to restructure it.
 when_to_use: "User says 'write a PRD', 'create requirements', 'document what we're building', 'I need a product requirements doc', 'define the feature'."
 ---
 
-# /prd
+# /2-Define-PRD
 
 Take the current conversation context and codebase understanding and produce a comprehensive PRD. Do NOT interview the user — synthesize what you already know. If something is unknown, write `<TBD>` and call it out at the end.
 
@@ -16,9 +16,9 @@ Before running the PRD synthesis, evaluate whether the user has enough context t
 - Is a concrete problem articulated?
 - Is the scope of "what to build" clear?
 
-If two or more of these are missing or vague, suggest `/discover` instead of proceeding. Phrase it as a suggestion, not a block:
+If two or more of these are missing or vague, suggest `/1-Discover` instead of proceeding. Phrase it as a suggestion, not a block:
 
-> "Your inputs look thin for a PRD synthesis. I can either proceed with what's here, or run `/discover` to surface the problem before structuring it. Which do you prefer?"
+> "Your inputs look thin for a PRD synthesis. I can either proceed with what's here, or run `/1-Discover` to surface the problem before structuring it. Which do you prefer?"
 
 Proceed with the PRD if the user confirms, regardless of input quality. The routing is a suggestion, never a gate.
 
@@ -49,13 +49,13 @@ Sketch the major modules you would build or modify. Actively look for opportunit
 
 Check with the user that these modules match their expectations. Confirm which modules they want tests written for.
 
-### Step 3: Write the PRD to `.claude/prd.md`
+### Step 3: Write the PRD to `.claude/2-Define-PRD.md`
 
 Use the template below. Where information isn't available, write `<TBD>` and add it to the `## Open Questions` section at the end. Do NOT invent details.
 
 ### Step 4: Hand off
 
-Tell the user the PRD is at `.claude/prd.md` and recommend `/plan` next to break it into vertical slices.
+Tell the user the PRD is at `.claude/2-Define-PRD.md` and recommend `/2-Define-Plan` next to break it into vertical slices.
 
 ## PRD Template
 
@@ -182,7 +182,7 @@ Explicit list of things we are NOT doing in this PRD. Anything users might assum
 
 ## 14. Open Questions
 
-Things that need answers before `/plan` can produce a usable plan.
+Things that need answers before `/2-Define-Plan` can produce a usable plan.
 
 - <question 1>
 - <question 2>
@@ -197,11 +197,11 @@ Anything else relevant — links to research, prior incidents, related ADRs.
 - **Synthesize, don't interview.** If you don't know something, write `<TBD>` and add it to Open Questions. Don't pad with imagined details.
 - **Quantify NFRs and success metrics.** Vague targets like "fast" or "secure" are not requirements — they're hopes.
 - **Implementation Decisions should survive refactors.** Use module names and behaviors, not file paths.
-- **Write to `.claude/prd.md`**, not GitHub. Recommend the user commit it.
-- **Recommend `/plan` next** in the handoff message.
+- **Write to `.claude/2-Define-PRD.md`**, not GitHub. Recommend the user commit it.
+- **Recommend `/2-Define-Plan` next** in the handoff message.
 
 ## If Something Goes Wrong
 
 - **Context too thin to synthesize requirements** — ask the user for a one-paragraph description of the problem and target user before proceeding; do not guess at requirements.
 - **Conflicting signals between conversation and codebase** — surface the conflict explicitly in the PRD under a "Assumptions & Open Questions" section; do not silently pick one.
-- **`.claude/prd.md` write fails** — confirm write permission to `.claude/`; create the directory if needed.
+- **`.claude/2-Define-PRD.md` write fails** — confirm write permission to `.claude/`; create the directory if needed.

@@ -1,12 +1,12 @@
 ﻿---
-name: glossary
-description: Use when the user wants to extract project domain terms into a consistent glossary — flagging ambiguous terms, proposing canonical names, and writing the result to `.claude/glossary.md`.
+name: 2-Define-Glossary
+description: Use when the user wants to extract project domain terms into a consistent glossary — flagging ambiguous terms, proposing canonical names, and writing the result to `.claude/2-Define-Glossary.md`.
 when_to_use: "User says 'build a glossary', 'define domain terms', 'harden terminology', 'sharpen language', 'what does this word mean in our codebase'."
 ---
 
-# /glossary
+# /2-Define-Glossary
 
-Extract and formalize domain terminology from the current conversation into a consistent glossary, saved to `.claude/glossary.md`.
+Extract and formalize domain terminology from the current conversation into a consistent glossary, saved to `.claude/2-Define-Glossary.md`.
 
 ## Pre-flight
 
@@ -21,7 +21,7 @@ Extract and formalize domain terminology from the current conversation into a co
 ## Before You Start
 
 - Run this after enough conversation context exists to surface real domain terms — running it on an empty session produces a shallow result.
-- If `.claude/glossary.md` already exists, this skill extends it rather than overwrites it; review the existing file for terms to preserve.
+- If `.claude/2-Define-Glossary.md` already exists, this skill extends it rather than overwrites it; review the existing file for terms to preserve.
 
 ## Process
 
@@ -31,12 +31,12 @@ Extract and formalize domain terminology from the current conversation into a co
    - Different words used for the same concept (synonyms)
    - Vague or overloaded terms
 3. **Propose a canonical glossary** with opinionated term choices
-4. **Write to `.claude/glossary.md`** in the working directory using the format below
+4. **Write to `.claude/2-Define-Glossary.md`** in the working directory using the format below
 5. **Output a summary** inline in the conversation
 
 ## Output Format
 
-Write a `.claude/glossary.md` file with this structure:
+Write a `.claude/2-Define-Glossary.md` file with this structure:
 
 ```md
 # Glossary
@@ -101,7 +101,7 @@ Write a `.claude/glossary.md` file with this structure:
 
 When invoked again in the same conversation:
 
-1. Read the existing `.claude/glossary.md`
+1. Read the existing `.claude/2-Define-Glossary.md`
 2. Incorporate any new terms from subsequent discussion
 3. Update definitions if understanding has evolved
 4. Re-flag any new ambiguities
@@ -111,4 +111,4 @@ When invoked again in the same conversation:
 
 - **No domain terms found** — the conversation or codebase may be too thin; ask the user to paste a short description of the domain before re-running.
 - **Terms are too ambiguous to define** — flag them explicitly as "Needs Clarification" in the glossary rather than guessing at meaning.
-- **Existing `.claude/glossary.md` conflicts with new terms** — surface the conflict and ask the user which definition to keep.
+- **Existing `.claude/2-Define-Glossary.md` conflicts with new terms** — surface the conflict and ask the user which definition to keep.

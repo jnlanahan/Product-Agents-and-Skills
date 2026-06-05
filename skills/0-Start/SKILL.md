@@ -1,10 +1,10 @@
 ---
-name: start
+name: 0-Start
 description: Run once at project initialization to capture context, create .claude/ scaffolding, and get oriented. Re-runnable — updates specific sections if .claude/context.md already exists. Never asks which workflow to use; captures context and suggests a starting point.
 when_to_use: "User opens a project for the first time, says 'let's get started', 'set up context', 'initialize this project', 'what is this codebase'."
 ---
 
-# /start
+# /0-Start
 
 Initialize a new project. Run this once when you open a fresh codebase or a fresh idea. If you've already run it, re-running lets you update specific sections of `.claude/context.md` without overwriting everything.
 
@@ -56,7 +56,7 @@ last-reviewed: <today's date>
 <who reviews, who approves, any external partners>
 
 ## Glossary pointer
-→ See .claude/glossary.md (if it exists)
+→ See .claude/2-Define-Glossary.md (if it exists)
 ```
 
 ### Step 4: Seed .claude/progress.md
@@ -70,7 +70,7 @@ Append-only. Each entry: timestamp, skill, output, key decisions, next step.
 
 ---
 
-## <today's date> <time> — /start completed
+## <today's date> <time> — /0-Start completed
 - Output: `.claude/context.md`
 - Context captured: <brief summary of what the user told you>
 - Next likely: <your suggestion based on their answers>
@@ -84,16 +84,16 @@ Based on the user's answers, suggest one skill to run next. Do not present a lis
 
 | User has | Suggest |
 |---|---|
-| Just an idea | `/discover` — surface the problem before structuring it |
-| Discovery notes already | `/prd` — turn your notes into a structured problem definition |
-| An existing PRD | `/plan` — decompose the PRD into implementation slices |
-| An existing codebase to add to | `/next` — see what state the project is in |
-| A vibe-coded prototype | `/migrate-from-vibe` — production-readiness path |
+| Just an idea | `/1-Discover` — surface the problem before structuring it |
+| Discovery notes already | `/2-Define-PRD` — turn your notes into a structured problem definition |
+| An existing PRD | `/2-Define-Plan` — decompose the PRD into implementation slices |
+| An existing codebase to add to | `/0-Next` — see what state the project is in |
+| A vibe-coded prototype | `/4-Build-Migrate-From-Vibe` — production-readiness path |
 
 ## Post-flight
 
 - Append to `.claude/progress.md`:
-  - Timestamp, `/start`, output path `.claude/context.md`
+  - Timestamp, `/0-Start`, output path `.claude/context.md`
   - Key decisions: what context was captured
   - Suggested next step: the skill you recommended
 

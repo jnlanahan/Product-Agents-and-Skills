@@ -1,12 +1,12 @@
 ﻿---
-name: prototype
-description: MUST BE USED when the user wants to design or visualize a feature's UI before building it. Generates 3 radically different clickable HTML prototypes (TailwindCSS via CDN, mock data, fake auth, fake API). Saves to `prototypes/variant-A.html`, `variant-B.html`, `variant-C.html`. The user opens each in a browser, picks one, and that variant becomes the design reference for `/build-feature`. Do NOT use to implement features — prototype output is throwaway HTML only; use `/build-feature` once a variant is chosen.
+name: 3-Design-Prototype
+description: MUST BE USED when the user wants to design or visualize a feature's UI before building it. Generates 3 radically different clickable HTML prototypes (TailwindCSS via CDN, mock data, fake auth, fake API). Saves to `prototypes/variant-A.html`, `variant-B.html`, `variant-C.html`. The user opens each in a browser, picks one, and that variant becomes the design reference for `/4-Build-Feature`. Do NOT use to implement features — prototype output is throwaway HTML only; use `/4-Build-Feature` once a variant is chosen.
 when_to_use: "User says 'design this feature', 'what should this look like', 'show me UI options', 'make a mockup', 'prototype the UI', 'I want to see options before building'."
 ---
 
-# /prototype
+# /3-Design-Prototype
 
-You generate three radically different clickable HTML prototypes for a feature. The user opens each in a browser, navigates around, picks the one they like, and that becomes the design reference for `/build-feature`.
+You generate three radically different clickable HTML prototypes for a feature. The user opens each in a browser, navigates around, picks the one they like, and that becomes the design reference for `/4-Build-Feature`.
 
 **These are throwaways.** No backend, no real auth, no real API calls — fake everything. The point is to compare three distinct interaction models and visual approaches before committing to a design.
 
@@ -27,7 +27,7 @@ You generate three radically different clickable HTML prototypes for a feature. 
 
 ## When to Use
 
-- After `/prd` and `/plan`, before `/build-feature`
+- After `/2-Define-PRD` and `/2-Define-Plan`, before `/4-Build-Feature`
 - When the user asks "what should this UI look like?"
 - When you've described a feature in words and want to make it concrete
 - When the user wants to compare radically different design approaches
@@ -52,7 +52,7 @@ You need just enough to design 3 distinct variants. Ask in one batch:
 > 4. **Mock data shape** (what does one item look like? give me 3-5 example records)
 > 5. **Constraints** (must use shadcn? must match an existing brand? mobile-first? desktop-first?)
 
-If a `.claude/prd.md` exists, prefer reading it over interviewing.
+If a `.claude/2-Define-PRD.md` exists, prefer reading it over interviewing.
 
 ### Step 2: Plan the three variants
 
@@ -99,12 +99,12 @@ Open each one in your browser:
   - Or drag the file into a browser tab
 
 Click around in each. Try every screen. When you've picked one, tell me which letter,
-and that variant becomes the design reference for `/build-feature`.
+and that variant becomes the design reference for `/4-Build-Feature`.
 ```
 
 ### Step 5: After the user picks
 
-Note the choice in `.claude/plan.md` (or `.claude/prd.md`) under a new `## Design Reference` section pointing to the chosen variant file. Tell the user `/build-feature` will mirror that variant's structure.
+Note the choice in `.claude/2-Define-Plan.md` (or `.claude/2-Define-PRD.md`) under a new `## Design Reference` section pointing to the chosen variant file. Tell the user `/4-Build-Feature` will mirror that variant's structure.
 
 ## HTML Skeleton (use as starting point for each variant)
 
@@ -227,7 +227,7 @@ Each variant fills in `renderList`, `renderDetail`, `renderCreate`, `renderEmpty
 - **Fake everything.** No backend, no real auth, no real API. Mock data inline.
 - **Self-contained.** Each variant in one file. No imports.
 - **Polished enough to judge.** Not a wireframe. Real-looking text, real spacing, real interactions. But not pixel-perfect — that comes later.
-- **Don't carry into the build.** When `/build-feature` runs, it builds against the project's actual stack and component library. The prototype is a reference for layout/interaction, not code to copy.
+- **Don't carry into the build.** When `/4-Build-Feature` runs, it builds against the project's actual stack and component library. The prototype is a reference for layout/interaction, not code to copy.
 - **Save to `prototypes/`** at the repo root. Add `prototypes/` to `.gitignore` unless the user wants to commit them as design reference.
 
 ## If Something Goes Wrong

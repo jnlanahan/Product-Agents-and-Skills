@@ -1,10 +1,10 @@
 ﻿---
-name: triage
-when_to_use: "User says 'this is broken', 'X doesn't work', 'investigate this bug', or types /triage."
-description: MUST BE USED when the user reports a bug or wants to investigate a problem. Listens conversationally, explores the codebase to find root cause, forms a hypothesis with file:line evidence, proposes 2+ fixes (root cause + workaround), and writes a complete bug report to `.claude/bugs/<short-name>.md`. Replaces standalone bug-investigation, bug-report, and QA-session skills. Trigger on `/triage`, "this is broken", "X doesn't work", "investigate this bug".
+name: 5-Validate-Triage
+when_to_use: "User says 'this is broken', 'X doesn't work', 'investigate this bug', or types /5-Validate-Triage."
+description: MUST BE USED when the user reports a bug or wants to investigate a problem. Listens conversationally, explores the codebase to find root cause, forms a hypothesis with file:line evidence, proposes 2+ fixes (root cause + workaround), and writes a complete bug report to `.claude/bugs/<short-name>.md`. Replaces standalone bug-investigation, bug-report, and QA-session skills. Trigger on `/5-Validate-Triage`, "this is broken", "X doesn't work", "investigate this bug".
 ---
 
-# /triage
+# /5-Validate-Triage
 
 You triage a bug end-to-end: listen, investigate, find root cause, propose fixes, write a complete bug report. The output is a markdown file at `.claude/bugs/<short-name>.md` that anyone (you, a teammate, future you) can pick up.
 
@@ -36,8 +36,8 @@ This skill replaces three older ones — bug-investigation, bug-report-doc, and 
 ## When NOT to Use
 
 - The fix is obviously a one-liner → just fix it
-- It's a feature request, not a bug → use `/prd`
-- It's an architectural concern, not a defect → use `/refactor`
+- It's a feature request, not a bug → use `/2-Define-PRD`
+- It's an architectural concern, not a defect → use `/2-Define-Refactor`
 
 ## Procedure
 

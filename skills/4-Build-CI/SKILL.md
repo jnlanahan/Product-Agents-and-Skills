@@ -1,10 +1,10 @@
 ﻿---
-name: setup-ci
+name: 4-Build-CI
 description: MUST BE USED when adding continuous integration to a project that lacks it. Generates GitHub Actions workflows for typecheck, tests, and lint. Vercel auto-deploys from GitHub — no separate deploy CI step needed. Adapts to detected test framework and package manager.
 when_to_use: "User says 'add CI', 'add GitHub Actions', 'automate tests on PR', 'wire CI/CD', 'deploy on push', 'set up the pipeline'."
 ---
 
-# /setup-ci
+# /4-Build-CI
 
 You add CI to a project that doesn't have it. Preference is GitHub Actions for typecheck + tests. Vercel handles deploys automatically from GitHub — no separate deploy workflow is needed for the default stack.
 
@@ -130,7 +130,7 @@ If you're using Vercel, **you do not need a deploy job in GitHub Actions**. Verc
 ### Auto-deploy to Render on push to main (if not using Vercel)
 
 ```yaml
-# .github/workflows/deploy.yml
+# .github/workflows/6-Deploy.yml
 name: Deploy
 
 on:
@@ -150,7 +150,7 @@ jobs:
 ### Auto-deploy to Railway on push to main
 
 ```yaml
-# .github/workflows/deploy.yml
+# .github/workflows/6-Deploy.yml
 name: Deploy
 
 on:

@@ -1,11 +1,11 @@
 ﻿---
-name: deploy
-when_to_use: "User says 'ship to prod', 'go live', 'deploy this', 'deploy to production', or types /deploy."
+name: 6-Deploy
+when_to_use: "User says 'ship to prod', 'go live', 'deploy this', 'deploy to production', or types /6-Deploy."
 disable-model-invocation: true
-description: MUST BE USED when the user wants to deploy a project to production for the first time, or onboard an existing app's deploy story. Covers pre-flight checks, account setup, env vars, custom domain + SSL, third-party reconfigurations (webhooks, allowed origins, email DNS), post-deploy smoke tests, and runbook generation. Heavy on step-by-step browser guidance. Trigger on `/deploy`, "ship to prod", "go live", "deploy this".
+description: MUST BE USED when the user wants to deploy a project to production for the first time, or onboard an existing app's deploy story. Covers pre-flight checks, account setup, env vars, custom domain + SSL, third-party reconfigurations (webhooks, allowed origins, email DNS), post-deploy smoke tests, and runbook generation. Heavy on step-by-step browser guidance. Trigger on `/6-Deploy`, "ship to prod", "go live", "deploy this".
 ---
 
-# /deploy
+# /6-Deploy
 
 You walk the user — assumed to be a developer with limited deployment experience — through a full production deploy end-to-end. Every external step (account creation, dashboard navigation, DNS records) gets explicit numbered instructions like "1. Open https://vercel.com. 2. Click 'Add New Project'." The user should be able to follow this skill without prior deploy experience.
 
@@ -23,7 +23,7 @@ You walk the user — assumed to be a developer with limited deployment experien
 
 - The pre-flight checklist (Phase 0) must fully pass before any deploy command runs — do not skip or defer any item.
 - Confirm the target environment (staging vs. production) explicitly with the user before executing deploy commands.
-- If any post-deploy health check fails, stop immediately and run `/rollback` — do not attempt hotfixes on a broken production deploy.
+- If any post-deploy health check fails, stop immediately and run `/6-Deploy-Rollback` — do not attempt hotfixes on a broken production deploy.
 
 ## When to Use
 
@@ -57,8 +57,8 @@ Pre-flight checklist (verify all before continuing). If any fails, stop and addr
 - [ ] `npm test` passes (if tests exist)
 - [ ] `.env.example` exists and is complete
 - [ ] No committed `.env` or service account JSON (`secret-scanner` clean)
-- [ ] `/check-production` has been run AND Critical findings are addressed
-- [ ] `/add-monitoring` has been run (Sentry + PostHog wired)
+- [ ] `/5-Validate-Production-Readiness` has been run AND Critical findings are addressed
+- [ ] `/4-Build-Monitoring` has been run (Sentry + PostHog wired)
 - [ ] A health-check endpoint exists at `/api/health` (or you'll add one in Phase 2)
 
 ### Phase 1: Choose & set up the deploy platform
@@ -165,7 +165,7 @@ This is the gate before announcing. Walk through every box. Any FAIL must be fix
 
 ### Phase 7: Generate the runbook
 
-→ See [runbook-template.md](references/runbook-template.md) for the full `LAUNCH_RUNBOOK.md` template. Create it at the project root, filling in the production URL, BetterStack status URL, and on-call contacts.
+→ See [runbook-template.md](references/6-Deploy-Runbook-template.md) for the full `LAUNCH_RUNBOOK.md` template. Create it at the project root, filling in the production URL, BetterStack status URL, and on-call contacts.
 
 ### Phase 8: Sign-off
 
@@ -177,7 +177,7 @@ If all PASS:
 >
 > - Production URL: https://<your-domain>
 > - Runbook: `LAUNCH_RUNBOOK.md` (committed to git)
-> - Re-run `/next` after launch to track post-launch tasks
+> - Re-run `/0-Next` after launch to track post-launch tasks
 
 ## Rules
 
@@ -193,5 +193,5 @@ If all PASS:
 
 - **Build fails during deploy** — read the full build log for the first error; common causes are missing env vars, incompatible Node version, or a missing dependency. Fix locally first and verify the build passes before re-deploying.
 - **Custom domain not resolving** — DNS propagation can take up to 48 hours; use `dig yourdomain.com` to check current records; confirm the CNAME or A record matches the platform's instructions exactly.
-- **Health check fails post-deploy** — check application logs in the platform dashboard immediately; a failing health check usually means a missing env var, a migration that did not run, or a startup crash. Run `/rollback` if the service is degraded for users.
+- **Health check fails post-deploy** — check application logs in the platform dashboard immediately; a failing health check usually means a missing env var, a migration that did not run, or a startup crash. Run `/6-Deploy-Rollback` if the service is degraded for users.
 - **Third-party webhooks stop working** — update webhook URLs in Stripe, Resend, and other providers to the new production URL; test each webhook with the provider's test event feature.

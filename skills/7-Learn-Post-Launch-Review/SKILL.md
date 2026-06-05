@@ -1,10 +1,10 @@
 ﻿---
-name: post-launch-review
-when_to_use: "User says 'post-launch', 'launch retro', 'how did the launch go', 'review after launch', 'metrics review', or types /post-launch-review. Best used 2–4 weeks after shipping."
-description: MUST BE USED 2–4 weeks after a production launch or major feature ship to close the learn loop. Reviews actual metrics against the PRD's success criteria, surfaces surprises, runs a Start/Stop/Continue retro, and produces a ranked action item list and next-iteration ideas. Trigger on `/post-launch-review`, "post-launch", "launch retro", "how did it go", "review after launch", "metrics review", "check the launch".
+name: 7-Learn-Post-Launch-Review
+when_to_use: "User says 'post-launch', 'launch retro', 'how did the launch go', 'review after launch', 'metrics review', or types /7-Learn-Post-Launch-Review. Best used 2–4 weeks after shipping."
+description: MUST BE USED 2–4 weeks after a production launch or major feature ship to close the learn loop. Reviews actual metrics against the PRD's success criteria, surfaces surprises, runs a Start/Stop/Continue retro, and produces a ranked action item list and next-iteration ideas. Trigger on `/7-Learn-Post-Launch-Review`, "post-launch", "launch retro", "how did it go", "review after launch", "metrics review", "check the launch".
 ---
 
-# /post-launch-review
+# /7-Learn-Post-Launch-Review
 
 You run a structured post-launch review — the learn loop that closes every workflow. You pull metrics, surface surprises, run a retro, and produce a record of what to do next.
 
@@ -35,8 +35,8 @@ You run a structured post-launch review — the learn loop that closes every wor
 ### Step 1: Gather context
 
 Read:
-- `.claude/prd.md` — original success metrics and goals (if it exists)
-- `.claude/plan.md` — original planned scope (if it exists)
+- `.claude/2-Define-PRD.md` — original success metrics and goals (if it exists)
+- `.claude/2-Define-Plan.md` — original planned scope (if it exists)
 - `RUNBOOK.md` — current operational state
 
 Ask the user to share (or paste):
@@ -72,16 +72,16 @@ From the retro and metric review, produce a ranked action item list:
 - **P0**: Critical issues (bugs, UX blockers) → fix immediately
 - **P1**: Optimization opportunities → prioritize in next sprint
 - **P2**: Metrics to add or monitor → observability improvements
-- **Backlog**: Next-iteration feature ideas → `/prd` candidates
+- **Backlog**: Next-iteration feature ideas → `/2-Define-PRD` candidates
 
 Each action item needs an owner and a rough timeline.
 
 ### Step 5: Save the review
 
-Save to `.claude/post-launch-review-<date>.md`.
+Save to `.claude/7-Learn-Post-Launch-Review-<date>.md`.
 
 Offer:
-> Want me to run `/prd` now with the next-iteration ideas from this review?
+> Want me to run `/2-Define-PRD` now with the next-iteration ideas from this review?
 
 ---
 
@@ -147,7 +147,7 @@ Reviewed by: <name>
 - **Use actual numbers**, not vibes. If metrics aren't available, add "instrument X" as a P2 action item.
 - **Every action item needs an owner and timeline** — "we should do X" with no owner isn't an action item.
 - **Don't skip surprises** — surprises are where the most actionable learnings come from.
-- **Connect to the next cycle** — every post-launch review should produce at least one `/prd` candidate or one new `/next-steps` entry.
+- **Connect to the next cycle** — every post-launch review should produce at least one `/2-Define-PRD` candidate or one new `/0-Next-steps` entry.
 - **Blameless** — focus on systems, processes, and decisions. Don't name individuals in the "what didn't work" section.
 
 ## If Something Goes Wrong

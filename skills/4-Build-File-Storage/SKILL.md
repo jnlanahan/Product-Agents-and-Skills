@@ -1,10 +1,10 @@
 ---
-name: add-files
+name: 4-Build-File-Storage
 description: MUST BE USED when the user wants to add or extend file uploads, file sharing, folders, tags, image transforms, or per-user quotas. Detects existing storage (AWS S3, Firebase Storage, R2, UploadThing) and extends it; if none, scaffolds AWS S3 + CloudFront CDN. Always enforces server-side validation, ownership checks, and magic-byte MIME verification.
 when_to_use: "User says 'add file uploads', 'let users upload files', 'add image uploads', 'set up S3', 'add file storage'."
 ---
 
-# /add-files
+# /4-Build-File-Storage
 
 You add file features. The default is **AWS S3 + CloudFront CDN**. If a different provider is already wired, adapt to it — never migrate.
 
@@ -351,7 +351,7 @@ export function verifyMagicBytes(buffer: Buffer, claimedMime: string): boolean {
 
 ```typescript
 // app/api/uploadthing/core.ts
-import { createUploadthing, type FileRouter } from 'uploadthing/next';
+import { createUploadthing, type FileRouter } from 'uploadthing/0-Next';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { db } from '@/db';

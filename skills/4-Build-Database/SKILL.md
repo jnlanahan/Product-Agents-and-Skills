@@ -1,10 +1,10 @@
 ﻿---
-name: setup-database
+name: 4-Build-Database
 description: MUST BE USED when the user wants to set up a database, add a table, add a column, add an index, or run a migration. Detects ORM (Drizzle / Prisma / Kysely / raw SQL) and adapts. Walks through migration generation → review → apply → verification, with explicit warnings around destructive migrations. Aimed at amateur users — never silently runs destructive operations.
 when_to_use: "User says 'add a table', 'add a column', 'run a migration', 'set up the database', 'add an index', 'create a schema'."
 ---
 
-# /setup-database
+# /4-Build-Database
 
 Database setup and migration helper. Two main jobs:
 
@@ -40,8 +40,8 @@ Aimed at users who haven't run database migrations many times before. Errs heavi
 
 ## When NOT to Use
 
-- Production deploy (use `/deploy`, which handles `db:migrate` against prod)
-- Schema design from scratch — use `/plan` to think through the schema, then come here to apply it
+- Production deploy (use `/6-Deploy`, which handles `db:migrate` against prod)
+- Schema design from scratch — use `/2-Define-Plan` to think through the schema, then come here to apply it
 
 ## Procedure
 
@@ -123,7 +123,7 @@ After any migration:
 - Removing a unique constraint or primary key
 - Anything against a column that already has data
 
-If the user is doing this in production via `/deploy`, the deploy skill takes over — never use `db:push` against production. Use `db:migrate` only.
+If the user is doing this in production via `/6-Deploy`, the deploy skill takes over — never use `db:push` against production. Use `db:migrate` only.
 
 ## ORM-Specific Notes
 

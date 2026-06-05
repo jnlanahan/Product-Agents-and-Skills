@@ -1,16 +1,16 @@
 ---
-name: resume
+name: 0-Resume
 description: Run at the start of any new chat on a project with prior history. Reads .claude/progress.md and calls project-state-detector to give a 5–10 line orientation: current mode, last activity, open threads, recommended next step. Read-only.
 when_to_use: "Start of a new chat on an existing project. User says 'where were we', 'catch me up', 'what's the status', 'resume'."
 ---
 
-# /resume
+# /0-Resume
 
 Recover session state when opening a project that has prior history. Run this at the top of any new conversation so you don't start cold. Takes under 30 seconds.
 
 ## Pre-flight
 
-- Check for `.claude/progress.md`. If it does not exist, tell the user: "No progress log found — this looks like a fresh project. Run `/start` to initialize it."
+- Check for `.claude/progress.md`. If it does not exist, tell the user: "No progress log found — this looks like a fresh project. Run `/0-Start` to initialize it."
 - Check for `.claude/context.md`. Read it if it exists.
 
 ## Procedure
@@ -49,5 +49,5 @@ This skill is read-only. Do not append to `progress.md` (that would pollute the 
 ## Constraints
 
 - Never modify any files.
-- If `.claude/` is empty or missing, redirect to `/start` immediately.
+- If `.claude/` is empty or missing, redirect to `/0-Start` immediately.
 - Keep the output tight — the goal is orientation in under 30 seconds, not a full audit.

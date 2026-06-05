@@ -1,17 +1,17 @@
 ---
-name: handoff
-when_to_use: "User says 'write a handoff doc', 'brief a contractor', 'package this for the team', 'external handoff', or types /handoff."
-description: Use to package PRD, plan, and architecture into a single standalone document for stakeholders without codebase access — contractors, outsourced developers, executives, or design partners. Output is .claude/handoff-<feature-name>.md. Trigger on /handoff, "write a handoff doc", "brief a contractor", "package this for the team", "external handoff".
+name: 6-Handoff
+when_to_use: "User says 'write a handoff doc', 'brief a contractor', 'package this for the team', 'external handoff', or types /6-Handoff."
+description: Use to package PRD, plan, and architecture into a single standalone document for stakeholders without codebase access — contractors, outsourced developers, executives, or design partners. Output is .claude/6-Handoff-<feature-name>.md. Trigger on /6-Handoff, "write a handoff doc", "brief a contractor", "package this for the team", "external handoff".
 ---
 
-# /handoff
+# /6-Handoff
 
 Package everything a contractor, external developer, or executive needs to understand what to build — without requiring codebase access.
 
 ## Pre-flight
 
-- Read `.claude/prd.md` if it exists (required — no PRD means no handoff).
-- Read `.claude/plan.md` if it exists.
+- Read `.claude/2-Define-PRD.md` if it exists (required — no PRD means no handoff).
+- Read `.claude/2-Define-Plan.md` if it exists.
 - Read `.claude/architecture.md` if it exists.
 - Read `.claude/measurement.md` if it exists.
 - Read `.claude/context.md` if present.
@@ -20,7 +20,7 @@ Package everything a contractor, external developer, or executive needs to under
 
 ## Post-flight
 
-- Append to `.claude/progress.md`: timestamp, `/handoff`, output path, key decisions, suggested next step.
+- Append to `.claude/progress.md`: timestamp, `/6-Handoff`, output path, key decisions, suggested next step.
 - If `.claude/progress.md` is missing, create it with a header first.
 
 ## When to Use
@@ -32,7 +32,7 @@ Package everything a contractor, external developer, or executive needs to under
 
 ## When NOT to Use
 
-- Internal handoff between engineers on the same team → use `.claude/plan.md` directly
+- Internal handoff between engineers on the same team → use `.claude/2-Define-Plan.md` directly
 - Live product documentation → wrong tool; use a wiki or README
 
 ## Procedure
@@ -45,7 +45,7 @@ Ask: "What is the name of the feature or project this handoff is for?" Use this 
 
 Assemble from all available `.claude/` artifacts. Do not expose internal file paths or codebase-specific jargon. Write for a smart reader with no repo access.
 
-### Step 3: Write .claude/handoff-<slug>.md
+### Step 3: Write .claude/6-Handoff-<slug>.md
 
 ```markdown
 ---
@@ -106,8 +106,8 @@ status: draft
 
 ## Reference materials
 
-- PRD: `.claude/prd.md`
-- Implementation plan: `.claude/plan.md`
+- PRD: `.claude/2-Define-PRD.md`
+- Implementation plan: `.claude/2-Define-Plan.md`
 - Architecture: `.claude/architecture.md` (if available)
 ```
 
@@ -115,4 +115,4 @@ status: draft
 
 - Write for a reader with no codebase access — no file paths, no internal jargon.
 - Acceptance criteria must be PM-readable, not engineer-readable. No code. No API specs.
-- If key inputs are missing (`prd.md` doesn't exist), stop and tell the user: "I need a PRD before I can produce a handoff doc. Run `/prd` first."
+- If key inputs are missing (`prd.md` doesn't exist), stop and tell the user: "I need a PRD before I can produce a handoff doc. Run `/2-Define-PRD` first."

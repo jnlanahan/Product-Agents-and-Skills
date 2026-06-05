@@ -1,11 +1,11 @@
 ---
-name: setup-project
-description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. Use `--personal` flag for lighter personal tools (no Stripe, optional auth, SQLite). NOT for existing projects — for those, run `/next-steps` first.
+name: 0-Setup-Project
+description: MUST BE USED when starting a brand-new SaaS project from empty or fresh-scaffold state. Walks the user through third-party account setup, scaffolds the preferred stack in disciplined waves (one commit per wave), generates a CLAUDE.md with a skills index, and seeds git/GitHub conventions. Use `--personal` flag for lighter personal tools (no Stripe, optional auth, SQLite). NOT for existing projects — for those, run `/0-Next-steps` first.
 when_to_use: "User says 'start a new project', 'new SaaS app', 'scaffold this from scratch', 'I'm building a new app'."
 disable-model-invocation: true
 ---
 
-# /setup-project
+# /0-Setup-Project
 
 You set up a new project from near-empty state using the user's definitive stack from `_stack-preferences.md`. Discipline matters here: each layer goes in as a separate commit, in the right order, with verification before moving on.
 
@@ -22,7 +22,7 @@ You set up a new project from near-empty state using the user's definitive stack
 ## Critical
 
 - Only run on an empty directory or fresh scaffold — this skill scaffolds opinionated structure and will overwrite conflicting files.
-- For existing projects, run `/next-steps` first; do NOT run `/setup-project` on a project that already has real code.
+- For existing projects, run `/0-Next-steps` first; do NOT run `/0-Setup-Project` on a project that already has real code.
 - Verify the target directory before starting (`ls`) and confirm it is empty or contains only a README or basic scaffold.
 
 ## When to Use
@@ -33,13 +33,13 @@ You set up a new project from near-empty state using the user's definitive stack
 
 ## When NOT to Use
 
-- Project has source files beyond a scaffold → run `/next-steps` first to assess
+- Project has source files beyond a scaffold → run `/0-Next-steps` first to assess
 - Project has an existing auth/payment/db setup → use the targeted `/add-*` skill instead
-- Project came from a vibe-coding tool (Replit/V0/Lovable/Bolt) → run `/migrate-from-vibe` first
+- Project came from a vibe-coding tool (Replit/V0/Lovable/Bolt) → run `/4-Build-Migrate-From-Vibe` first
 
 ## `--personal` Mode (lighter stack for personal tools)
 
-When invoked as `/setup-project --personal`, use a reduced scope:
+When invoked as `/0-Setup-Project --personal`, use a reduced scope:
 
 | Layer | SaaS default | Personal (`--personal`) |
 |---|---|---|
@@ -60,7 +60,7 @@ Skip the "External account setup" step for omitted services. Ask only about the 
 
 Run `stack-detector` and `codebase-classifier` in parallel. If classification is **not** `greenfield`:
 
-> Stop. Tell the user: "This project is `<wired|vibe-coded>`. `/setup-project` is greenfield only. Run `/next-steps` to understand what's there, then use targeted `/add-*` skills."
+> Stop. Tell the user: "This project is `<wired|vibe-coded>`. `/0-Setup-Project` is greenfield only. Run `/0-Next-steps` to understand what's there, then use targeted `/add-*` skills."
 
 ### Step 2: Confirm framework
 
@@ -206,18 +206,18 @@ After each wave: `npm run build && npm run typecheck`. If broken, fix before nex
 ### Step 9: Hand off
 
 > Project is ready for development. Next steps:
-> - Run `/prd` to produce a PRD for your first feature
-> - Then `/plan` to turn it into vertical slices
-> - Then `/build-feature` to implement
-> - Run `/next-steps` anytime to see project state
-> - When ready to ship: `/check-production` then `/deploy`
+> - Run `/2-Define-PRD` to produce a PRD for your first feature
+> - Then `/2-Define-Plan` to turn it into vertical slices
+> - Then `/4-Build-Feature` to implement
+> - Run `/0-Next-steps` anytime to see project state
+> - When ready to ship: `/5-Validate-Production-Readiness` then `/6-Deploy`
 
 ## Rules
 
 - **External accounts before code.** Don't install anything until the user has the credentials in hand.
 - **One wave per commit.** Easier review, easier rollback.
 - **Verify after each wave.** Don't proceed if `npm run build` is broken.
-- **Don't write app features.** This skill wires infrastructure. The first user-facing feature is `/build-feature`.
+- **Don't write app features.** This skill wires infrastructure. The first user-facing feature is `/4-Build-Feature`.
 - **Don't run `db:push` against a production database.** Local dev only. Production uses `db:migrate`.
 - **Always generate `CLAUDE.md` with the skills index.** Without it, the agent can't suggest commands the user has forgotten.
 

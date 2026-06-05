@@ -1,24 +1,24 @@
 ---
-name: architect
+name: 3-Architect
 description: Use when a feature or product involves novel architecture decisions that warrant explicit review before building. Walks through 5 steps (detect stack → data model → integrations → tradeoffs → output) to produce .claude/architecture.md. Step-decomposed — each step ends at a reviewable checkpoint. Optional for trivial features; required for greenfield products and significant infrastructure changes.
 when_to_use: "User says 'what's the architecture', 'design the system', 'help me think through the data model', 'how should we architect this', 'technical design'."
 ---
 
-# /architect
+# /3-Architect
 
 Make architecture decisions explicit and reviewable before building begins. Works in sessions — stop after any step and resume later.
 
 ## Pre-flight
 
 - Check for `.claude/architecture.md`. If it exists, this may be an update run — confirm with the user.
-- Read `.claude/prd.md` and `.claude/context.md` if they exist.
+- Read `.claude/2-Define-PRD.md` and `.claude/context.md` if they exist.
 - Read `.claude/progress.md` (last 5 entries).
 - Call `project-state-detector`; if mode is off-pattern, surface a one-line note (do NOT block).
 
 ## Post-flight
 
 - `.claude/architecture.md` is produced by step-05.
-- Append to `.claude/progress.md`: timestamp, `/architect`, output path, key decisions, suggested next step.
+- Append to `.claude/progress.md`: timestamp, `/3-Architect`, output path, key decisions, suggested next step.
 - If `.claude/progress.md` is missing, create it with a header first.
 
 ## How it works
@@ -35,7 +35,7 @@ step-05-output         → Assemble .claude/architecture.md
 
 ## Orchestration logic
 
-Check `.claude/progress.md` for any prior `/architect` entries to determine resume point.
+Check `.claude/progress.md` for any prior `/3-Architect` entries to determine resume point.
 
 If no prior architect work: start at step-01.
 
@@ -43,7 +43,7 @@ After each step, ask: "Ready to continue to the next step, or do you want to pau
 
 ## When to skip
 
-- Simple CRUD feature on existing stack → skip; use `/plan` directly
+- Simple CRUD feature on existing stack → skip; use `/2-Define-Plan` directly
 - Bug fix or small enhancement → skip entirely
 - Full greenfield product or novel architecture → run all 5 steps
 

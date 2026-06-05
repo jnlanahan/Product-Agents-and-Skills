@@ -1,11 +1,11 @@
 ﻿---
-name: rollback
-when_to_use: "User says 'rollback plan', 'how do I revert production', 'undo deploy', 'production is broken', 'need to rollback', or types /rollback."
+name: 6-Deploy-Rollback
+when_to_use: "User says 'rollback plan', 'how do I revert production', 'undo deploy', 'production is broken', 'need to rollback', or types /6-Deploy-Rollback."
 disable-model-invocation: true
-description: MUST BE USED when a production deploy has introduced a regression and the team needs a rollback plan, or proactively before a risky deploy to document the rollback path. Assesses what changed, classifies rollback complexity, and generates a numbered step-by-step rollback runbook covering code, DB migrations, env vars, and traffic. Trigger on `/rollback`, "rollback plan", "how do I revert production", "undo deploy", "production is broken", "need to rollback".
+description: MUST BE USED when a production deploy has introduced a regression and the team needs a rollback plan, or proactively before a risky deploy to document the rollback path. Assesses what changed, classifies rollback complexity, and generates a numbered step-by-step rollback runbook covering code, DB migrations, env vars, and traffic. Trigger on `/6-Deploy-Rollback`, "rollback plan", "how do I revert production", "undo deploy", "production is broken", "need to rollback".
 ---
 
-# /rollback
+# /6-Deploy-Rollback
 
 You generate and (when the user is ready to execute) walk through a rollback for a broken production deploy.
 
@@ -53,7 +53,7 @@ Output a numbered plan based on the complexity above. Include:
 - Estimated time
 - Who to notify
 
-Save plan to `.claude/rollback-<date>.md`.
+Save plan to `.claude/6-Deploy-Rollback-<date>.md`.
 
 ### Step 4: Walk through (if user is ready to execute)
 
@@ -64,7 +64,7 @@ Go step by step. Confirm each step completed before proceeding. Rollbacks have o
 > Rollback complete. Next:
 > - Confirm the regression is resolved (smoke test the affected feature)
 > - Notify stakeholders that the incident is resolved
-> - Run `/postmortem` to capture what happened, why, and how to prevent it
+> - Run `/7-Learn-Postmortem` to capture what happened, why, and how to prevent it
 
 ---
 
@@ -156,7 +156,7 @@ No DB action needed now. Schedule cleanup:
 - **Data loss requires a backup restore** — no migration SQL fixes deleted data. Confirm backup availability before starting a destructive rollback.
 - **Revert commits, not resets** — use `git revert` (safe, creates new commit) not `git reset --hard` on shared branches.
 - **Notify stakeholders immediately** — users should know about an outage; don't try to fix silently for more than 5 minutes.
-- **Run `/postmortem` after** — document what happened, why, and how to prevent recurrence.
+- **Run `/7-Learn-Postmortem` after** — document what happened, why, and how to prevent recurrence.
 
 ## If Something Goes Wrong
 

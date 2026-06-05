@@ -1,10 +1,10 @@
 ---
-name: add-auth
+name: 4-Build-Auth
 description: MUST BE USED when the user wants to add or extend authentication. Detects existing auth provider (Neon Auth / Better Auth, Firebase Auth, Clerk, NextAuth, Supabase Auth, custom JWT) and adapts to it. If none, scaffolds Neon Auth via Better Auth per stack preferences. Handles sign-up, sign-in, Google Sign-In, MFA, organizations, and role-based access.
 when_to_use: "User says 'add login', 'add sign-up', 'wire auth', 'add authentication', 'I need users to sign in', 'add Google Sign-In', 'set up auth'."
 ---
 
-# /add-auth
+# /4-Build-Auth
 
 You add authentication features. The default is **Neon Auth (via Better Auth)**. If a different auth provider is already wired, adapt to it — never migrate.
 
@@ -32,7 +32,7 @@ If the user is setting up auth for the first time, ask:
 
 > Before we write any code, let's confirm two things:
 >
-> 1. **Do you have a Neon project?** (Neon Auth stores user tables inside your Neon Postgres DB.) If not, run `/setup-database` first.
+> 1. **Do you have a Neon project?** (Neon Auth stores user tables inside your Neon Postgres DB.) If not, run `/4-Build-Database` first.
 > 2. **Do you have Google OAuth credentials?** You'll need a `CLIENT_ID` and `CLIENT_SECRET` from the Google Cloud Console. If not, I'll walk you through creating them.
 >
 > Reply "yes" to both, or let me know which one you need help with first.

@@ -1,10 +1,10 @@
 ﻿---
-name: setup-tests
+name: 4-Build-Tests
 description: MUST BE USED when a project has no test framework or when adding a first meaningful test suite. Scaffolds Vitest (Next.js/Vite) or Jest (Express/Node), adds test utilities and setup, and writes the first passing unit + integration tests following the project's existing patterns.
 when_to_use: "User says 'add tests', 'write tests', 'set up testing', 'add Vitest', 'add Jest', 'scaffold the test suite', 'I have no tests'."
 ---
 
-# /setup-tests
+# /4-Build-Tests
 
 You add a test framework and a first meaningful test suite to a project that has none or almost none.
 

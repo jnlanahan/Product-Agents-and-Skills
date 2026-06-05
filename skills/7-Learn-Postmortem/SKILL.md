@@ -1,11 +1,11 @@
 ﻿---
-name: postmortem
-when_to_use: "User says 'write postmortem', 'incident review', 'post-incident', 'root cause analysis', 'RCA', 'what happened in prod', or types /postmortem."
+name: 7-Learn-Postmortem
+when_to_use: "User says 'write postmortem', 'incident review', 'post-incident', 'root cause analysis', 'RCA', 'what happened in prod', or types /7-Learn-Postmortem."
 disable-model-invocation: true
-description: MUST BE USED after a production outage, severe bug, data incident, or security exposure. Generates a structured blameless postmortem with an incident timeline, root cause analysis (5 Whys), contributing factors, and a concrete action item list. Trigger on `/postmortem`, "write postmortem", "incident review", "post-incident", "what happened", "root cause analysis", "RCA".
+description: MUST BE USED after a production outage, severe bug, data incident, or security exposure. Generates a structured blameless postmortem with an incident timeline, root cause analysis (5 Whys), contributing factors, and a concrete action item list. Trigger on `/7-Learn-Postmortem`, "write postmortem", "incident review", "post-incident", "what happened", "root cause analysis", "RCA".
 ---
 
-# /postmortem
+# /7-Learn-Postmortem
 
 You generate a structured blameless postmortem after a production incident. Blameless means the focus is on systems and processes — not individuals.
 
@@ -72,7 +72,7 @@ Distinguish:
 
 ### Step 4: Generate the postmortem document
 
-Produce the document using the template below. Save to `.claude/postmortem-<YYYY-MM-DD>-<short-slug>.md`.
+Produce the document using the template below. Save to `.claude/7-Learn-Postmortem-<YYYY-MM-DD>-<short-slug>.md`.
 
 ### Step 5: Review action items
 
@@ -82,7 +82,7 @@ For each action item, confirm:
 - It's in the team's backlog
 
 Offer:
-> Want me to run `/triage` on any of the bug-related action items to plan the fix?
+> Want me to run `/5-Validate-Triage` on any of the bug-related action items to plan the fix?
 
 ---
 

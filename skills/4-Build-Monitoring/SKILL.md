@@ -1,10 +1,10 @@
 ﻿---
-name: add-monitoring
+name: 4-Build-Monitoring
 description: MUST BE USED before any production launch. Wires both Sentry (errors) and PostHog (product analytics) — not one or the other. Walks the user through account setup, env vars, and verification with real test events. Identifies authenticated users in both tools so analytics is attributable.
 when_to_use: "User says 'wire Sentry', 'wire PostHog', 'add observability', 'add error tracking', 'add analytics', 'set up monitoring'."
 ---
 
-# /add-monitoring
+# /4-Build-Monitoring
 
 You wire **both** Sentry and PostHog. They don't overlap:
 - **Sentry** = production errors + stack traces + performance + source maps
@@ -85,7 +85,7 @@ Call `Sentry.setUser()` and `posthog.identify()` after successful sign-in; call 
 
 ### Step 7: Set env vars
 
-Add `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `NEXT_PUBLIC_POSTHOG_KEY`, and `NEXT_PUBLIC_POSTHOG_HOST` to `.env.example`. Tell the user to set these in `.env.local`. Production vars get set during `/deploy`.
+Add `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `NEXT_PUBLIC_POSTHOG_KEY`, and `NEXT_PUBLIC_POSTHOG_HOST` to `.env.example`. Tell the user to set these in `.env.local`. Production vars get set during `/6-Deploy`.
 
 ### Step 8: Verify
 

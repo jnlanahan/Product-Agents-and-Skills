@@ -1,16 +1,16 @@
 ---
-name: measure
-description: Use to produce a telemetry and measurement plan before building. Defines success metrics, event schema, telemetry destinations, and failure signals. Output is .claude/measurement.md. Pairs with /add-monitoring for implementation.
+name: 2-Define-Measurement
+description: Use to produce a telemetry and measurement plan before building. Defines success metrics, event schema, telemetry destinations, and failure signals. Output is .claude/measurement.md. Pairs with /4-Build-Monitoring for implementation.
 when_to_use: "User says 'define metrics', 'measurement plan', 'what should we track', 'telemetry strategy', 'how do we know this worked', 'define KPIs'."
 ---
 
-# /measure
+# /2-Define-Measurement
 
-Define how you will know if this feature worked — before you build it. Produces a measurement plan that `/add-monitoring` can implement.
+Define how you will know if this feature worked — before you build it. Produces a measurement plan that `/4-Build-Monitoring` can implement.
 
 ## Pre-flight
 
-- Read `.claude/prd.md` if it exists — success metrics in the PRD are the starting point.
+- Read `.claude/2-Define-PRD.md` if it exists — success metrics in the PRD are the starting point.
 - Read `.claude/architecture.md` if it exists — it informs what events are technically feasible.
 - Read `.claude/context.md` if present.
 - Read `.claude/progress.md` (last 5 entries).
@@ -18,7 +18,7 @@ Define how you will know if this feature worked — before you build it. Produce
 
 ## Post-flight
 
-- Append to `.claude/progress.md`: timestamp, `/measure`, output path `.claude/measurement.md`, key decisions, suggested next step.
+- Append to `.claude/progress.md`: timestamp, `/2-Define-Measurement`, output path `.claude/measurement.md`, key decisions, suggested next step.
 - If `.claude/progress.md` is missing, create it with a header first.
 
 ## When to Use
@@ -36,7 +36,7 @@ Define how you will know if this feature worked — before you build it. Produce
 
 ### Step 1: Pull success criteria from PRD
 
-Read `.claude/prd.md`. Extract or infer the success criteria. If the PRD doesn't have them, ask the user:
+Read `.claude/2-Define-PRD.md`. Extract or infer the success criteria. If the PRD doesn't have them, ask the user:
 
 > "What does success look like for this feature in 30 days? In 90 days? How would you know it failed?"
 
@@ -105,10 +105,10 @@ last-reviewed: <today's date>
 
 ## Implementation Notes
 
-→ Use `/add-monitoring` to wire Sentry and PostHog.
+→ Use `/4-Build-Monitoring` to wire Sentry and PostHog.
 → Reference this file when configuring PostHog dashboards and Sentry alerts.
 ```
 
 ## Pairs with
 
-`/add-monitoring` — implements the monitoring stack that captures these events. Run `/measure` first to know what to instrument, then `/add-monitoring` to wire it.
+`/4-Build-Monitoring` — implements the monitoring stack that captures these events. Run `/2-Define-Measurement` first to know what to instrument, then `/4-Build-Monitoring` to wire it.

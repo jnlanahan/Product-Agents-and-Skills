@@ -1,10 +1,10 @@
 ---
-name: next
+name: 0-Next
 description: Run anytime to see where the project is, what's stale, and which skill to run next. State-aware dashboard powered by project-state-detector. Your default "what should I do?" command. Read-only.
 when_to_use: "User says 'what should I do next', 'what's the status', 'I don't know what to work on', 'what's left', 'where are we'."
 ---
 
-# /next
+# /0-Next
 
 Your default orientation command. Run it anytime you're unsure what to do next, haven't worked on the project in a while, or just want a one-screen summary of where things stand.
 
@@ -16,16 +16,16 @@ Your default orientation command. Run it anytime you're unsure what to do next, 
 
 ## When to Use
 
-- **Don't know what to do next?** → `/next`
-- **New chat on an existing project?** → `/next` (or `/resume` for a deeper orientation)
-- **Just finished a skill and want to know what's next?** → `/next`
+- **Don't know what to do next?** → `/0-Next`
+- **New chat on an existing project?** → `/0-Next` (or `/0-Resume` for a deeper orientation)
+- **Just finished a skill and want to know what's next?** → `/0-Next`
 - **Onboarding a teammate?** → point them at the output
 
 ## When NOT to Use
 
-- For a deep code-level audit → `/check-production`
+- For a deep code-level audit → `/5-Validate-Production-Readiness`
 - For executing a specific change → use the targeted skill directly
-- For full session recovery with context replay → `/resume`
+- For full session recovery with context replay → `/0-Resume`
 
 ## Procedure
 
@@ -56,8 +56,8 @@ SIGNAL: <one-line evidence>
 
 ARTIFACTS
   ✓ .claude/context.md
-  ✓ .claude/prd.md
-  ⚠ .claude/plan.md  [stale — last touched 2026-04-15]
+  ✓ .claude/2-Define-PRD.md
+  ⚠ .claude/2-Define-Plan.md  [stale — last touched 2026-04-15]
   ✗ .claude/architecture.md  [missing]
 
 RECOMMENDED NEXT
@@ -78,4 +78,4 @@ This skill is read-only. Do not append to `progress.md`.
 
 - Never modify any files.
 - Off-pattern skills are surfaced as information only — never blocked.
-- If `.claude/` is entirely missing, the dashboard should say "No project state found. Run `/start` to initialize."
+- If `.claude/` is entirely missing, the dashboard should say "No project state found. Run `/0-Start` to initialize."

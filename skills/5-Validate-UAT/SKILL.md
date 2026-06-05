@@ -1,10 +1,10 @@
 ﻿---
-name: uat
-when_to_use: "User says 'user acceptance test', 'UAT', 'acceptance testing', 'test before launch', 'test with real users', or types /uat."
-description: MUST BE USED before migrating users to a new version or shipping a feature that changes existing behavior. Generates a structured user acceptance testing (UAT) checklist from the codebase and recent changes, walks through each scenario with the user, and records pass/fail/blocked results with a final ship/no-ship decision. Trigger on `/uat`, "user acceptance test", "UAT", "acceptance testing", "test before launch", "test with real users".
+name: 5-Validate-UAT
+when_to_use: "User says 'user acceptance test', 'UAT', 'acceptance testing', 'test before launch', 'test with real users', or types /5-Validate-UAT."
+description: MUST BE USED before migrating users to a new version or shipping a feature that changes existing behavior. Generates a structured user acceptance testing (UAT) checklist from the codebase and recent changes, walks through each scenario with the user, and records pass/fail/blocked results with a final ship/no-ship decision. Trigger on `/5-Validate-UAT`, "user acceptance test", "UAT", "acceptance testing", "test before launch", "test with real users".
 ---
 
-# /uat
+# /5-Validate-UAT
 
 You run a structured user acceptance test session. You generate the test plan from the codebase and recent changes, walk through each scenario with the user, and produce a UAT report with a clear pass/fail/conditional decision.
 
@@ -28,7 +28,7 @@ You run a structured user acceptance test session. You generate the test plan fr
 
 - Before migrating early users to a new version (W4: migrate-to-production)
 - Before staged rollout of a high-impact feature (W3: add-feature)
-- After `/check-production` finds behavioral issues that need human verification
+- After `/5-Validate-Production-Readiness` finds behavioral issues that need human verification
 - When automated tests pass but you need a human to confirm the actual UX
 
 ## Procedure
@@ -37,7 +37,7 @@ You run a structured user acceptance test session. You generate the test plan fr
 
 Read:
 - `git log --oneline -15` — recent commits
-- `.claude/plan.md` if it exists — planned scope
+- `.claude/2-Define-Plan.md` if it exists — planned scope
 - `CLAUDE.md` for project context
 
 Run `stack-detector` to understand the tech so test steps are realistic (right URLs, right tooling).
@@ -92,10 +92,10 @@ Ask the user to confirm the decision.
 
 ### Step 5: Save and act
 
-Save report to `.claude/uat-<feature>-<date>.md`.
+Save report to `.claude/5-Validate-UAT-<feature>-<date>.md`.
 
 If FAIL: offer to open triage sessions for failed scenarios.
-> Want me to run `/triage` for the failed scenarios? I'll work through each one.
+> Want me to run `/5-Validate-Triage` for the failed scenarios? I'll work through each one.
 
 ---
 

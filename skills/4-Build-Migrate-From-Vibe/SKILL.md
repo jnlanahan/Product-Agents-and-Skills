@@ -1,11 +1,11 @@
 ﻿---
-name: migrate-from-vibe
+name: 4-Build-Migrate-From-Vibe
 description: MUST BE USED when the user wants to move a project off a vibe-coding platform (Replit, V0, Lovable, Bolt, Cursor-only, ChatGPT-generated) onto a real local stack. Detects the source platform from file markers, maps env vars and integrations, extracts the working app, and rewires it onto the user's preferred stack. Preserves working features; flags inconsistencies as out-of-scope rather than fixing them.
 when_to_use: "User says 'move off Replit', 'migrate from Lovable', 'extract from v0', 'get this off Bolt', 'move to a real local codebase'."
 disable-model-invocation: true
 ---
 
-# /migrate-from-vibe
+# /4-Build-Migrate-From-Vibe
 
 You move a project off a vibe-coding platform (Replit, V0, Lovable, Bolt) onto a real local stack the user can develop, test, and deploy normally. Preserve what works. Flag inconsistencies; don't fix them inline.
 
@@ -33,8 +33,8 @@ You move a project off a vibe-coding platform (Replit, V0, Lovable, Bolt) onto a
 
 ## When NOT to Use
 
-- Brand new project → use `/setup-project`
-- Already on a real local stack but messy → use `/refactor` or `/check-production`
+- Brand new project → use `/0-Setup-Project`
+- Already on a real local stack but messy → use `/2-Define-Refactor` or `/5-Validate-Production-Readiness`
 - Production-deployed but on the source platform's hosting → bigger conversation; ask user first
 
 ## Procedure
@@ -105,13 +105,13 @@ Show the user a plan with these sections:
 - Missing error handling
 - TODOs and `// FIXME` comments
 
-We'll list these in `OUT_OF_SCOPE.md` for the user to address with `/refactor` or `/triage` after the port lands.
+We'll list these in `OUT_OF_SCOPE.md` for the user to address with `/2-Define-Refactor` or `/5-Validate-Triage` after the port lands.
 
 Get approval before executing.
 
 ### Step 5: Execute in waves (one commit per wave)
 
-Mirror `/setup-project`'s wave discipline. One commit per wave, verify between each.
+Mirror `/0-Setup-Project`'s wave discipline. One commit per wave, verify between each.
 
 **Wave 1: Establish the new stack skeleton**
 - Initialize the target framework (Next.js or Vite+Express)
@@ -149,7 +149,7 @@ Mirror `/setup-project`'s wave discipline. One commit per wave, verify between e
 
 **Wave 7: Add what was missing**
 - Test infrastructure (Vitest or Jest)
-- Sentry + PostHog (per `/add-monitoring`)
+- Sentry + PostHog (per `/4-Build-Monitoring`)
 - Security middleware
 - CI workflow
 - CLAUDE.md
@@ -171,10 +171,10 @@ Mirror `/setup-project`'s wave discipline. One commit per wave, verify between e
 Tell the user:
 
 > Migration complete. Run:
-> - `/next-steps` — see what stage the project is at now and what's next
-> - `/check-production` — full audit (vibe-coded apps usually have hidden issues)
-> - Address each `OUT_OF_SCOPE.md` item one at a time using `/refactor` or `/triage`
-> - When ready, `/deploy` will walk you through production deployment
+> - `/0-Next-steps` — see what stage the project is at now and what's next
+> - `/5-Validate-Production-Readiness` — full audit (vibe-coded apps usually have hidden issues)
+> - Address each `OUT_OF_SCOPE.md` item one at a time using `/2-Define-Refactor` or `/5-Validate-Triage`
+> - When ready, `/6-Deploy` will walk you through production deployment
 
 ## Source-Platform Specific Gotchas
 
@@ -204,7 +204,7 @@ Tell the user:
 
 ### ChatGPT/Claude pasted
 
-- The most variable. Treat as a fresh `/setup-project` with the existing files as input.
+- The most variable. Treat as a fresh `/0-Setup-Project` with the existing files as input.
 - Inconsistent file patterns are the norm — don't try to harmonize during the port.
 
 ## Rules
@@ -214,7 +214,7 @@ Tell the user:
 - **Verify between waves.** `npm run build && npm run dev` after each.
 - **Flag, don't fix.** Inconsistencies, security issues, missing patterns → `OUT_OF_SCOPE.md`. Address them later with the right skill.
 - **Preserve working features bit-for-bit.** A working page that works the same after the port is a win. A "improved" page that breaks subtly is a loss.
-- **After the port, run `/next-steps` and `/check-production`** — don't claim done until those pass.
+- **After the port, run `/0-Next-steps` and `/5-Validate-Production-Readiness`** — don't claim done until those pass.
 
 ## If Something Goes Wrong
 

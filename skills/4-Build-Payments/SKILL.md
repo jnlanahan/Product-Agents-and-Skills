@@ -1,10 +1,10 @@
 ﻿---
-name: add-payment
+name: 4-Build-Payments
 description: MUST BE USED when the user wants to add or extend payments. Stripe-first; detects existing Stripe setup and extends, or detects a different processor (Paddle, Lemon Squeezy) and adapts. Always handles webhook signature verification, idempotency, and Customer Portal.
 when_to_use: "User says 'add Stripe', 'add payments', 'add subscription', 'add billing', 'add a paywall', 'wire up payments'."
 ---
 
-# /add-payment
+# /4-Build-Payments
 
 You add or extend payment functionality. Stripe-only — if the project uses a different processor (Paddle, Lemon Squeezy), surface that and ask whether to proceed with the existing processor or migrate.
 
