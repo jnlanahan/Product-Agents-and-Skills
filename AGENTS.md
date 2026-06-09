@@ -2,7 +2,7 @@
 
 This repository is a curated library of **Claude Code agents and skills** that drive a full Product Development Lifecycle (PDLC). Agents are read-only diagnostic helpers; skills are conversational workflows that orchestrate the work. Both are designed to be installed under `~/.claude/agents/` and `~/.claude/skills/` and used globally across projects.
 
-> **Index counts:** 12 agents · 29 skills · 8 workflows.
+> **Index counts:** 12 agents · 30 skills · 8 workflows.
 
 For the lifecycle this library is built around, see [PDLC_Phases.md](PDLC_Phases.md). For composed end-to-end paths through these tools, see [WORKFLOWS.md](WORKFLOWS.md). For a list of known coverage gaps, see [GAPS.md](GAPS.md).
 
@@ -420,6 +420,14 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **Flags** — `--lite`: fast 30-second sanity check (secret-scanner + build + health check only); for hotfixes and personal tools
 - **Calls agents** — `stack-detector`, `codebase-classifier`, `secret-scanner`, `dependency-currency-checker`, `prod-readiness-auditor`
 - **File** — [skills/5-Validate-Production-Readiness/SKILL.md](skills/5-Validate-Production-Readiness/SKILL.md)
+
+#### `/code-review` — `5-Validate-Code-Review`
+
+- **Use when** — the user wants to review code changes before pushing
+- **Output** — intent statement + severity-graded findings table (file:line) + go/no-go verdict + updated `.claude/progress.md`
+- **Calls agents** — `stack-detector`, `project-state-detector`
+- **File** — [skills/5-Validate-Code-Review/SKILL.md](skills/5-Validate-Code-Review/SKILL.md)
+- **Notes** — intent-first: infers what the developer was trying to accomplish from the conversation before reviewing, so deliberate decisions aren't flagged as mistakes
 
 ---
 
