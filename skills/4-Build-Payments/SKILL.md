@@ -24,6 +24,7 @@ You add or extend payment functionality. Stripe-only — if the project uses a d
 - Always start with Stripe test-mode keys (`sk_test_...`). Never wire live keys (`sk_live_...`) until the full flow is verified in test mode.
 - Webhook signature verification is non-negotiable — never skip it, even for a quick demo.
 - Do not handle raw card data in application code — all card collection must go through Stripe Elements or Stripe Checkout.
+- **Checkout error handling is non-negotiable.** Every button or function that calls a checkout or billing endpoint must have a `catch` block that shows a user-visible error (toast, alert, or inline message). A silent failure on checkout is worse than a visible error — the user has no idea whether their money was charged. No exceptions, same rule as webhook signature verification.
 
 ## Procedure
 
@@ -107,6 +108,7 @@ Migration needed: <yes/no, depends on schema>
 
 After execution:
 
+0. **Restart the dev server** after adding any new keys to `.env` / `.env.local`. Environment variables are read at startup — the running server does not pick up changes. Confirm the keys are loading by checking the server's startup logs for any "missing key" or "payments not configured" warnings before touching the UI.
 1. Run `stripe listen --forward-to <local-webhook-url>` and trigger a test checkout
 2. Use test card `4242 4242 4242 4242`, any future expiry, any CVC
 3. Verify webhook signature passes (no 400 from `stripe.webhooks.constructEvent`)

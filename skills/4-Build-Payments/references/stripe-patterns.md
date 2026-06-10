@@ -88,6 +88,35 @@ app.post('/api/webhooks/stripe', async (c) => {
 
 > **Gotcha (Hono):** If the route sits behind an auth middleware that parses the body as JSON first, `c.req.text()` will return an empty string or the stringified JSON — both break signature verification. Register the webhook route on a sub-router that has no body-parsing middleware, or register it before attaching the auth middleware chain.
 
+## Checkout button error handling
+
+Always wrap the checkout redirect in try/catch with a user-visible error. A silent failure (button does nothing, no toast, no message) is worse than showing an error — the user cannot tell if they were charged.
+
+```typescript
+// React example — adapt toast to your UI library
+async function handleBuyClick() {
+  try {
+    const res = await fetch('/api/checkout', { method: 'POST' });
+    if (!res.ok) throw new Error(await res.text());
+    const { url } = await res.json();
+    window.location.href = url;
+  } catch (err) {
+    toast.error('Could not start checkout. Please try again.');
+    console.error(err);
+  }
+}
+```
+
+Common causes of a silent 503/500 on the checkout endpoint:
+- Stripe keys not loaded (server not restarted after adding to `.env`)
+- `STRIPE_SECRET_KEY` is undefined at runtime — add a startup guard:
+
+```typescript
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY is not set — restart the server after adding it to .env');
+}
+```
+
 ## Checkout Session creation
 
 - Pass `client_reference_id: user.id` so webhook can identify the user
