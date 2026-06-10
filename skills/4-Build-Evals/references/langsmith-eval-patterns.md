@@ -19,17 +19,73 @@ pip install langsmith anthropic
 ## Env vars
 
 ```
-LANGCHAIN_TRACING_V2=true
-LANGCHAIN_API_KEY=ls__...
-LANGCHAIN_PROJECT=my-app-evals
+LANGSMITH_TRACING=true
+LANGSMITH_API_KEY=ls__...
+LANGSMITH_PROJECT=my-app-evals
 ANTHROPIC_API_KEY=sk-ant-...    # needed if using LLM-as-judge
 ```
 
 ---
 
-## Tracing wrapper
+## SDK wrapping (recommended — Path A)
 
-Wrap your existing AI function so LangSmith records every call.
+Wrap the SDK client once at initialization. Every call is automatically traced — no changes needed at call sites.
+
+### TypeScript — Anthropic SDK
+
+```typescript
+// lib/ai.ts
+import Anthropic from '@anthropic-ai/sdk';
+import { wrapAnthropic } from 'langsmith/wrappers';
+
+export const ai = wrapAnthropic(new Anthropic());
+// Use ai.messages.create() exactly as before — all calls are now traced
+```
+
+### TypeScript — Vercel AI SDK
+
+```typescript
+import { anthropic } from '@ai-sdk/anthropic';
+import { wrapAISDKModel } from 'langsmith/wrappers/vercel';
+
+export const model = wrapAISDKModel(anthropic('claude-sonnet-4-6'));
+// Pass model to generateText() / streamText() as normal
+```
+
+### TypeScript — OpenAI SDK
+
+```typescript
+import OpenAI from 'openai';
+import { wrapOpenAI } from 'langsmith/wrappers';
+
+export const openai = wrapOpenAI(new OpenAI());
+```
+
+### Python — Anthropic SDK
+
+```python
+# lib/ai.py
+from anthropic import Anthropic
+from langsmith.wrappers import wrap_anthropic
+
+ai = wrap_anthropic(Anthropic())
+# Use ai.messages.create() exactly as before — all calls are now traced
+```
+
+### Python — OpenAI SDK
+
+```python
+from openai import OpenAI
+from langsmith.wrappers import wrap_openai
+
+client = wrap_openai(OpenAI())
+```
+
+---
+
+## Tracing wrapper (alternative — use when you can't swap the client)
+
+Use the `traceable` decorator to wrap individual functions instead of the client. Useful when the AI client is initialized in third-party code you don't control.
 
 ### TypeScript
 
@@ -237,8 +293,10 @@ async function llmJudge(
     ],
   });
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : '{}';
-  const { score, reason } = JSON.parse(text);
+  const text = response.content[0].type === 'text' ? response.content[0].text : '';
+  // Models sometimes wrap JSON in markdown fences — extract the first {...} block
+  const match = text.match(/\{[\s\S]*?\}/);
+  const { score, reason } = JSON.parse(match?.[0] ?? '{}');
   return { key: 'llm_accuracy', score, comment: reason };
 }
 ```
@@ -247,6 +305,7 @@ async function llmJudge(
 
 ```python
 import json
+import re
 import anthropic
 
 judge_client = anthropic.Anthropic()
@@ -273,7 +332,10 @@ def llm_judge(inputs: dict, outputs: dict) -> dict:
             "content": f"Question: {inputs['user_message']}\n\nResponse to evaluate: {outputs['result']}",
         }],
     )
-    result = json.loads(response.content[0].text)
+    text = response.content[0].text
+    # Models sometimes wrap JSON in markdown fences — extract the first {...} block
+    match = re.search(r'\{[\s\S]*?\}', text)
+    result = json.loads(match.group() if match else '{}')
     return {"key": "llm_accuracy", "score": result["score"], "comment": result["reason"]}
 ```
 
@@ -375,10 +437,10 @@ Or add to `.github/workflows/ci.yml`:
 - name: Run AI evals
   run: npm run eval
   env:
-    LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
-    LANGCHAIN_TRACING_V2: "true"
-    LANGCHAIN_PROJECT: my-app-evals
+    LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+    LANGSMITH_TRACING: "true"
+    LANGSMITH_PROJECT: my-app-evals
     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
-Add `LANGCHAIN_API_KEY` and `ANTHROPIC_API_KEY` to your GitHub repo secrets (Settings → Secrets → Actions).
+Add `LANGSMITH_API_KEY` and `ANTHROPIC_API_KEY` to your GitHub repo secrets (Settings → Secrets → Actions).

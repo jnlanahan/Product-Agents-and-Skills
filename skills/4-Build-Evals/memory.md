@@ -1,0 +1,1 @@
+- Agents with native tool use (web_search, API calls) require full live pipeline evals — no mocking option exists without a major refactor. Warn the user about cost ($5–15) and time (5–10 min) before they run.
