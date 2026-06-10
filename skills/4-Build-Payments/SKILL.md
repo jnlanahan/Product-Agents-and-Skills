@@ -12,6 +12,7 @@ You add or extend payment functionality. Stripe-only — if the project uses a d
 
 - Read `.claude/progress.md` (last 5 entries) and `.claude/context.md` if present
 - Call `project-state-detector`; if mode is off-pattern for this skill, surface a one-line warning (do NOT block)
+- **Dev/mock auth bypass check:** Ask or grep for any dev-login shortcut (e.g., a route like `/dev-login`, a hardcoded user bypass, or a `DEV_USER_ID` env var that skips real auth). If found, flag it: test-mode payment flows will be unreliable until it is removed or gated behind a condition that is off during payment testing.
 
 ## Post-flight
 
@@ -70,6 +71,14 @@ Use `AskUserQuestion` if available, or prompt:
 > 5. **New webhook event handler** (e.g., `invoice.payment_failed` for dunning)
 
 Then ask for the specific details (price, currency, product description, billing interval).
+
+**For one-time purchases specifically, also ask:**
+> Will you need to handle duplicate webhook events reliably (e.g., fulfillment that must not run twice)? If yes (recommended default), I'll add a `processed_events` table for idempotency tracking. This is a simple insert-before-handle pattern — cheap to add now, painful to retrofit later.
+
+**Admin bypass pattern (ask if not already present):**
+> Should the app owner (you) be able to use the app without paying, even in production? If yes, I'll add a seeded admin user whose tier is set directly in the database — no payment required. This lets you test and demo without triggering real charges.
+
+If the user says yes, add a seed script or a one-time DB migration that sets the owner's tier/role to the highest plan. Document how to re-run it if the user ever needs to reset their own account.
 
 ### Step 4: Write the plan
 

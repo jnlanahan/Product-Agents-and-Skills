@@ -64,6 +64,30 @@ app.post('/api/webhooks/stripe',
 );
 ```
 
+For Hono:
+
+```typescript
+// Hono webhook route — register WITHOUT auth middleware.
+// Stripe signature IS the auth — adding a Bearer/session check will reject all webhooks.
+// c.req.text() gives the raw body string before any JSON parsing.
+app.post('/api/webhooks/stripe', async (c) => {
+  const body = await c.req.text(); // raw body — do NOT use c.req.json()
+  const sig = c.req.header('stripe-signature');
+  if (!sig) return c.text('No signature', 400);
+
+  let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+  } catch (err) {
+    return c.text('Invalid signature', 400);
+  }
+  // idempotency + handle...
+  return c.text('OK', 200);
+});
+```
+
+> **Gotcha (Hono):** If the route sits behind an auth middleware that parses the body as JSON first, `c.req.text()` will return an empty string or the stringified JSON — both break signature verification. Register the webhook route on a sub-router that has no body-parsing middleware, or register it before attaching the auth middleware chain.
+
 ## Checkout Session creation
 
 - Pass `client_reference_id: user.id` so webhook can identify the user
