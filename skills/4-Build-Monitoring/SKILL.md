@@ -34,7 +34,15 @@ If only one is wired, add the other. If both are wired, verify config and exit.
 
 In parallel:
 - `stack-detector` — what's in package.json
-- `pattern-finder` — "Find existing analytics/error tracking code: client init, where providers mount, what events are tracked"
+- `pattern-finder` — "Find existing analytics/error tracking code: client init, where providers mount, what events are tracked. Also find: error boundaries, onError handlers, stream/async failure paths, auth sign-in/sign-out handlers, and the 3–5 core feature actions the app performs."
+
+After both agents return, generate a short "Here's what we'll monitor" summary tailored to this app before doing anything else. Example shape:
+
+> **What Sentry will catch in your app:** server crashes in your API routes, React render errors in [ErrorBoundary], and failures in [specific async path like stream processing or file upload].
+>
+> **What PostHog will track:** who [does the core action], how far users get in [specific funnel], and where they drop off. We'll fire events like `[feature]_started`, `[feature]_completed`, `signed_in`.
+
+Show this to the user before continuing. This sets expectations so nothing surprises them mid-setup.
 
 ### Step 2: Determine state
 
@@ -47,27 +55,39 @@ In parallel:
 
 ### Step 3: Account setup (USER does these in browser)
 
-Walk the user through both account setups, verbatim:
+Before asking for credentials, give a one-paragraph plain-English description of what each tool will do in **this specific app** — not generic marketing copy. Use the pattern-finder results from Step 1. For example:
+
+> "Sentry will automatically catch crashes in your API routes, React render errors in your ErrorBoundary, and any unhandled promise rejections. When something breaks in production you'll get an email with the exact file and line number.
+>
+> PostHog will record every time a user starts an analysis, how far they get, and whether they complete it. You can see session replays of confusing moments and build a funnel to see where people drop off."
+
+Then walk through account setup:
 
 > **Sentry** (https://sentry.io):
 >
 > 1. Sign up for a free account
 > 2. Create a new project — when asked "What platform?" pick the framework that matches your project (Next.js, Node.js, React, etc.)
 > 3. After creation, you'll see your **DSN** on the setup page — copy it
-> 4. Go to **Settings → Account → Auth Tokens** → click **"Create New Token"**
-> 5. Scopes needed: `project:read`, `project:releases`, `org:read`
+> 4. For the auth token: go to your **profile avatar (bottom-left) → User Settings → Auth Tokens** OR **Settings → [Your Org] → Organization Auth Tokens** — you want the **Organization Auth Token**, NOT the Security Token shown in project settings
+> 5. Click **"Create New Token"**; scopes needed: `project:read`, `project:releases`, `org:read`
 > 6. Copy the token (starts with `sntrys_`) — you won't see it again
-> 7. Reply with: DSN, project name, org name, auth token
 >
+> **Paste both the DSN and the auth token directly in this chat — I'll add them to your .env file.**
+>
+> Also tell me your Sentry project name and org name (shown in the URL: `sentry.io/organizations/<org-name>/`).
+
 > **PostHog** (https://posthog.com):
+>
+> **Free tier note:** PostHog's free plan allows 1 project. If you have multiple apps, use a single project and we'll tag every event with `app: 'yourappname'` so you can filter per app in dashboards — no upgrade needed.
 >
 > 1. Sign up for a free account
 > 2. Create a project (or use the default one)
-> 3. **Settings → Project → Project API Key** — copy the value (starts with `phc_`)
+> 3. Go to **Settings → Project → Project API Key** — copy the value (starts with `phc_`)
 > 4. Note your host URL — usually `https://us.i.posthog.com` (or `https://eu.i.posthog.com` if EU region)
-> 5. Reply with: project API key, host URL
+>
+> **Paste the API key and host URL directly in this chat — I'll add them to your .env file.**
 
-Wait for the user to confirm.
+Wait for the user to provide all values before continuing.
 
 → See [sentry-posthog-patterns.md](references/sentry-posthog-patterns.md) for installation commands, user identification code, env var list, and Sentry verification test snippet.
 
@@ -85,7 +105,11 @@ Call `Sentry.setUser()` and `posthog.identify()` after successful sign-in; call 
 
 ### Step 7: Set env vars
 
-Add `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `NEXT_PUBLIC_POSTHOG_KEY`, and `NEXT_PUBLIC_POSTHOG_HOST` to `.env.example`. Tell the user to set these in `.env.local`. Production vars get set during `/6-Deploy`.
+Add `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `NEXT_PUBLIC_POSTHOG_KEY`, and `NEXT_PUBLIC_POSTHOG_HOST` to `.env.example`. Write the actual values to `.env.local`.
+
+> **Important:** After writing the env vars, tell the user: "Restart the dev server now — Vite/Next.js won't pick up new env vars without a full restart. Stop the server (Ctrl+C) and run your start command again before testing."
+
+Production vars get set during `/6-Deploy`.
 
 ### Step 8: Verify
 
@@ -121,7 +145,7 @@ Skip: every button click, every form input. Session replay covers granular UX.
 
 ## If Something Goes Wrong
 
-- **Sentry events not appearing** — confirm the DSN is set in `.env` and the server was restarted; use Sentry's test event button (Settings > Projects > your project > "Send a test event").
+- **Sentry events not appearing / stuck on "waiting"** — the most common cause is the dev server wasn't restarted after adding env vars. Stop it (Ctrl+C) and rerun. Then confirm DSN is present in `.env.local`. Sentry also has a test button: Settings → Projects → your project → "Send a test event".
 - **PostHog not tracking events** — check the API key and host in the PostHog config; confirm `posthog.identify()` is called after login and not before the client initializes.
 - **User identity not showing in Sentry/PostHog** — confirm `Sentry.setUser()` and `posthog.identify()` are called after authentication resolves, not on app mount.
 - **Source maps not uploading to Sentry** — verify `SENTRY_AUTH_TOKEN` and `SENTRY_ORG`/`SENTRY_PROJECT` are set in CI; source maps must be uploaded at build time, not runtime.

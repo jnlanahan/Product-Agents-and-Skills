@@ -60,7 +60,7 @@ Present as a table:
 In order of severity (errors first, then warnings, then info):
 
 - **`auto-fix`** — offer to apply the fix. If user says "fix them all", batch-apply all auto-fix findings at once.
-- **`ask-user`** — relay the finding verbatim (id, file:line, description). Ask how to proceed. Translate the answer into: apply the fix with their guidance, approve as-is, or skip.
+- **`ask-user`** — relay the finding verbatim (id, file:line, description), then add a **My read:** line with your own judgment — whether you think it looks intentional, risky, or fine — before asking the user how to proceed. This makes the exchange feel like a decision, not a deferral. Example: *"My read: the timeout increase looks intentional given the retry context, but worth confirming."* Translate the user's answer into: apply the fix with their guidance, approve as-is, or skip.
 - **`no-op`** — acknowledge briefly. No action needed.
 
 ### Step 6: Verdict
@@ -74,7 +74,7 @@ After all findings are resolved, give a clear verdict:
 ## Rules
 
 - Never flag pre-existing issues unless the new diff touches them
-- `ask-user` findings must be relayed verbatim — no paraphrasing, no pre-judging the answer
+- `ask-user` findings must be relayed verbatim — no paraphrasing. Always add a **My read:** line with your judgment before asking; never just throw the question back without a view.
 - Auto-fixes are mechanical only (null checks, missing imports, formatting) — no logic or behavior changes without asking
 - Block only on unresolved `error` severity — warnings never block
 - If intent inference is uncertain, state it as "Intent inferred (uncertain):" and proceed anyway

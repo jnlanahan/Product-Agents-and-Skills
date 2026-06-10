@@ -2,7 +2,7 @@
 
 This repository is a curated library of **Claude Code agents and skills** that drive a full Product Development Lifecycle (PDLC). Agents are read-only diagnostic helpers; skills are conversational workflows that orchestrate the work. Both are designed to be installed under `~/.claude/agents/` and `~/.claude/skills/` and used globally across projects.
 
-> **Index counts:** 12 agents · 30 skills · 8 workflows.
+> **Index counts:** 12 agents · 31 skills · 8 workflows.
 
 For the lifecycle this library is built around, see [PDLC_Phases.md](PDLC_Phases.md). For composed end-to-end paths through these tools, see [WORKFLOWS.md](WORKFLOWS.md). For a list of known coverage gaps, see [GAPS.md](GAPS.md).
 
@@ -345,6 +345,13 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 - **Use when** — wiring observability before any production launch
 - **Output** — both Sentry (errors, stack traces, performance, source maps) AND PostHog (analytics, replay, flags, funnels). Walks through account setup, env vars, verification with real test events. Identifies authenticated users in both.
 - **File** — [skills/4-Build-Monitoring/SKILL.md](skills/4-Build-Monitoring/SKILL.md)
+
+#### `/add-evals` — `4-Build-Evals`
+
+- **Use when** — adding LangSmith evals to an existing AI feature; reads the AI code, decides if evals are worth building, designs the dataset and evaluator, and wires a runnable script
+- **Output** — `scripts/run-evals.ts` (or `.py`), a LangSmith dataset with ≥5 examples, and at least one passing evaluator with a baseline score
+- **Calls agents** — `stack-detector`
+- **File** — [skills/4-Build-Evals/SKILL.md](skills/4-Build-Evals/SKILL.md)
 
 #### `/add-ai` — `4-Build-AI`
 
