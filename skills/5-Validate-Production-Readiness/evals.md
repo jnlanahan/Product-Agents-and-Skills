@@ -13,3 +13,6 @@ For each FAIL provide one line of reason. Do not add criteria beyond what is lis
 8. No fixes were applied during the audit — report-only mode was honored
 9. If `--lite` mode: results explicitly cover secrets scan, build check, and health endpoint
 10. `.claude/progress.md` was updated on completion
+11. If any secret-type key sits behind a client-exposed env prefix (`NEXT_PUBLIC_`/`VITE_`/`REACT_APP_`/`EXPO_PUBLIC_`/`PUBLIC_`/`NUXT_PUBLIC_`), it is reported as Critical — or the report states no client-bundled secrets were found
+12. If the app uses Supabase or Firebase/Firestore, the report addresses data-access control (RLS enabled + scoped policies, or Firestore rules not in open/test mode) — or states it was checked and is sound
+13. If the app has a client UI that fetches data, the report addresses client-side failure handling (error states / error boundary, not blank-screen-on-failed-request) — or states it was checked and is sound

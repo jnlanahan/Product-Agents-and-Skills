@@ -82,7 +82,7 @@ All twelve agents are **read-only by design** (best practice #10). They detect, 
 - **Tools** — `Read, Grep, Glob, Bash`
 - **Output** — `SECRET SCAN REPORT` with truncated evidence and rotation actions for each finding
 - **File** — [agents/secret-scanner.md](agents/secret-scanner.md)
-- **Notes** — scans both working tree AND git history; reports only — never deletes or rotates
+- **Notes** — scans both working tree AND git history; also flags secret keys behind public env prefixes (`NEXT_PUBLIC_`/`VITE_`/etc.) that ship in the client bundle; reports only — never deletes or rotates
 
 ### `dependency-currency-checker`
 

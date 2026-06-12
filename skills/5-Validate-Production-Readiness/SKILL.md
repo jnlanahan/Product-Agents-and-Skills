@@ -75,7 +75,7 @@ Call `prod-readiness-auditor` with full context:
 > Pre-scanned secrets: <count from secret-scanner; brief summary>
 > Outdated dependencies: <list from currency-checker>
 >
-> Cover all 8 areas. Cite file:line for every finding. Be honest about severity.
+> Cover all 9 areas. Cite file:line for every finding. Be honest about severity.
 
 ### Step 3: Assemble the final report
 

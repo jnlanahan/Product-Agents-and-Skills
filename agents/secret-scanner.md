@@ -1,6 +1,6 @@
 ---
 name: secret-scanner
-description: MUST BE USED before any production deploy and during `/check-production`. Scans the working tree, git history, and source for committed secrets and credential exposure across the SaaS stack (Stripe, Firebase, Resend, Sentry, Anthropic, OpenAI, Google OAuth, AWS, Slack, GitHub PATs). Returns a structured SECRET SCAN REPORT with truncated evidence and rotation actions. Reports only — does not delete or rotate.
+description: MUST BE USED before any production deploy and during `/check-production`. Scans the working tree, git history, and source for committed secrets and credential exposure across the SaaS stack (Stripe, Firebase, Supabase, Resend, Sentry, Anthropic, OpenAI, Google OAuth, AWS, Slack, GitHub PATs), and flags secret keys exposed to the browser via public env prefixes (NEXT_PUBLIC_/VITE_/etc.). Returns a structured SECRET SCAN REPORT with truncated evidence and rotation actions. Reports only — does not delete or rotate.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
@@ -35,6 +35,8 @@ Grep `src/`, `server/`, `app/`, `pages/`, `lib/`, `components/`, `hooks/` for:
 | `sk-ant-[A-Za-z0-9_-]{90,}` | Anthropic API key |
 | `sk-proj-[A-Za-z0-9_-]{40,}` or `sk-[A-Za-z0-9]{48}` | OpenAI API key |
 | `AIza[A-Za-z0-9_-]{35}` | Google API key (Firebase, Maps, etc.) — note: NEXT_PUBLIC_FIREBASE_API_KEY is browser-safe but should still be env |
+| `https://[a-z0-9]{20}\.supabase\.co` | Supabase project URL (low risk, env preferred) |
+| `eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+` near `supabase`/`SUPABASE` | Supabase key (JWT). Decode the middle segment: `"role":"service_role"` = **Critical, server-only, bypasses RLS**; `"role":"anon"` = browser-safe but env-preferred |
 | `[a-zA-Z0-9_-]+\.apps\.googleusercontent\.com` | Google OAuth client ID (less critical, but env preferred) |
 | `GOCSPX-[A-Za-z0-9_-]{28}` | Google OAuth client secret |
 | `-----BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY-----` | Any private key |
@@ -48,7 +50,18 @@ Grep `src/`, `server/`, `app/`, `pages/`, `lib/`, `components/`, `hooks/` for:
 - MongoDB: `mongodb://user:password@host`
 - Any `https://username:password@`
 
-### 4. Firebase config in source (special case)
+### 4. Secrets exposed to the browser via a public env prefix (high signal)
+Anything assigned to an env var with a **client-exposed prefix** is compiled into the JavaScript bundle and readable in DevTools. Grep for these prefixes:
+
+`NEXT_PUBLIC_`, `VITE_`, `REACT_APP_`, `PUBLIC_` (SvelteKit/Astro), `EXPO_PUBLIC_`, `NUXT_PUBLIC_`
+
+Then classify each match by what it holds:
+- **Critical — secret behind a public prefix:** the var name contains `SECRET`, `PRIVATE`, `SERVICE_ROLE`, or holds a secret key value (`sk_`, `sk-ant-`, `sk-proj-`, `re_`, `whsec_`, `GOCSPX-`, a DB connection string, or a `service_role` JWT). This secret is shipped to every visitor — rotate it and move it server-side.
+- **Expected / browser-safe:** Firebase web config, Stripe *publishable* key (`pk_`), Supabase *anon* key, PostHog project key. Note as informational, not a finding.
+
+Report a public-prefixed secret under CRITICAL FINDINGS (same urgency as a committed key — it is already public).
+
+### 5. Firebase config in source (special case)
 Firebase client config (`apiKey`, `authDomain`, `projectId`, etc.) is **technically browser-safe** — it's public. But it should still be in env vars (`NEXT_PUBLIC_FIREBASE_*`), not hardcoded in source, because:
 - Easier to rotate per-environment
 - Reduces accidental exposure of dev project to prod and vice versa

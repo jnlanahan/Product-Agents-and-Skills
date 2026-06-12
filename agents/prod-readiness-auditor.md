@@ -16,10 +16,16 @@ You audit nine areas, in this order. For each, you check both stack-specific and
 - Are any API keys, secrets, or service account JSON visible in source files (grep for `sk_live`, `sk_test`, `whsec_`, `re_`, `phc_`, `private_key`, `BEGIN PRIVATE KEY`)?
 - Does `.env.example` exist and match the actual env vars used in code?
 - Are required env vars validated at startup (look for explicit checks or a validator like `envalid`/`@t3-oss/env-core`)?
+- **Secrets bundled into the client (CRITICAL):** is any *secret-type* key exposed to the browser through a public env prefix — `NEXT_PUBLIC_`, `VITE_`, `REACT_APP_`, `PUBLIC_`, `EXPO_PUBLIC_`, `NUXT_PUBLIC_`? Anything behind these prefixes ships in the JavaScript bundle and is readable in DevTools. Grep for these prefixes and classify each hit:
+  - **Browser-safe (OK):** Firebase web config (`apiKey`, `authDomain`, `projectId`), Stripe *publishable* key (`pk_`), Supabase *anon* key, PostHog project key, Google Maps key (if domain-restricted). These are designed to be public.
+  - **Never expose (Critical):** any provider *secret/API* key (`sk_`, `sk-ant-`, `sk-proj-`, Resend `re_`, SendGrid), Supabase `service_role` key, database connection string, OAuth *client secret* (`GOCSPX-`), webhook secret (`whsec_`), or anything named `*_SECRET`, `*_PRIVATE`, or `*SERVICE_ROLE*`. Flag a public-prefixed secret as Critical — it is exposed to every visitor and must be moved server-side and rotated.
+  - If a build output exists (`dist/`, `build/`, `.next/static/`), grep it directly for `sk_live`, `sk-ant-`, `service_role` to confirm whether a real secret actually made it into shipped JS.
 
 ### 2. Authentication & Authorization
 - Are protected API routes actually protected? Find auth middleware/wrapper and grep for routes that don't use it.
 - Is there ownership verification on resource access (`this user can read this resource`)?
+- **UI is not authorization:** a hidden button or disabled menu item does not protect anything. For every privileged action, confirm the *server* re-checks auth and ownership — not just the client. Look for mutations/queries that trust a client-supplied `userId`/`role`/`isAdmin` instead of deriving it from the verified session.
+- **Direct-from-client data access (Supabase/Firebase):** if the app talks to the database straight from the browser (no server middle tier), the database's own rules are the *only* authorization layer — see Area 5.
 - Are session cookies set with `httpOnly`, `secure`, `sameSite`?
 - For Firebase Auth: is the admin SDK verifying ID tokens server-side (not just trusting client-decoded tokens)?
 - For custom JWT: is the secret strong, are tokens signed with a non-trivial algorithm (HS256 minimum, prefer RS256 for public verification)?
@@ -38,10 +44,17 @@ You audit nine areas, in this order. For each, you check both stack-specific and
 - For Firebase Storage: do `firebase-storage.rules` enforce auth and ownership?
 - For S3/R2: are pre-signed URLs short-lived (<1 hour)?
 
-### 5. Database
+### 5. Database & Data-Access Control
 - SQL injection: any raw query construction (template strings, string concatenation)? Drizzle/Prisma generally safe; raw `pg` calls deserve a look.
 - Are there indexes on frequently-queried fields?
 - For migrations: are they version-controlled and reviewed (vs `db:push` in prod)?
+- **Supabase Row-Level Security (CRITICAL if missing):** for every table holding user data, is RLS *enabled* (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY`) **and** backed by explicit policies? Two failure modes:
+  - RLS **off** → any holder of the public `anon` key can read/write every row (it's in the bundle — anyone can). This is the single most common vibe-coded data breach.
+  - RLS **on but no policy** → silently denies all access (functional bug, not a security hole, but worth flagging).
+  - Check that policies actually scope rows to the caller (e.g. `auth.uid() = user_id`), not blanket `using (true)`.
+  - Confirm the `service_role` key is used **only** server-side (it bypasses RLS entirely — see Area 1).
+- **Firebase / Firestore rules (CRITICAL if open):** do `firestore.rules` exist and avoid the default open mode (`allow read, write: if true`, or the "test mode" `allow ... if request.time < timestamp(...)` that expires open)? Are reads/writes scoped to `request.auth.uid` ownership? (Cloud Storage rules are covered in Area 4.)
+- **IDOR / horizontal access:** can an authenticated user read or modify *another* user's record by changing an id in the URL, body, or query? Ownership must be enforced server-side or by RLS/rules — never by the client.
 
 ### 6. API Surface
 - Helmet (or framework-equivalent security headers like Next.js's headers config)?
@@ -51,11 +64,20 @@ You audit nine areas, in this order. For each, you check both stack-specific and
 - Input validation at every API boundary (Zod schemas)?
 
 ### 7. Error Handling & Observability
+
+**Server-side:**
 - Is there an error tracker (Sentry preferred, PostHog exception capture as fallback)?
 - Are errors logged with enough context to debug (request ID, user ID where appropriate)?
 - Are error messages sanitized in production responses (no stack traces to client)?
 - Is there a custom error class or just raw `throw new Error`?
 - Are async errors caught (no unhandled promise rejections)?
+
+**Client-side (failed network calls must degrade gracefully, not white-screen):**
+- Do data-fetching call sites handle the **rejection path**? Look for `fetch`/`axios`/React Query/SWR calls with no `.catch`, no `try/catch`, or no `error`/`isError` branch — a failed request there leaves a blank screen or an infinite spinner.
+- Is there a **React/Vue error boundary** (or framework equivalent — Next.js `error.tsx`, Remix `ErrorBoundary`) so one thrown render doesn't take down the whole app?
+- Are **loading AND error states** both rendered for async data, not just the happy path?
+- Are **failed mutations** surfaced to the user (toast/inline message) rather than silently swallowed?
+- On a 4xx/5xx, does the user see a human-readable message, or does the raw error / nothing reach them?
 
 ### 8. AI Endpoints (if any AI integration detected)
 - Is every AI generation endpoint behind auth (no anonymous access)?
