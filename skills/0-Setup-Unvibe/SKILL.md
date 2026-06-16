@@ -62,9 +62,29 @@ If `codebase-classifier` returns `greenfield` or `wired`, stop and reroute:
 
 Otherwise continue.
 
-### Step 2: Assess (full scan, all agents in parallel)
+**Determine codebase size.** Count source files with a single glob, excluding `node_modules`, build output, `.git`, lockfiles, and generated/vendored assets (e.g. `**/*.{ts,tsx,js,jsx,py,go,rb,vue,svelte}` minus those paths). The count selects the assessment path in Step 2:
 
-Run these read-only agents in parallel:
+- **Under 200 source files → Step 2A (one guided Explore agent).** Cheaper and faster; preserves context for the remediation waves where it actually matters. For small/medium codebases, one guided Explore agent beats six specialized detectors on cost-per-insight.
+- **200 or more → Step 2B (full detector fan-out, each capped).**
+
+### Step 2A: Assess — small/medium codebases (one guided Explore agent)
+
+For codebases under 200 source files, do **not** fan out six detectors — that burns most of the context before any work starts. Run a single `Explore` agent ("very thorough") covering all six concerns, with a **hard 400-word output cap**:
+
+> Assess this vibe-coded codebase for rehabilitation. Cover all six areas; return findings only — no preamble, no code blocks. **Hard limit: 400 words total.**
+> 1. **Platform artifacts** — Replit/Lovable/v0/Bolt/StackBlitz configs, AI boilerplate comments, mock data wired into production paths, scratch/`.bak`/`.old` files.
+> 2. **Duplication** — near-duplicate files, components, utilities, types; list clusters with a recommended canonical.
+> 3. **Dead code** — unreferenced files, unused exports, orphaned dependencies; note deletion confidence.
+> 4. **Architecture drift** — competing patterns (multiple state managers / validation libs / styling approaches), half-implemented features.
+> 5. **Secrets** — committed `.env` files or credentials; truncate any value to first 8 chars + `***`.
+> 6. **Stale dependencies** — stack-relevant majors that have drifted.
+> Group findings under the six headings above, cite `file:line`, and omit any heading with no findings.
+
+If the Explore agent surfaces a serious secrets exposure, or the codebase turns out larger/messier than the file count implied, escalate to the matching targeted detector from Step 2B **for that concern only**. Otherwise go straight to Step 3.
+
+### Step 2B: Assess — large codebases (full detector fan-out, capped)
+
+For 200+ source files, run these read-only agents in parallel. **Append an explicit output cap to every detector's prompt** — `"Return only your structured report, capped at 350 words; describe each cluster/finding in one sentence; keep file:line citations but no exhaustive filename dumps; omit empty sections."` — so no single detector floods the context:
 
 1. `vibe-artifact-detector` — platform configs, AI boilerplate comments, mock data in prod paths, scratch files
 2. `duplication-detector` — near-duplicate files, components, utilities, types
@@ -75,7 +95,10 @@ Run these read-only agents in parallel:
 
 Collect all six reports. Do not summarize to the user yet — go straight to Step 3.
 
-### Step 3: Synthesize the plan
+### Step 3: Write the plan (inline)
+
+Write the plan directly from the assessment output — there is no separate synthesis agent. With the Step 2 output already capped and structured, the main model composes the plan itself.
+
 
 Write `.claude/0-Setup-Unvibe-plan.md` with this structure:
 
@@ -85,7 +108,8 @@ Write `.claude/0-Setup-Unvibe-plan.md` with this structure:
 ## Snapshot
 - Stack: <one-line summary from stack-detector>
 - Classification: vibe-coded (<confidence>)
-- Detectors run: vibe-artifact, duplication, dead-code, drift, secret-scanner, dependency-currency
+- Source files: <count>
+- Assessment: <one Explore agent (Step 2A) | six detectors (Step 2B)>
 
 ## Critical findings (do these first or do not deploy)
 - <committed .env / secrets in history / etc., from secret-scanner>
