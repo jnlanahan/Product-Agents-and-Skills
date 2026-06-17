@@ -52,8 +52,8 @@ Wait for the user. Walk through any missing setup before proceeding.
 
 **Creating an IAM user with S3 access:**
 1. Go to IAM → Users → Create user
-2. Name: `myapp-s3-user`
-3. Attach policy: click "Attach policies directly" → create inline policy with this JSON:
+2. Name: `myapp-s3-user` → Next → finish creating the user (skip adding permissions on the creation screen — see the warning below)
+3. **Attach the policy *after* the user exists.** Open the user → **Permissions** tab → Add permissions → Create inline policy → JSON, and paste:
    ```json
    {
      "Version": "2012-10-17",
@@ -64,17 +64,30 @@ Wait for the user. Walk through any missing setup before proceeding.
      }]
    }
    ```
-4. Create user → go to Security credentials tab → Create access key → Application running outside AWS
+   > ⚠️ Attaching an inline policy *during user creation* frequently fails to save silently. Always do it from the user's **Permissions** tab after the user exists, and confirm the policy is listed there before moving on. If it's missing, add it from that tab.
+4. Still on the user → **Security credentials** tab → Create access key → "Application running outside AWS"
 5. Copy the **Access Key ID** and **Secret Access Key** — you only see the secret once
 
 **Creating a CloudFront distribution:**
 1. Go to CloudFront → Create distribution
 2. Origin domain: select your S3 bucket
-3. Origin access: choose "Origin access control settings (recommended)" → create new OAC
-4. Copy the bucket policy that CloudFront shows you and apply it to your S3 bucket
-5. Default cache behavior: Viewer protocol policy = Redirect HTTP to HTTPS
-6. Create distribution → copy the **Distribution domain name** (e.g. `d1234abcd.cloudfront.net`)
-7. For signed URLs (private files): go to Key Management → Public Keys → create a key pair; note the Key Pair ID and download the private key
+3. **Origin access:** the current wizard shows a single checkbox — **"Allow private S3 bucket access to CloudFront"**. Check it. This auto-creates the Origin Access Control (OAC) *and* writes the S3 bucket policy for you. (Older guides describe separate "Origin access control settings" radio buttons plus a manual "copy this bucket policy to your bucket" step — those are gone; the checkbox replaces both.)
+4. Default cache behavior: Viewer protocol policy = Redirect HTTP to HTTPS. Leave **Restrict viewer access = No** for now (you'll turn it on below only if you serve private files).
+5. Create distribution → copy the **Distribution domain name** (e.g. `d1234abcd.cloudfront.net`) → this is your `CLOUDFRONT_DOMAIN`.
+
+**Setting up signed URLs (only if you serve private files):**
+
+Signed URLs need an RSA key pair. Do this once, in four steps:
+
+1. **Generate the key pair locally** (run in your project root):
+   ```bash
+   node -e "const c=require('crypto');const{publicKey,privateKey}=c.generateKeyPairSync('rsa',{modulusLength:2048,publicKeyEncoding:{type:'spki',format:'pem'},privateKeyEncoding:{type:'pkcs8',format:'pem'}});const fs=require('fs');fs.writeFileSync('cloudfront_private_key.pem',privateKey);fs.writeFileSync('cloudfront_public_key.pem',publicKey);console.log('Wrote cloudfront_private_key.pem and cloudfront_public_key.pem');"
+   ```
+2. **Register the Public key:** CloudFront → **Key management → Public keys** → Create public key → paste the contents of `cloudfront_public_key.pem`. After saving, copy its **ID — it starts with `K`** (e.g. `K2ABCDEF123456`). **This Public key ID is your `CLOUDFRONT_KEY_PAIR_ID`.** Do not confuse it with the OAC ID, the distribution ID, or the key-group ID — they look similar, but only the *Public key* ID (under Key management → Public keys) works for signing.
+3. **Create a Key group:** CloudFront → **Key management → Key groups** → Create key group → add the public key you just registered.
+4. **Restrict the distribution:** open your distribution → Behaviors → edit the default behavior → set **Restrict viewer access = Yes** → Trusted authorization type = Trusted key groups → select the key group from step 3 → Save. (CloudFront takes 5–15 min to deploy this change.)
+
+**Secure the private key:** keep `cloudfront_private_key.pem` as a gitignored file (add `cloudfront_private_key.pem`, or `*.pem`, to `.gitignore`) and point `CLOUDFRONT_PRIVATE_KEY_PATH` at it. Do **not** paste the key into a `\n`-escaped multi-line env var — that's error-prone and easy to corrupt. You can delete `cloudfront_public_key.pem` after step 2; CloudFront has it now.
 
 ### Step 1: Detect
 
@@ -111,7 +124,7 @@ Then specifics:
 - Allowed MIME types (images only? PDFs? any?)
 - Per-user storage quota (e.g., free 100MB, pro 10GB)
 - Public vs private files
-- Direct upload to S3 (pre-signed URL) vs through your server
+- Upload source: **user uploads** (browser → S3 via pre-signed URL) vs **server-generated/derived content** (your server produces the bytes — use the server-side upload variant, which skips pre-signed URLs and CORS)
 
 ### Step 4: Plan
 
@@ -127,6 +140,58 @@ Always include:
 Write code, mirroring existing patterns.
 
 ### Step 6: Verify
+
+**First, isolate the AWS layer with a standalone script — before wiring anything into the app.** It tells you whether S3, the OAC, and signing each work independently, so you don't debug AWS and app code at the same time. Save as `scripts/verify-storage.mjs` and run with your env vars loaded (e.g. `node --env-file=.env scripts/verify-storage.mjs`):
+
+```javascript
+// scripts/verify-storage.mjs — verifies S3 + CloudFront signing end to end, no app required
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/cloudfront-signer';
+import { readFileSync } from 'fs';
+
+const {
+  AWS_REGION, AWS_S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,
+  CLOUDFRONT_DOMAIN, CLOUDFRONT_KEY_PAIR_ID, CLOUDFRONT_PRIVATE_KEY_PATH,
+} = process.env;
+
+const s3 = new S3Client({
+  region: AWS_REGION,
+  credentials: { accessKeyId: AWS_ACCESS_KEY_ID, secretAccessKey: AWS_SECRET_ACCESS_KEY },
+});
+const key = `__verify__/${Date.now()}.txt`;
+
+// 1. PutObject — proves IAM creds + bucket write
+await s3.send(new PutObjectCommand({ Bucket: AWS_S3_BUCKET, Key: key, Body: 'ok', ContentType: 'text/plain' }));
+console.log('✓ PutObject succeeded');
+
+// 2. Signed URL should return 200 — proves OAC + key pair + key group
+const signed = getSignedUrl({
+  url: `https://${CLOUDFRONT_DOMAIN}/${key}`,
+  keyPairId: CLOUDFRONT_KEY_PAIR_ID,
+  privateKey: readFileSync(CLOUDFRONT_PRIVATE_KEY_PATH, 'utf8'),
+  dateLessThan: new Date(Date.now() + 60_000).toISOString(),
+});
+const okRes = await fetch(signed);
+console.log(okRes.status === 200 ? '✓ Signed URL returned 200' : `✗ Signed URL returned ${okRes.status} (expected 200)`);
+
+// 3. Unsigned URL should return 403 — proves "Restrict viewer access" is on
+const unsignedRes = await fetch(`https://${CLOUDFRONT_DOMAIN}/${key}`);
+console.log(unsignedRes.status === 403 ? '✓ Unsigned URL returned 403' : `✗ Unsigned URL returned ${unsignedRes.status} (expected 403)`);
+
+// 4. DeleteObject — cleanup + proves delete permission
+await s3.send(new DeleteObjectCommand({ Bucket: AWS_S3_BUCKET, Key: key }));
+console.log('✓ DeleteObject succeeded — cleanup done');
+```
+
+What each result isolates:
+- **PutObject fails** → IAM creds wrong, policy not attached, or bucket name/region wrong (see "IAM credentials not working" below).
+- **Signed URL ≠ 200** → OAC/bucket policy, the Public key, or the key group is misconfigured. CloudFront can take 5–15 min to deploy after changes — wait and re-run before debugging.
+- **Unsigned URL ≠ 403** → "Restrict viewer access" isn't on for the behavior, so private files are publicly readable.
+- **DeleteObject fails** → IAM policy is missing `s3:DeleteObject`.
+
+> If you serve only **public** files (no signing setup), skip checks 2–3 — an unsigned public URL should return 200.
+
+Then verify the app-level behavior:
 
 - Upload a file → confirm it appears in the S3 bucket (check AWS Console)
 - Fetch the file via a CloudFront URL → confirm it loads
@@ -148,8 +213,9 @@ AWS_SECRET_ACCESS_KEY=
 AWS_REGION=us-east-1
 AWS_S3_BUCKET=myapp-uploads
 CLOUDFRONT_DOMAIN=d1234abcd.cloudfront.net
-CLOUDFRONT_KEY_PAIR_ID=APKA...          # Only needed for signed (private) URLs
-CLOUDFRONT_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----\n...  # Only needed for signed URLs
+# Signed (private) URLs only — see the Step 0b signing setup:
+CLOUDFRONT_KEY_PAIR_ID=K2ABCDEF123456                    # The PUBLIC KEY id (starts with K) — NOT the OAC/distribution/key-group id
+CLOUDFRONT_PRIVATE_KEY_PATH=./cloudfront_private_key.pem # Path to the gitignored .pem — preferred over a \n-escaped inline key
 ```
 
 ### t3-env validation
@@ -163,8 +229,8 @@ server: {
   AWS_S3_BUCKET: z.string().min(1),
   CLOUDFRONT_DOMAIN: z.string().min(1),
   // Only add these if using private/signed URLs:
-  CLOUDFRONT_KEY_PAIR_ID: z.string().optional(),
-  CLOUDFRONT_PRIVATE_KEY: z.string().optional(),
+  CLOUDFRONT_KEY_PAIR_ID: z.string().optional(),       // Public key ID (starts with K)
+  CLOUDFRONT_PRIVATE_KEY_PATH: z.string().optional(),  // Path to the gitignored .pem file
 }
 ```
 
@@ -256,6 +322,44 @@ export async function POST(req: Request) {
 }
 ```
 
+### Server-side upload (generated / derived content — no presigned URL, no CORS)
+
+When *your server* produces the bytes — PDFs you generate, thumbnails, exports, AI-generated images — upload straight from the server with `PutObjectCommand`. This skips presigned URLs and S3 CORS config entirely: the browser never touches S3, so there's nothing to configure cross-origin. Use this variant when the user is storing generated/derived content rather than accepting user uploads.
+
+```typescript
+// lib/upload-server-file.ts
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { s3 } from '@/lib/s3';
+import { db } from '@/db';
+import { files } from '@/db/schema';
+import { env } from '@/env';
+
+export async function storeServerFile(opts: {
+  userId: string;
+  buffer: Buffer;
+  name: string;
+  mime: string;
+}) {
+  const key = `users/${opts.userId}/${Date.now()}-${opts.name}`;
+  await s3.send(new PutObjectCommand({
+    Bucket: env.AWS_S3_BUCKET,
+    Key: key,
+    Body: opts.buffer,
+    ContentType: opts.mime,
+  }));
+  const [row] = await db.insert(files).values({
+    userId: opts.userId,
+    s3Key: key,
+    name: opts.name,
+    mime: opts.mime,
+    size: opts.buffer.length,
+  }).returning();
+  return row;
+}
+```
+
+Magic-byte verification is unnecessary here (you control the bytes), but still use per-user paths and enforce quotas. Serve the result with the same public/signed CloudFront helpers below.
+
 ### CloudFront delivery URL (for public files)
 
 ```typescript
@@ -272,13 +376,17 @@ export function getPublicFileUrl(s3Key: string): string {
 ```typescript
 // lib/cloudfront.ts
 import { getSignedUrl } from '@aws-sdk/cloudfront-signer';
+import { readFileSync } from 'fs';
 import { env } from '@/env';
+
+// Read the private key from the gitignored .pem file once at module load
+const privateKey = readFileSync(env.CLOUDFRONT_PRIVATE_KEY_PATH!, 'utf8');
 
 export function getPrivateFileUrl(s3Key: string, expiresInSeconds = 3600): string {
   return getSignedUrl({
     url: `https://${env.CLOUDFRONT_DOMAIN}/${s3Key}`,
-    keyPairId: env.CLOUDFRONT_KEY_PAIR_ID!,
-    privateKey: env.CLOUDFRONT_PRIVATE_KEY!,
+    keyPairId: env.CLOUDFRONT_KEY_PAIR_ID!, // the Public key ID (starts with K)
+    privateKey,
     dateLessThan: new Date(Date.now() + expiresInSeconds * 1000).toISOString(),
   });
 }
@@ -431,8 +539,9 @@ export async function getSignedDownloadUrl(path: string, expiresInSeconds = 3600
 ## If Something Goes Wrong
 
 - **Upload fails with CORS error** — in the S3 bucket settings, add a CORS configuration allowing your app's origin for PUT requests; add `localhost` for dev and your production domain for prod.
-- **CloudFront returns 403** — confirm the bucket policy was updated to allow CloudFront OAC access (AWS Console shows this policy during CloudFront setup; you must apply it to the bucket manually).
+- **CloudFront returns 403** — for **private** files this is expected without a signed URL (it confirms "Restrict viewer access" is on — good). For **public** files, confirm the "Allow private S3 bucket access to CloudFront" checkbox was checked when the distribution was created (it auto-writes the bucket policy). On older distributions created before that checkbox, apply the OAC bucket policy to the bucket manually. Allow 5–15 min for CloudFront to deploy any change.
 - **Pre-signed URL expired** — the client has 10 minutes to complete the upload; if the upload is slow, increase `expiresIn` in the presigner.
 - **File validation rejecting valid files** — check magic-byte MIME detection; browser-reported MIME types can be spoofed.
 - **Ownership check fails for valid user** — confirm the `userId` field in the DB record matches the auth session's `session.user.id` format exactly (string vs UUID mismatch is common).
-- **IAM credentials not working** — verify the IAM policy is attached to the correct user and targets the correct bucket ARN; test with the AWS CLI: `aws s3 ls s3://your-bucket-name`.
+- **IAM credentials not working** — verify the IAM policy is attached to the correct user and targets the correct bucket ARN; the inline policy often fails to attach during user creation, so check the user's **Permissions** tab and re-add it there if missing. Test with the AWS CLI: `aws s3 ls s3://your-bucket-name`.
+- **`CLOUDFRONT_KEY_PAIR_ID` rejected / signature invalid** — it must be the **Public key** ID (starts with `K`, found under CloudFront → Key management → Public keys), not the OAC ID, distribution ID, or key-group ID. These look similar; only the Public key ID signs.
