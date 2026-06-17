@@ -24,8 +24,12 @@ Before writing any code, the user needs Google OAuth credentials:
 ### 2. Install dependencies
 
 ```bash
-npm install better-auth @better-auth/neon
+npm install better-auth
 ```
+
+> There is **no `@better-auth/neon` package** — Better Auth talks to Neon through the standard Drizzle (or Postgres) adapter. Installing `@better-auth/neon` will fail. You only need `better-auth` plus your existing Drizzle setup.
+
+**Port note:** the examples below use `http://localhost:3000`. If your dev server runs on a different port (Next.js auto-bumps to `3001`, `3002`, … when `3000` is taken), replace **every** `3000` here — in `BETTER_AUTH_URL`, the auth-client `baseURL`, and the Google redirect URI — with your actual port. A port mismatch is the most common cause of a silent OAuth failure.
 
 ### 3. Set environment variables
 
@@ -38,7 +42,11 @@ AUTH_GOOGLE_CLIENT_ID=    # From Google Cloud Console
 AUTH_GOOGLE_CLIENT_SECRET= # From Google Cloud Console
 ```
 
-### 4. Wire t3-env validation
+### 4. (Optional) Wire t3-env validation
+
+**t3-env is optional, not required.** If the project doesn't already use `@t3-oss/env-nextjs`, skip this step and read directly from `process.env` in `lib/auth.ts` (with a `!` or a manual check). Only add t3-env if the project already has it wired or the user asks for env validation. Do not install it just for auth.
+
+If you do use it:
 
 ```typescript
 // src/env.ts
@@ -64,36 +72,95 @@ export const env = createEnv({
 });
 ```
 
-### 5. Create the auth config
+### 5. Hand-write the Drizzle auth schema (do NOT rely on the CLI generator)
+
+The Better Auth CLI generator (`npx @better-auth/cli generate`) **cannot resolve `@/` path aliases**, so it fails on most Next.js projects that import `db` via `@/db`. Hand-write the schema instead. Paste this as-is — it matches Better Auth's expected table/column names for the Postgres + Drizzle adapter:
+
+```typescript
+// db/auth-schema.ts
+import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+
+export const user = pgTable('user', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('email_verified').notNull().default(false),
+  image: text('image'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const session = pgTable('session', {
+  id: text('id').primaryKey(),
+  expiresAt: timestamp('expires_at').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+});
+
+export const account = pgTable('account', {
+  id: text('id').primaryKey(),
+  accountId: text('account_id').notNull(),
+  providerId: text('provider_id').notNull(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
+  idToken: text('id_token'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  scope: text('scope'),
+  password: text('password'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const verification = pgTable('verification', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+```
+
+Then push it to the DB: `npm run db:push` (or your project's Drizzle migration command). **Tell the user to run this before testing — the app will error on first sign-up if the tables don't exist.**
+
+### 6. Create the auth config
+
+Use t3-env (`env`) **only if you wired it in step 4**; otherwise read straight from `process.env` as shown in the commented alternative.
 
 ```typescript
 // lib/auth.ts
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/db'; // your Drizzle db instance
-import { env } from '@/env';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
-  secret: env.BETTER_AUTH_SECRET,
-  baseURL: env.BETTER_AUTH_URL,
+  secret: process.env.BETTER_AUTH_SECRET!,
+  baseURL: process.env.BETTER_AUTH_URL!,
   socialProviders: {
     google: {
-      clientId: env.AUTH_GOOGLE_CLIENT_ID,
-      clientSecret: env.AUTH_GOOGLE_CLIENT_SECRET,
+      clientId: process.env.AUTH_GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_CLIENT_SECRET!,
     },
   },
   emailAndPassword: {
     enabled: true, // set false if you want Google-only
+    // requireEmailVerification: true,  // see "Email verification" below before enabling
   },
 });
 
 export type Session = typeof auth.$Infer.Session;
 ```
 
-### 6. Create the API catch-all route
+### 7. Create the API catch-all route
 
 ```typescript
 // app/api/auth/[...all]/route.ts
@@ -103,7 +170,7 @@ import { toNextJsHandler } from 'better-auth/next-js';
 export const { GET, POST } = toNextJsHandler(auth);
 ```
 
-### 7. Create the auth client (for client components)
+### 8. Create the auth client (for client components)
 
 ```typescript
 // lib/auth-client.ts
@@ -113,10 +180,19 @@ export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
 });
 
-export const { signIn, signOut, signUp, useSession } = authClient;
+export const {
+  signIn,
+  signOut,
+  signUp,
+  useSession,
+  requestPasswordReset, // NOT `forgetPassword` — that name does not exist on the client
+  resetPassword,
+} = authClient;
 ```
 
-### 8. Add session middleware for protected routes
+> **Password reset method name:** the client method is **`requestPasswordReset`**, not `forgetPassword`. Calling `authClient.forgetPassword(...)` throws "not a function." To kick off a reset: `await requestPasswordReset({ email, redirectTo: '/reset-password' })`, then on the reset page call `await resetPassword({ newPassword, token })`.
+
+### 9. Add session middleware for protected routes
 
 ```typescript
 // middleware.ts (at the repo root, next to package.json)
@@ -142,7 +218,7 @@ export const config = {
 };
 ```
 
-### 9. Verify session server-side in API routes
+### 10. Verify session server-side in API routes
 
 ```typescript
 // app/api/protected/route.ts
@@ -161,7 +237,7 @@ export async function GET() {
 }
 ```
 
-### 10. Verify session in Server Components
+### 11. Verify session in Server Components
 
 ```typescript
 // app/dashboard/page.tsx
@@ -227,6 +303,80 @@ export default function SignInPage() {
 
 ---
 
+## Sign-up Page (with email verification)
+
+If you enabled `requireEmailVerification: true` in `lib/auth.ts`, the naive "redirect to /dashboard on sign-up" flow **breaks** — Better Auth does not create a session until the email is verified, so the redirect lands the user back on the sign-in page with no explanation. Instead, render a "check your email" state. Paste this as-is:
+
+```typescript
+// app/sign-up/page.tsx
+'use client';
+import { signUp } from '@/lib/auth-client';
+import { useState } from 'react';
+
+export default function SignUpPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    const { error } = await signUp.email({ email, password, name });
+    if (error) {
+      setError(error.message ?? 'Sign-up failed');
+      return;
+    }
+    // With requireEmailVerification, there is no session yet — show the check-email state
+    setSent(true);
+  }
+
+  if (sent) {
+    return (
+      <div>
+        <h1>Check your email</h1>
+        <p>We sent a verification link to <strong>{email}</strong>. Click it to finish creating your account, then sign in.</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" />
+      <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
+      <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
+      {error && <p role="alert">{error}</p>}
+      <button type="submit">Create account</button>
+    </form>
+  );
+}
+```
+
+> If you did **not** enable `requireEmailVerification`, sign-up returns a session immediately and you can redirect to `/dashboard` instead of showing the check-email state.
+
+### Sending the verification email (Resend)
+
+Wire `emailVerification.sendVerificationEmail` in `lib/auth.ts`:
+
+```typescript
+emailVerification: {
+  sendOnSignUp: true,
+  async sendVerificationEmail({ user, url }) {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev', // or your verified domain
+      to: user.email,
+      subject: 'Verify your email',
+      html: `<a href="${url}">Verify your email</a>`,
+    });
+  },
+},
+```
+
+> ⚠️ **Resend test mode delivers to ONE address only.** Until you verify a custom domain in Resend, the API only delivers to the email address of the Resend account owner — and only when sending from `onboarding@resend.dev`. Emails to any other recipient silently fail (they show as "delivered" in some clients but never arrive). **Tell the user this before they test**: have them sign up with the *same email as their Resend account*, or verify a domain first. This single fact accounts for most "the verification email never came" reports.
+
+---
+
 ## Sign-out
 
 ```typescript
@@ -260,15 +410,15 @@ export function UserGreeting() {
 
 ---
 
-## Database tables (auto-created by Better Auth)
+## Database tables
 
-Better Auth automatically creates these tables in your Neon DB on first run:
+With the Drizzle adapter the tables are **not** auto-created — you define them in `db/auth-schema.ts` (step 5) and push them with `npm run db:push`. The four tables:
 - `user` — name, email, emailVerified, image, createdAt, updatedAt
 - `session` — token, userId, expiresAt, ipAddress, userAgent
-- `account` — providerId, providerAccountId, userId (links OAuth accounts)
-- `verification` — for email verification tokens
+- `account` — accountId, providerId, userId, password (links OAuth + stores password hash)
+- `verification` — for email-verification and password-reset tokens
 
-You can extend the `user` table by adding columns in your Drizzle schema and telling Better Auth about them via `additionalFields`.
+You can extend the `user` table by adding columns in `db/auth-schema.ts` and telling Better Auth about them via `additionalFields`.
 
 ---
 

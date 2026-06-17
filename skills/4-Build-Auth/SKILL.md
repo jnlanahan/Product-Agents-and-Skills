@@ -83,7 +83,7 @@ Show concrete changes. Always include:
 
 Write the code, mirroring existing patterns from `pattern-finder`.
 
-→ See [neon-auth-patterns.md](references/neon-auth-patterns.md) for implementation patterns (Better Auth config, Google Sign-In, session middleware, protected routes, t3-env integration).
+→ See [neon-auth-patterns.md](references/neon-auth-patterns.md) for implementation patterns (hand-written Drizzle auth schema, Better Auth config, Google Sign-In, email-verification sign-up state, password reset, session middleware, protected routes, optional t3-env).
 
 → See [firebase-auth-patterns.md](references/firebase-auth-patterns.md) for Firebase Auth, Clerk, and NextAuth adaptation patterns (for existing projects that use those providers).
 
@@ -93,6 +93,14 @@ Write the code, mirroring existing patterns from `pattern-finder`.
 2. Add `import "dotenv/config"` as the very first line of the server entry point.
 
 **After adding `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.env`:** `tsx watch` does not auto-restart on `.env` changes. Tell the user to stop and restart the server.
+
+**Windows port-orphan pitfall (Next.js):** a backgrounded `next dev` on Windows frequently orphans a node process that keeps holding the port after you think you've stopped it. The symptom is Next.js silently starting on `3001`/`3002` (which then breaks `BETTER_AUTH_URL` and the Google redirect URI), or `EADDRINUSE`. Don't chase it — kill the port and restart cleanly:
+```powershell
+# find and kill whatever is on port 3000, then restart
+npx kill-port 3000   # or: Get-NetTCPConnection -LocalPort 3000 | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+npm run dev
+```
+Prefer running `next dev` in the foreground while testing auth so the port is released the moment you stop it.
 
 **Google Auth Platform setup (console UI as of 2025):**
 The old "OAuth consent screen" is now **Google Auth Platform** with a sidebar:
@@ -107,6 +115,32 @@ When creating the OAuth client, two URI fields trip people up:
 The JavaScript origins field rejects paths — it will silently error or fail if you include one. State this explicitly before the user fills it in.
 
 ### Step 6: Verify end-to-end
+
+**Fast wiring check with curl (do this before any manual clicking).** These hit the Better Auth endpoints directly and confirm the routes, DB, and providers are wired without a browser round-trip. Replace `3000` with the actual dev-server port.
+
+```bash
+# 1. Email sign-up — expect 200 with a user object (or a "check email" response if verification is on)
+curl -i -X POST http://localhost:3000/api/auth/sign-up/email \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password1234","name":"Test"}'
+
+# 2. Email sign-in — expect 200 + a set-cookie session header
+curl -i -X POST http://localhost:3000/api/auth/sign-in/email \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password1234"}'
+
+# 3. Google social sign-in — expect 200 with a JSON { url: "https://accounts.google.com/..." } redirect target
+curl -i -X POST http://localhost:3000/api/auth/sign-in/social \
+  -H "Content-Type: application/json" \
+  -d '{"provider":"google","callbackURL":"/dashboard"}'
+
+# 4. Password reset request — expect 200 (and, if email is wired, a Resend delivery)
+curl -i -X POST http://localhost:3000/api/auth/request-password-reset \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","redirectTo":"/reset-password"}'
+```
+
+A `404` on any of these means the catch-all route isn't wired; a `500` usually means the DB tables weren't pushed (`npm run db:push`) or `BETTER_AUTH_SECRET` is missing. Once curl is green, do the manual flow below.
 
 - **Health check first:** Before testing the OAuth flow, hit `/api/health` (or equivalent) and confirm `google_oauth: true` and `database: true` are both present. This catches a misconfigured env before a confusing OAuth round-trip.
 - Sign up with a new account → check DB (`users` table in your Neon DB) for the new user record
