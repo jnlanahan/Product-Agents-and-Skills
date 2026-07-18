@@ -104,7 +104,21 @@ Standalone build (the icon):
 3. **`.easignore` that mirrors ignores but KEEPS `mobile/.env`** — EAS respects .gitignore by default, which would strip the env vars and the built app would silently point at localhost
 4. User creates a free expo.dev account; `npx eas-cli login` is interactive — the USER runs it (browser flow), Claude cannot
 5. `npx eas-cli build --platform android --profile preview` → yes/Enter to first-run prompts → 10–20 min free queue → install link/QR on the phone
-6. Set expectations: data updates live from the server; changes to app screens need a rebuild (same command)
+6. Set expectations explicitly — non-developers assume an installed app auto-updates. The real model:
+   - **Server-side changes** (insights, sync, security, anything backend): git push → host redeploys → installed app benefits instantly. No rebuild ever.
+   - **Screen/JS changes**: with a plain APK, each one needs a full rebuild + reinstall (~15+ min).
+   - **Native changes** (Expo SDK upgrade, new native module): always a real rebuild, no way around it. Rare — a few times a year.
+
+### Phase 6.5: Wire EAS Update (over-the-air screen updates)
+
+Do this before the SECOND screen change, so the user's next rebuild is their
+last routine one. EAS Update ships JS changes to installed apps in seconds
+(downloaded silently on next app launch); free tier is generous.
+
+1. `npx expo install expo-updates` then `npx eas-cli update:configure`
+2. **One more rebuild is required** after wiring it in — the update-receiver must be baked into the APK. Warn the user this final rebuild is expected, then it's OTA from there.
+3. Publishing a screen change afterwards: `npx eas-cli update --channel preview --message "what changed"` — seconds, no reinstall, no phone touching.
+4. Native changes still require a rebuild; EAS Update only carries JS/assets.
 
 ### Phase 7: Verify end-to-end
 
