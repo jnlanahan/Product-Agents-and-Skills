@@ -117,8 +117,37 @@ last routine one. EAS Update ships JS changes to installed apps in seconds
 
 1. `npx expo install expo-updates` then `npx eas-cli update:configure`
 2. **One more rebuild is required** after wiring it in — the update-receiver must be baked into the APK. Warn the user this final rebuild is expected, then it's OTA from there.
-3. Publishing a screen change afterwards: `npx eas-cli update --channel preview --message "what changed"` — seconds, no reinstall, no phone touching.
-4. Native changes still require a rebuild; EAS Update only carries JS/assets.
+3. Publishing a screen change afterwards:
+   `npx eas-cli update --channel preview --environment preview --non-interactive --message "what changed"`
+   — seconds, no reinstall, no phone touching. **`--environment` is mandatory
+   everywhere `eas update` runs (manual AND CI): without it the bundle ships
+   with NO baked `EXPO_PUBLIC_*` vars, the app can't authenticate, and the
+   user sees demo mode that reads as "my app reverted to an old version".**
+4. Phones fetch the LATEST update group on the branch — a bad publish after a
+   good one wins. Fix by republishing correctly; waiting never helps.
+5. Native changes still require a rebuild; EAS Update only carries JS/assets.
+   **Rollback trap: with `runtimeVersion: {"policy": "appVersion"}`, adding a
+   native module does NOT change the runtime version — old installed binaries
+   ACCEPT the new OTA, crash at launch on the missing native module, and
+   expo-updates silently rolls back to the previous bundle. The phone "looks
+   old" with no error surfaced anywhere. A new build + sideload must land
+   BEFORE any OTA that references new native modules.**
+
+### Phase 6.6: Auto-publish OTA on git push (GitHub Actions)
+
+Wire pushes touching `mobile/**` to publish the OTA automatically:
+1. Workflow (`.github/workflows/eas-update.yml`): checkout → setup-node →
+   `expo/expo-github-action` with `token: ${{ secrets.EXPO_TOKEN }}` →
+   `npm ci` → `eas update --branch <channel> --environment <env> --auto --non-interactive`
+2. The USER creates the token (expo.dev → Account → Access tokens) and adds it
+   as the `EXPO_TOKEN` repo secret (GitHub → Settings → Secrets and variables
+   → Actions). **Without the secret the workflow fails on every push while the
+   push itself succeeds — screens silently never reach the phone.**
+3. VERIFY after the first push: `gh run list --workflow eas-update` shows
+   success. Backend deploy (host) and OTA (EAS) are independent pipelines —
+   never report "it'll reach your phone" without checking both: curl a NEW
+   endpoint on the deployed backend, and `eas update:list --branch <ch>` for
+   what phones actually fetch.
 
 ### Phase 7: Verify end-to-end
 
