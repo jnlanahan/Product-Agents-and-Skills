@@ -5,7 +5,7 @@ skill: "6-Deploy"
 
 # Launch Runbook Template
 
-Create `LAUNCH_RUNBOOK.md` at the project root with this content, filling in the placeholders:
+Create `LAUNCH_RUNBOOK.md` at the project root with this content, filling in the placeholders. This project deploys on **either Vercel or Railway** — keep the lines for the platform this project actually uses and delete the other.
 
 ```markdown
 # Launch Runbook
@@ -18,7 +18,7 @@ Create `LAUNCH_RUNBOOK.md` at the project root with this content, filling in the
 
 | Symptom | First place to check |
 |---|---|
-| Site is down | Vercel dashboard → deployment status; BetterStack incidents |
+| Site is down | Deploy platform dashboard → deployment status (Vercel: Deployments tab · Railway: service → Deployments); BetterStack incidents |
 | Errors spiking | Sentry → Issues |
 | Payments not processing | Stripe dashboard → Webhooks → recent deliveries |
 | Emails not sending | Resend dashboard → Logs |
@@ -36,11 +36,12 @@ Create `LAUNCH_RUNBOOK.md` at the project root with this content, filling in the
 
 ### Roll back a deploy
 1. Vercel → your project → Deployments tab → find the last stable deploy → "..." → "Promote to Production"
-2. Or: `git revert <sha> --no-edit && git push origin main` (triggers a new Vercel deploy)
+   (Railway → service → Deployments → last stable deploy → "..." → "Redeploy" / "Rollback")
+2. Or: `git revert <sha> --no-edit && git push origin main` (triggers a new deploy on either platform)
 
 ### Rotate a leaked secret
 1. Generate new secret in the relevant dashboard
-2. Update env var in Vercel → Settings → Environment Variables → Redeploy
+2. Update env var: Vercel → Settings → Environment Variables → Redeploy (Railway → service → Variables; redeploys automatically)
 3. Revoke the old secret in the original dashboard
 
 ### Run a migration in production
@@ -48,7 +49,7 @@ Create `LAUNCH_RUNBOOK.md` at the project root with this content, filling in the
 - Manual: `DATABASE_URL=<prod-url> npm run db:migrate` from local
 
 ### View production logs
-- Vercel → your project → Functions tab → Runtime Logs
+- Vercel → your project → Functions tab → Runtime Logs (Railway → service → Deployments → View Logs, or the Observability tab)
 - Or Sentry → Issues for error-only filtering
 
 ## Known issues

@@ -26,7 +26,7 @@ This file is read by Claude Code on every conversation. Keep it short.
 - Env validation: t3-env
 - Monitoring: Sentry (errors) + PostHog (product analytics)
 - Tests: <Vitest | Jest>
-- Deploy: Vercel
+- Deploy: <Vercel | Railway>
 
 ## Conventions
 

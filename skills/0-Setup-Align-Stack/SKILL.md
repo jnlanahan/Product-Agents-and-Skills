@@ -1,6 +1,6 @@
 ---
 name: 0-Setup-Align-Stack
-description: MUST BE USED when the user wants to migrate an existing project's integrations to their preferred stack — Neon Postgres + Drizzle, Neon Auth via Better Auth, Stripe, AWS S3 + CloudFront, Sentry, PostHog, Vercel AI SDK, Zod, and Vercel. Detects what's currently wired, shows a gap table (current vs. target), sequences migrations by risk, gets explicit approval per layer, then executes one wave per layer with one commit each. Never migrates live auth or active subscriptions without a documented migration plan.
+description: MUST BE USED when the user wants to migrate an existing project's integrations to their preferred stack — Neon Postgres + Drizzle, Neon Auth via Better Auth, Stripe, AWS S3 + CloudFront, Sentry, PostHog, Vercel AI SDK, Zod, and deploy on Vercel or Railway. Detects what's currently wired, shows a gap table (current vs. target), sequences migrations by risk, gets explicit approval per layer, then executes one wave per layer with one commit each. Never migrates live auth or active subscriptions without a documented migration plan, and never migrates between Vercel and Railway as a side effect.
 when_to_use: "User says 'migrate to my preferred stack', 'convert to Neon', 'switch from Supabase', 'replace Clerk', 'off Firebase Auth', 'switch to Better Auth', 'replace Prisma with Drizzle'."
 ---
 
@@ -54,7 +54,7 @@ This skill is the intentional counterpart to `_adaptation-playbook.md`'s "existi
 | Monitoring | **Sentry** (errors) + **PostHog** (analytics) |
 | AI | **Vercel AI SDK** (`ai` package) |
 | Validation | **Zod** |
-| Deploy | **Vercel** |
+| Deploy | **Vercel or Railway** (co-equal; ask the user — never migrate between them as a side effect) |
 
 → Full stack rationale: [skills/_stack-preferences.md](../_stack-preferences.md)
 
@@ -93,7 +93,7 @@ Example:
 | Monitoring | none | Sentry + PostHog | `missing` |
 | AI | OpenAI SDK | Vercel AI SDK | `needs-migration` |
 | Validation | Yup | Zod | `needs-migration` |
-| Deploy | Railway | Vercel | `needs-migration` |
+| Deploy | Railway | Vercel or Railway | `aligned` (Railway is an accepted target — don't migrate it) |
 
 Show the table to the user. Ask:
 > Which layers do you want to migrate? I'll sequence them lowest-risk first. You can defer any layer.
@@ -224,16 +224,18 @@ For every approved wave:
 
 → See [skills/4-Build-File-Storage/SKILL.md](../4-Build-File-Storage/SKILL.md) for full wiring detail.
 
-### Deploy: Railway / Render / Heroku / fly.io → Vercel
+### Deploy: Render / Heroku / fly.io → Vercel or Railway
 
-1. Confirm project is Next.js (Vercel is ideal for Next.js; for Express/Vite ask the user if they want serverless functions or a separate host)
-2. Walk through [platform setup steps](../6-Deploy/references/platform-setup-steps.md)
-3. Wire all env vars in Vercel dashboard (import from `.env.example`)
+**Vercel and Railway are both accepted targets — if the project is already on either one, it's `aligned`; do not migrate between them.** Only migrate when the current platform is something else (Render, Heroku, fly.io, etc.). Ask the user which target they want — there is no default.
+
+1. Confirm the framework. Vercel is ideal for Next.js (serverless); Railway suits long-running servers, background workers, or websockets. For Express/Vite, ask whether they want serverless functions (Vercel) or a single container host (Railway).
+2. Walk through [platform setup steps](../6-Deploy/references/platform-setup-steps.md) for the chosen platform
+3. Wire all env vars on the target platform (Vercel dashboard, or Railway → service → Variables — import from `.env.example`)
 4. Connect GitHub repo; confirm auto-deploy on push is active
-5. Test: push a commit, confirm Vercel build completes, preview URL works
-6. DNS cutover: provide A/CNAME values; user does the registrar change
+5. Test: push a commit, confirm the build completes and the preview/live URL works
+6. DNS cutover: provide A/CNAME values for the chosen platform; user does the registrar change
 7. Decommission old platform only after DNS has propagated and the app is live on the new domain for 24 h
-8. Commit: `"align-stack: wired Vercel deployment"` (usually config-only; no source changes)
+8. Commit: `"align-stack: wired <Vercel|Railway> deployment"` (usually config-only; no source changes)
 
 → See [skills/6-Deploy/SKILL.md](../6-Deploy/SKILL.md) for the full deploy guide.
 

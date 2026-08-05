@@ -422,9 +422,9 @@ You can extend the `user` table by adding columns in `db/auth-schema.ts` and tel
 
 ---
 
-## Environment variables for Vercel
+## Environment variables for production (Vercel or Railway)
 
-When deploying to Vercel, add these to **Project Settings → Environment Variables**:
+Add these where your deploy platform stores env vars — **Vercel: Project Settings → Environment Variables**, or **Railway: service → Variables tab**:
 
 ```
 BETTER_AUTH_SECRET     → your generated secret (same value as local)

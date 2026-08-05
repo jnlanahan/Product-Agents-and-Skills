@@ -221,7 +221,7 @@ Skill folders are prefixed with the PDLC stage number so they sort by lifecycle 
 
 #### `/align-stack` — `0-Setup-Align-Stack`
 
-- **Use when** — migrating an existing project's integrations to the user's preferred stack (Neon Postgres + Drizzle, Neon Auth via Better Auth, Stripe, S3 + CloudFront, Sentry, PostHog, Vercel AI SDK, Zod, Vercel). The explicit counterpart to `_adaptation-playbook.md`'s "existing patterns win" rule — invoked specifically when the user wants to *change* existing patterns, not work around them.
+- **Use when** — migrating an existing project's integrations to the user's preferred stack (Neon Postgres + Drizzle, Neon Auth via Better Auth, Stripe, S3 + CloudFront, Sentry, PostHog, Vercel AI SDK, Zod, and deploy on Vercel or Railway). The explicit counterpart to `_adaptation-playbook.md`'s "existing patterns win" rule — invoked specifically when the user wants to *change* existing patterns, not work around them.
 - **Output** — `.claude/align-stack-plan.md` (gap table + approved wave sequence), then one committed wave per integration layer
 - **Flags** — any layer can be deferred; auth and payments have hard stops when live users / active subscriptions are present
 - **Calls agents** — `stack-detector`, `codebase-classifier`, `project-state-detector`
@@ -499,7 +499,7 @@ These aren't skills themselves; they're shared knowledge that skills reference.
 | File | Purpose |
 | --- | --- |
 | [PDLC_Phases.md](PDLC_Phases.md) | Defines all 7 PDLC phases (Discover, Define, Design, Build, Validate, Deploy, Learn) — activities, outputs, exit criteria |
-| [skills/_stack-preferences.md](skills/_stack-preferences.md) | The user's locked greenfield stack: Neon Auth (Better Auth), Stripe, Neon + Drizzle, AWS S3 + CloudFront, Vercel, Sentry + PostHog, t3-env, etc. Read by `/setup-project` and `/add-*` skills when nothing is detected. |
+| [skills/_stack-preferences.md](skills/_stack-preferences.md) | The user's locked greenfield stack: Neon Auth (Better Auth), Stripe, Neon + Drizzle, AWS S3 + CloudFront, deploy on Vercel or Railway (co-equal, no default), Sentry + PostHog, t3-env, etc. Read by `/setup-project` and `/add-*` skills when nothing is detected. |
 | [skills/_adaptation-playbook.md](skills/_adaptation-playbook.md) | Five core rules every skill follows when deciding whether to install fresh, extend existing, or stay out of the way. Critical for handling vibe-coded apps without breaking them. |
 | [settings.snippet.json](settings.snippet.json) | Optional Claude Code hook config to merge into `~/.claude/settings.json`. Provides a session-start reminder about `stack-detector` and runs `npm run check` after edits. |
 

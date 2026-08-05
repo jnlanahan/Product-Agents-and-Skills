@@ -77,7 +77,7 @@ Read `_stack-preferences.md`. By default the target is:
 - Stripe (or whatever was wired)
 - AWS S3 + CloudFront (or whatever storage was wired)
 - Sentry + PostHog
-- Deploy to Vercel
+- Deploy to Vercel or Railway (ask the user — co-equal, no default)
 
 Confirm with user. If something different was wired (Supabase Auth, Vercel Postgres, etc.), keep it — don't migrate. Migrating an integration mid-port doubles the risk.
 
@@ -183,7 +183,7 @@ Tell the user:
 - `process.env.REPLIT_*` won't exist outside Replit. Look for code that depends on it and rewire to standard env vars or remove.
 - Replit DB (key-value) won't translate cleanly. Likely need to migrate to Postgres.
 - `replit.nix` and `.replit` files are useless outside Replit; delete them.
-- "Always-on" / Replit Deploy → replace with Vercel; this is a deploy-skill problem after the port.
+- "Always-on" / Replit Deploy → replace with Vercel or Railway (the user's choice); this is a deploy-skill problem after the port.
 
 ### V0 (Vercel)
 

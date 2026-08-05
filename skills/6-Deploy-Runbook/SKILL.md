@@ -30,7 +30,7 @@ You generate an operational runbook for the current project — the first-respon
 
 Run in parallel:
 - `stack-detector` — full stack, deploy target, monitoring tools
-- Read `vercel.json`, `Dockerfile`, or `.github/workflows/*.yml` if they exist
+- Read `vercel.json`, `railway.json`/`railway.toml`, `Dockerfile`, or `.github/workflows/*.yml` if they exist
 - Read the health check endpoint code (typically `app/api/health/route.ts` or `routes/health.ts`)
 - Read `.env.example` for the full list of required env vars
 
@@ -63,7 +63,7 @@ Last reviewed: <YYYY-MM-DD>
 | | |
 |---|---|
 | **Production URL** | https://... |
-| **Deploy platform** | Vercel (or detected platform) |
+| **Deploy platform** | Vercel or Railway (whichever this project uses) |
 | **Primary on-call** | Name — slack @handle or email |
 | **Backup on-call** | Name — slack @handle or email |
 | **Monitoring** | [Sentry](https://sentry.io) · [PostHog](https://app.posthog.com) |
@@ -85,10 +85,17 @@ If this fails: the service is down. Go to Common Failure Modes.
 
 ## Starting, stopping, restarting
 
-### Vercel (default)
+<!-- Keep the section for this project's platform; delete the other. -->
+
+### Vercel
 - **Deploy**: push to `main` (auto-deploys via GitHub integration) or `vercel --prod` from local
 - **Rollback**: Vercel dashboard → project → Deployments → find stable deploy → "..." → "Promote to Production"
 - **Stop** (emergency): Vercel dashboard → project → Settings → scroll to Danger Zone → "Pause Project"
+
+### Railway
+- **Deploy**: push to `main` (auto-deploys via GitHub integration) or `railway up` from local
+- **Rollback**: Railway dashboard → service → Deployments → find stable deploy → "..." → "Redeploy" (or "Rollback")
+- **Stop** (emergency): Railway dashboard → service → Settings → "Remove"/"Pause" the service, or set replicas to 0
 
 ---
 
@@ -142,9 +149,9 @@ All of the following must be set for the service to start. Missing any will caus
 - **Check**: [Resend dashboard](https://resend.com/emails) → Logs
 - **Fix**: Verify DNS records (DKIM/SPF) are correct in Resend → Domains. Check `RESEND_API_KEY` is current.
 
-### Serverless function timeout (Vercel)
-- **Symptoms**: Requests return 504 Gateway Timeout; Vercel logs show "Function exceeded maximum duration"
-- **Fix**: Identify the slow operation (DB query, external API call). Add `export const maxDuration = 60;` to the route for longer limits on Pro plans. Optimize the query or add a DB index.
+### Request timeout
+- **Vercel (serverless)**: Requests return 504 Gateway Timeout; Vercel logs show "Function exceeded maximum duration". Fix: identify the slow operation (DB query, external API call), add `export const maxDuration = 60;` to the route for longer limits on Pro plans, optimize the query or add a DB index.
+- **Railway (long-running server)**: no serverless function limit, but a slow request can still time out at a proxy/load balancer or exhaust memory. Fix: check the Observability/metrics tab for memory or CPU saturation; optimize the slow operation or scale the service up.
 
 ---
 
@@ -174,8 +181,9 @@ See full procedure in [`/6-Deploy-Rollback` skill] or run `/6-Deploy-Rollback`.
 
 **Quick summary** (code-only rollback):
 ```
-Vercel: Dashboard → project → Deployments → stable deploy → "..." → Promote to Production
-Git: git revert <sha> --no-edit && git push origin main
+Vercel:  Dashboard → project → Deployments → stable deploy → "..." → Promote to Production
+Railway: Dashboard → service → Deployments → stable deploy → "..." → Redeploy / Rollback
+Git:     git revert <sha> --no-edit && git push origin main
 ```
 
 For DB migration rollback, read the rollback skill first — ordering matters.
@@ -187,7 +195,7 @@ For DB migration rollback, read the rollback skill first — ordering matters.
 | Service | Dashboard | What to check |
 |---|---|---|
 | Neon (DB) | https://console.neon.tech | Connection count, query latency, pause status |
-| Vercel | https://vercel.com | Deployment status, function logs |
+| Deploy platform | https://vercel.com OR https://railway.com | Deployment status, logs (Vercel: Functions/Runtime Logs · Railway: Deployments → View Logs) |
 | Stripe | https://dashboard.stripe.com | Webhook delivery, payment success rate |
 | Sentry | https://sentry.io | New error groups, error rate trend |
 | PostHog | https://app.posthog.com | Active users, funnel completion |

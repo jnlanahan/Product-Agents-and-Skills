@@ -7,7 +7,7 @@ description: MUST BE USED when the user wants to deploy a project to production 
 
 # /6-Deploy
 
-You walk the user — assumed to be a developer with limited deployment experience — through a full production deploy end-to-end. Every external step (account creation, dashboard navigation, DNS records) gets explicit numbered instructions like "1. Open https://vercel.com. 2. Click 'Add New Project'." The user should be able to follow this skill without prior deploy experience.
+You walk the user — assumed to be a developer with limited deployment experience — through a full production deploy end-to-end. The two supported platforms are **Vercel** and **Railway** — co-equal options with no default. If neither is already configured, ask the user which one they want before doing anything else. Every external step (account creation, dashboard navigation, DNS records) gets explicit numbered instructions like "1. Open https://vercel.com (or https://railway.com). 2. Click 'Add New Project'." The user should be able to follow this skill without prior deploy experience.
 
 ## Pre-flight
 
@@ -67,13 +67,13 @@ Determine the platform:
 
 | Detected | Action |
 |---|---|
-| Nothing | Default to **Vercel** (required default) |
+| Nothing | **Ask the user: Vercel or Railway?** No default — present both as co-equal (Vercel = serverless, Next.js-native; Railway = long-running container, good for workers/websockets/non-Next.js). Wait for their choice before proceeding. |
 | Vercel/Railway/Render/Fly detected | Use the existing platform |
 | Multiple deploy configs (e.g., `vercel.json` + `railway.json`) | Stop, ask which is real, archive the other |
 
 Then walk the user through account setup. Use the relevant section below.
 
-→ See [platform-setup-steps.md](references/platform-setup-steps.md) for verbatim browser instructions for Vercel account setup and env var wiring.
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) for verbatim browser instructions for **both** Vercel and Railway account setup and env var wiring. Use the section matching the user's chosen platform.
 
 Use the relevant section from the reference file and deliver it verbatim to the user. Wait for confirmation before proceeding.
 
@@ -81,13 +81,13 @@ Use the relevant section from the reference file and deliver it verbatim to the 
 
 Claude-side: open `.env.example` and list every required env var the user needs to provide.
 
-→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Env Vars — Vercel" section for the verbatim variable table and where to find each value. Deliver it to the user and wait for "done".
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Env Vars" section — it has the variable table (where to find each value) plus platform-specific steps for **Vercel** and **Railway**. Deliver the table and the steps for the user's platform, then wait for "done".
 
-Claude-side: if `/api/health` doesn't exist, add it now (use the project's framework idiom — Next.js `app/api/health/route.ts`). Commit and push. Vercel auto-deploys on every push to main.
+Claude-side: if `/api/health` doesn't exist, add it now (use the project's framework idiom — Next.js `app/api/health/route.ts`). Commit and push. Both Vercel and Railway auto-deploy on every push to main once the GitHub repo is connected.
 
 ### Phase 3: First deploy + verify it's running
 
-Claude-side: confirm the build succeeded (ask the user to check Vercel's "Deployments" tab and report any errors).
+Claude-side: confirm the build succeeded (ask the user to check the platform's "Deployments" tab — Vercel's Deployments tab or Railway's service Deployments — and report any errors).
 - Build error → look at the log, fix locally, push again
 - Runtime error → check env vars are correct, check Sentry for stack trace
 
@@ -95,7 +95,9 @@ Then:
 
 > **Verify the deploy is live:**
 >
-> 1. In your Vercel project → click the latest deployment → you'll see a `*.vercel.app` preview URL
+> 1. Find your live URL:
+>    - **Vercel** → click the latest deployment → you'll see a `*.vercel.app` URL
+>    - **Railway** → service → Settings → Networking → "Generate Domain" if you haven't → you'll see a `*.up.railway.app` URL
 > 2. Visit `https://<that-url>/api/health` — you should see `{"status":"ok",...}`
 > 3. Visit `https://<that-url>` — you should see your homepage
 > 4. Reply with the URL and "live" if it's working
@@ -108,9 +110,9 @@ This is the most-forgotten phase. The user has services configured for `localhos
 
 ### Phase 5: Custom domain (optional but recommended for launch)
 
-If the user wants a custom domain (e.g., `myapp.com` instead of `myapp.vercel.app`):
+If the user wants a custom domain (e.g., `myapp.com` instead of `myapp.vercel.app` or `myapp.up.railway.app`):
 
-→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Custom Domain Setup" section for verbatim Vercel CNAME and DNS steps.
+→ See [platform-setup-steps.md](references/platform-setup-steps.md) "Custom Domain Setup" section for verbatim CNAME and DNS steps for both Vercel and Railway.
 
 Then **redo the Phase 4 third-party updates with the new domain** — Google OAuth redirect URIs, Stripe webhook URL, Resend sender address all need the custom domain added.
 
@@ -153,9 +155,9 @@ This is the gate before announcing. Walk through every box. Any FAIL must be fix
 
 #### E. Operations
 - [ ] CI runs on every PR (typecheck + tests). If not, add `.github/workflows/test.yml` — see [platform-setup-steps.md](references/platform-setup-steps.md) "CI Workflow" for the exact YAML.
-- [ ] Production logs accessible (Vercel → project → Functions tab or Runtime Logs)
+- [ ] Production logs accessible (Vercel → project → Functions tab / Runtime Logs; Railway → service → Deployments → View Logs / Observability tab)
 - [ ] **Uptime monitor** configured. Walk the user through BetterStack — see [platform-setup-steps.md](references/platform-setup-steps.md) "Uptime Monitor Setup" for verbatim steps.
-- [ ] **Rollback procedure tested**: in Vercel → Deployments → previous successful deploy → "..." menu → "Promote to Production" → confirm rollback works on a non-critical change
+- [ ] **Rollback procedure tested**: Vercel → Deployments → previous successful deploy → "..." menu → "Promote to Production"; Railway → service → Deployments → previous deploy → "..." → "Redeploy" (or "Rollback") → confirm rollback works on a non-critical change
 
 #### F. Legal & content
 - [ ] Privacy Policy page exists and is linked from footer
@@ -181,7 +183,7 @@ If all PASS:
 
 ## Rules
 
-- **Step-by-step external instructions, always.** Every action outside the codebase gets numbered steps with exact button labels and URLs. Don't say "configure your DNS" — say "open your DNS provider, find DNS settings for yourdomain.com, add a CNAME record with name 'www' and value 'cname.vercel-dns.com', save."
+- **Step-by-step external instructions, always.** Every action outside the codebase gets numbered steps with exact button labels and URLs. Don't say "configure your DNS" — say "open your DNS provider, find DNS settings for yourdomain.com, add a CNAME record with name 'www' and value 'cname.vercel-dns.com' (Vercel) or the CNAME target Railway shows you, save." Use the CNAME target for the user's chosen platform.
 - **Pause for confirmation between phases.** Don't dump 50 instructions and walk away. After each user-facing phase, wait for "done" before proceeding.
 - **Never hand-wave third-party setup.** Account creation, dashboard navigation, DNS records, env var lookup — all explicit.
 - **Pre-flight is non-negotiable.** Don't deploy a build that fails locally.

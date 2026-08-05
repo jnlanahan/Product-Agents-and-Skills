@@ -48,7 +48,7 @@ When invoked as `/0-Setup-Project --personal`, use a reduced scope:
 | Payments | Stripe | Skip |
 | File storage | AWS S3 + CloudFront | Skip |
 | Monitoring | Sentry + PostHog | Sentry only (optional) |
-| Deploy | Vercel | Vercel (same; free hobby tier works) |
+| Deploy | Vercel or Railway (ask) | Vercel or Railway (same; both have a free starter tier) |
 
 Everything else (test infra, CI, CLAUDE.md, security middleware) still applies. Use `--personal` for: internal dashboards, scripts with a UI, personal productivity tools, side projects without a business model.
 
@@ -97,7 +97,10 @@ Before installing any code, the user needs accounts and credentials. Tell them, 
 > 5. **Sentry** (sentry.io) — sign up → create project (Next.js) → copy DSN → Settings → Auth Tokens → create with `project:releases` scope
 > 6. **PostHog** (posthog.com) — sign up → copy Project API Key and Host URL (optional but recommended)
 > 7. **GitHub** (github.com) — sign up if needed; you'll link a repo at the end of setup
-> 8. **Vercel** (vercel.com) — sign up with GitHub → you'll link the repo after git init
+> 8. **Deploy platform — pick one** (no default; both have a free tier, both auto-deploy from GitHub):
+>    - **Vercel** (vercel.com) — serverless, Next.js-native — sign up with GitHub, OR
+>    - **Railway** (railway.com) — long-running container, good for background workers/websockets — sign up with GitHub
+>    You'll link the repo after git init.
 >
 > Reply with all the values, or "I have them ready — let's go."
 
@@ -173,14 +176,18 @@ Each wave is a single commit — easier to roll back, easier to debug. After eac
 - **Generate `CLAUDE.md` with the skills index** (see Step 7)
 - Commit: "add health check, env example, readme, and claude.md"
 
-**Wave 13: Deploy to Vercel**
+**Wave 13: Deploy to Vercel or Railway** (use whichever the user picked in Step 4 — no default)
 - Confirm `.gitignore` covers `.env*`, `node_modules`, build outputs, `.claude/` (except committed planning docs)
 - `git init` if not already done; push to GitHub
-- Link GitHub repo to Vercel: `vercel link` (or walk through Vercel dashboard)
-- Add all env vars to Vercel: Project Settings → Environment Variables
-- Deploy: `vercel --prod` (or let Vercel auto-deploy from the GitHub push)
+- Link the GitHub repo to the chosen platform:
+  - **Vercel**: `vercel link` (or walk through the Vercel dashboard)
+  - **Railway**: New Project → Deploy from GitHub repo (or `railway link`); ensure `package.json` `start` binds to `$PORT`, e.g. `"start": "next start -p ${PORT:-3000}"`
+- Add all env vars on the platform: Vercel → Project Settings → Environment Variables; Railway → service → Variables (Raw Editor pastes them all at once)
+- Deploy: Vercel `vercel --prod`, or Railway `railway up` (or let either platform auto-deploy from the GitHub push)
 - Confirm the live URL works and `/api/health` returns 200
 - Commit: (no new code; just push to remote)
+
+For detailed browser steps, see [platform-setup-steps.md](../6-Deploy/references/platform-setup-steps.md).
 
 After each wave: `npm run build && npm run typecheck`. If broken, fix before next wave.
 
@@ -200,7 +207,7 @@ After each wave: `npm run build && npm run typecheck`. If broken, fix before nex
 - [ ] Sentry test exception appears in Sentry dashboard
 - [ ] PostHog event appears in PostHog dashboard (if wired)
 - [ ] CI passes on first PR (typecheck + tests green)
-- [ ] Vercel preview URL works on a test PR
+- [ ] Deploy platform preview URL works on a test PR (Vercel preview deployment, or Railway PR/branch environment)
 - [ ] `CLAUDE.md` exists at repo root and includes the Available Skills section
 
 ### Step 9: Hand off
@@ -227,6 +234,6 @@ After each wave: `npm run build && npm run typecheck`. If broken, fix before nex
 - **First migration fails** — confirm the DATABASE_URL is correct and t3-env passes startup validation.
 - **Better Auth session not persisting** — confirm `BETTER_AUTH_SECRET` is set and `BETTER_AUTH_URL` matches the running URL exactly.
 - **Google OAuth redirect mismatch** — the redirect URI in Google Cloud Console must exactly match `BETTER_AUTH_URL + /api/auth/callback/google`.
-- **Vercel deploy fails** — check that all env vars are set in Vercel Project Settings; missing env vars cause t3-env to throw at startup.
+- **Deploy fails (Vercel or Railway)** — check that all env vars are set on the platform (Vercel → Project Settings → Environment Variables; Railway → service → Variables); missing env vars cause t3-env to throw at startup.
 - **S3 upload fails with CORS error** — add a CORS configuration to the S3 bucket allowing PUT from your app domain.
 - **CloudFront returns 403** — make sure the bucket policy was updated to grant CloudFront OAC access (AWS shows this policy during distribution setup).

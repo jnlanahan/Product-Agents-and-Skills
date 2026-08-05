@@ -90,5 +90,5 @@ A founder has built "InvoiceParse" on Replit using ChatGPT. Two real customers a
 6. **`/add-monitoring`** — Sentry catches an immediate stack trace from a malformed PDF. PostHog tracks usage.
 7. **`/check-production`** — returns 1 Critical (`.env` was committed in Wave 1; needs scrub from git history), 4 Highs (no rate limit, no input size limit on uploads, no idempotency on webhook, no email validation on signup), 6 Mediums.
 8. **`/triage`** — fixes Critical (`git filter-repo`, rotate keys via secret-scanner's rotation actions). Fixes 4 Highs. Parks Mediums in a backlog.
-9. **`/deploy`** — Vercel + custom domain. First time the app has a real URL.
+9. **`/deploy`** — Vercel or Railway (the founder's choice) + custom domain. First time the app has a real URL.
 10. The two existing users are migrated. App now survives container restarts. The founder breathes.

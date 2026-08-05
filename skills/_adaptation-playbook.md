@@ -30,7 +30,7 @@ The only exception is when something is *missing entirely* — then preferences 
 | Firebase Auth | Neon Auth / Better Auth | Extend Firebase Auth; do not migrate |
 | Paddle | Stripe | Use Paddle (warn if you're less confident) |
 | SendGrid | Resend | Use SendGrid |
-| Railway/Render | Vercel | Use Railway/Render if already configured |
+| Vercel/Railway/Render | Vercel or Railway | Use whatever is already configured; never migrate deploy platforms as a side effect |
 | Nothing | Drizzle | Install Drizzle |
 | Nothing | Neon Auth / Better Auth | Install Neon Auth via Better Auth |
 
@@ -91,7 +91,7 @@ Vibe-coded only. Greenfield/wired don't need this skill.
 
 | Class | Strategy |
 |---|---|
-| Greenfield | Walk through Vercel phase by phase, with extensive browser-step instructions. |
+| Greenfield | Ask the user whether they want Vercel or Railway (no default), then walk through that platform phase by phase, with extensive browser-step instructions. |
 | Wired/vibe-coded | Detect existing platform and adapt. If multiple deploy configs exist, ask which is real. |
 
 ### `triage`

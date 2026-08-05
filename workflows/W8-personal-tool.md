@@ -6,7 +6,7 @@
 
 You're building something for **yourself** — or a tiny private group (your team, your family). No paying users. No multi-tenant requirements. No SLA. You want it to work, look reasonable, run somewhere, and stop demanding your attention. **You're paying with your own time, not your company's runway** — so most of the SaaS-grade rigor in [W2](W2-production-saas.md) is overkill.
 
-This workflow strips out anything you don't need: no Stripe, no full auth setup (often just a single shared password or none), no Sentry/PostHog overhead, often SQLite over Postgres, free-tier Vercel deploy.
+This workflow strips out anything you don't need: no Stripe, no full auth setup (often just a single shared password or none), no Sentry/PostHog overhead, often SQLite over Postgres, free-tier deploy on Vercel or Railway (your pick).
 
 ## PDLC mapping
 

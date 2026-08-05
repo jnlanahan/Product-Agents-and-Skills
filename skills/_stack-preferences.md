@@ -20,8 +20,8 @@ These are the **required defaults** for brand-new projects — not suggestions, 
 | Payments | **Stripe** | Checkout Sessions + Customer Portal; webhook signature mandatory |
 | File storage | **AWS S3 + CloudFront CDN** | S3 holds assets; CloudFront delivers them securely and cheaply at scale |
 | Env validation | **t3-env** | App crashes at startup if a required env var is missing — no silent failures |
-| Deploy | **Vercel (Hobby Tier)** | Built for Next.js; auto-deploys on every GitHub push; free tier covers most projects |
-| Version control | **GitHub** | Triggers Vercel deployments; links to Neon DB branches |
+| Deploy | **Vercel or Railway** | Co-equal options — pick one per project; no default. Both auto-deploy on every GitHub push. Vercel = serverless, Next.js-native. Railway = container/long-running Node server. Ask the user which they want. |
+| Version control | **GitHub** | Triggers Vercel/Railway deployments; links to Neon DB branches |
 | Analytics | **PostHog** | User tracking, session replay, feature flags (optional; wire from day one on SaaS) |
 | Errors | **Sentry (Free Tier)** | Captures exact error line and alerts automatically |
 | AI | **Vercel AI SDK (`ai` package)** | Swap models (OpenAI/Anthropic/Google) with one syntax; only wire if AI features planned |
@@ -83,7 +83,7 @@ NEXT_PUBLIC_POSTHOG_HOST=    # Optional
 - **Neon Auth (Better Auth)** — Auth and user data live in the same Postgres DB; no separate Firebase project to manage
 - **Neon + Drizzle** — Serverless Postgres with fully type-safe queries; Drizzle handles migrations automatically
 - **AWS S3 + CloudFront** — S3 is the industry standard for object storage; CloudFront prevents public bucket exposure and cuts egress costs
-- **Vercel** — Zero-config deployment for Next.js; every GitHub push is live in seconds
+- **Vercel or Railway** — Two co-equal deploy choices; pick one per project. Vercel is zero-config and serverless for Next.js; Railway runs the app as a long-running container and is a better fit for background workers, websockets, or non-Next.js servers. Both auto-deploy on every GitHub push — ask the user which they prefer instead of assuming
 - **t3-env** — Missing env vars cause loud startup failures instead of silent runtime bugs
 - **Sentry** — Captures the exact error line in production; free tier covers most projects
 - **shadcn/ui** — Copy-paste components that live in your codebase; no dependency lock-in
